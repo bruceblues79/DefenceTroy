@@ -10,5 +10,11 @@ dist
 # Local env
 *.local
 
-# Trae agent workspace
-.trae/
+# Skills CLI agent copies (source of truth: .agents/skills/ + skills-lock.json)
+# Regenerate local copies via `npx skills experimental_sync -y`
+.[a-z]*/
+!.agents/
+!.git/
+/agent/
+/data/
+/skills/
