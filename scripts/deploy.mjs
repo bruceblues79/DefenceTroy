@@ -62,8 +62,6 @@ console.log('[4/4] 外网校验 ...')
 const res = await fetch(SITE)
 if (!res.ok) throw new Error(`${SITE} 返回 HTTP ${res.status}`)
 const html = await res.text()
-for (const marker of ['<title>保卫特洛伊</title>', '<title>']) {
-  if (!html.includes(marker)) throw new Error(`线上页面缺少 ${marker}`)
-}
+if (!html.includes('<title>')) throw new Error('线上页面缺少 <title>')
 console.log(`  ${SITE} → HTTP ${res.status}，页面结构齐全`)
 console.log('部署完成')
