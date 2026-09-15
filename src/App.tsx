@@ -105,7 +105,7 @@ export default function App() {
           maxPolarAngle={THREE.MathUtils.degToRad(30)}
         />
         <directionalLight
-          position={[2, 9, 0]}
+          position={[2, 9, 3]}
           castShadow
           shadow-mapSize={[1024, 1024]}
           shadow-camera-left={-5}
