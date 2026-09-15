@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
+import { OrbitControls, OrthographicCamera } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
 import { useEffect, useState } from 'react'
 import { world } from './core/world'
@@ -63,12 +63,12 @@ export default function App() {
         <FullscreenPrompt />
         <Canvas dpr={[1, 2]}>
           <color attach="background" args={['#6b7280']} />
-          <PerspectiveCamera makeDefault position={[0, 9, 0]} fov={50} />
+          <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
           <OrbitControls
             target={[0, 0, 0]}
             enablePan={false}
-            minDistance={7}
-            maxDistance={9}
+            minZoom={60}
+            maxZoom={100}
             minAzimuthAngle={0}
             maxAzimuthAngle={0}
             minPolarAngle={0.001}
