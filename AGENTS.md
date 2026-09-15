@@ -1,7 +1,7 @@
-# brucewworld · v0.0.0
+# DefenceTroy
 
-> Vite 8 · React 19 · TypeScript 6 · three 0.185 · @react-three/fiber 9 · @react-three/drei 10 · gsap 3.15
-> Node 22+ / 包管理 npm / Lint oxlint / 单端口静态站点（GitHub Pages 友好）
+> 手机竖屏塔防游戏 · React Three Fiber + Three.js + koota (ECS)
+> 技术版本见 package.json · Node 22+ / npm / 单端口静态站点（GitHub Pages 友好）
 
 ## 编码前先思考
 **不要假设,不要掩盖困惑,要明确权衡。**
