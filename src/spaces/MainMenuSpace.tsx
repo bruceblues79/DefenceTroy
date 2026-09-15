@@ -8,17 +8,15 @@ const GLB_URL = `${import.meta.env.BASE_URL}assets/glb/main_page.glb`
 const COLORS = {
   start: '#2563eb', // 开始游戏按钮：蓝
   back: '#dc2626', // 返回主站按钮：红
-  page: '#6b7280', // 主页面底板：中灰
 } as const
 
-type ButtonType = 'start' | 'back' | 'page'
+type ButtonType = 'start' | 'back'
 
 function resolveButtonType(obj: THREE.Object3D): ButtonType | null {
   let cur: THREE.Object3D | null = obj
   while (cur) {
     if (cur.name === 'button_start') return 'start'
     if (cur.name === 'button_back') return 'back'
-    if (cur.name === 'main_page') return 'page'
     cur = cur.parent
   }
   return null

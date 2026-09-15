@@ -10,7 +10,7 @@ export default function App() {
     <WorldProvider world={world}>
       <Canvas dpr={[1, 2]}>
         <color attach="background" args={['#000000']} />
-        <PerspectiveCamera makeDefault position={[0, 9, 0]} fov={50} />
+        <PerspectiveCamera makeDefault position={[0, 9, 2]} fov={50} />
         <OrbitControls
           target={[0, 0, 0]}
           enablePan={false}
