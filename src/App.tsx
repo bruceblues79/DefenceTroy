@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, OrthographicCamera } from '@react-three/drei'
+import { Environment, OrbitControls, OrthographicCamera } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { world } from './core/world'
@@ -115,7 +115,7 @@ export default function App() {
           shadow-camera-near={1}
           shadow-camera-far={30}
         />
-        <ambientLight intensity={0.4} />
+        <Environment files={`${import.meta.env.BASE_URL}assets/battle_field.hdr`} />
         {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
         {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
         {gameState === 'play' && <BattleFieldSpace />}
