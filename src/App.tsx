@@ -1,10 +1,14 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, OrthographicCamera } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { world } from './core/world'
 import MainMenuSpace from './spaces/MainMenuSpace'
+import LoadingSpace from './spaces/LoadingSpace'
+import BattleFieldSpace from './spaces/BattleFieldSpace'
 import * as THREE from 'three'
+
+type GameState = 'menu' | 'loading' | 'play'
 
 function requestFullscreen() {
   const el = document.documentElement
@@ -57,6 +61,10 @@ function FullscreenPrompt() {
 }
 
 export default function App() {
+  const [gameState, setGameState] = useState<GameState>('menu')
+  const handleStart = useCallback(() => setGameState('loading'), [])
+  const handleLoaded = useCallback(() => setGameState('play'), [])
+
   return (
     <WorldProvider world={world}>
       <FullscreenPrompt />
@@ -74,7 +82,9 @@ export default function App() {
           maxPolarAngle={THREE.MathUtils.degToRad(30)}
         />
         <directionalLight position={[2, 9, 0]} />
-        <MainMenuSpace />
+        {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
+        {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
+        {gameState === 'play' && <BattleFieldSpace />}
       </Canvas>
     </WorldProvider>
   )

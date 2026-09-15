@@ -21,7 +21,7 @@ function resolveNodeName(obj: THREE.Object3D): string | null {
   return null
 }
 
-function MainPageModel() {
+function MainPageModel({ onStart }: { onStart: () => void }) {
   const { scene } = useGLTF(GLB_URL)
 
   const cloned = useMemo(() => {
@@ -48,7 +48,7 @@ function MainPageModel() {
         if (name === 'button_back') {
           window.location.href = 'https://svalbardpost.xyz/'
         }
-        // 'button_start' 为占位按钮，无后续内容
+        if (name === 'button_start') onStart()
         return
       }
       cur = cur.parent
@@ -58,10 +58,10 @@ function MainPageModel() {
   return <primitive object={cloned} onClick={handleClick} />
 }
 
-export default function MainMenuSpace() {
+export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
   return (
     <Suspense fallback={null}>
-      <MainPageModel />
+      <MainPageModel onStart={onStart} />
     </Suspense>
   )
 }
