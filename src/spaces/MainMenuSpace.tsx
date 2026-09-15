@@ -1,5 +1,5 @@
-import { Canvas, type ThreeEvent } from '@react-three/fiber'
-import { OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei'
+import { type ThreeEvent } from '@react-three/fiber'
+import { useGLTF } from '@react-three/drei'
 import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -62,22 +62,8 @@ function MainPageModel() {
 
 export default function MainMenuSpace() {
   return (
-    <Canvas>
-      <color attach="background" args={['#000000']} />
-      <PerspectiveCamera makeDefault position={[0, 9, 0]} fov={50} />
-      <OrbitControls
-        target={[0, 0, 0]}
-        enablePan={false}
-        minDistance={7}
-        maxDistance={9}
-        minAzimuthAngle={0}
-        maxAzimuthAngle={0}
-        minPolarAngle={0.001}
-        maxPolarAngle={THREE.MathUtils.degToRad(30)}
-      />
-      <Suspense fallback={null}>
-        <MainPageModel />
-      </Suspense>
-    </Canvas>
+    <Suspense fallback={null}>
+      <MainPageModel />
+    </Suspense>
   )
 }
