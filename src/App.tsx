@@ -37,7 +37,7 @@ function FullscreenPrompt() {
     <button
       onClick={request}
       style={{
-        position: 'absolute',
+        position: 'fixed',
         top: 8,
         left: '50%',
         transform: 'translateX(-50%)',
@@ -59,25 +59,23 @@ function FullscreenPrompt() {
 export default function App() {
   return (
     <WorldProvider world={world}>
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-        <FullscreenPrompt />
-        <Canvas dpr={[1, 2]}>
-          <color attach="background" args={['#6b7280']} />
-          <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
-          <OrbitControls
-            target={[0, 0, 0]}
-            enablePan={false}
-            minZoom={60}
-            maxZoom={100}
-            minAzimuthAngle={0}
-            maxAzimuthAngle={0}
-            minPolarAngle={0.001}
-            maxPolarAngle={THREE.MathUtils.degToRad(30)}
-          />
-          <directionalLight position={[2, 9, 0]} />
-          <MainMenuSpace />
-        </Canvas>
-      </div>
+      <FullscreenPrompt />
+      <Canvas dpr={[1, 2]}>
+        <color attach="background" args={['#6b7280']} />
+        <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
+        <OrbitControls
+          target={[0, 0, 0]}
+          enablePan={false}
+          minZoom={60}
+          maxZoom={100}
+          minAzimuthAngle={0}
+          maxAzimuthAngle={0}
+          minPolarAngle={0.001}
+          maxPolarAngle={THREE.MathUtils.degToRad(30)}
+        />
+        <directionalLight position={[2, 9, 0]} />
+        <MainMenuSpace />
+      </Canvas>
     </WorldProvider>
   )
 }
