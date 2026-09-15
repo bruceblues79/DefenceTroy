@@ -71,7 +71,7 @@ export default function App() {
     if (gameState !== 'play') return
     setCameraReady(false)
     const fromAngle = 0.001
-    const toAngle = THREE.MathUtils.degToRad(15)
+    const toAngle = THREE.MathUtils.degToRad(7.5)
     const duration = 100
     const startTime = performance.now()
     const tick = (now: number) => {
