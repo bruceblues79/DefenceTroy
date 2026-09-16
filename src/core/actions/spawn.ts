@@ -17,7 +17,6 @@ import {
 export const WALL_POSITION = { x: 0, y: 0, z: 2.95 }
 export const WALL_WIDTH = 4.5
 export const WALL_HP = 500
-export const WALL_ATTACK_LINE_Z = -1.8 // 敌人到达此 z 线即可攻击城墙
 
 export const ENEMY_ARCHER_HP = 30
 export const ENEMY_ARCHER_SPEED = 0.5

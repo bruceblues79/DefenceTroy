@@ -10,7 +10,7 @@ import {
   IsWall,
   Targeting,
 } from '../traits'
-import { ENEMY_ARCHER_SPEED, WALL_ATTACK_LINE_Z } from '../actions'
+import { ENEMY_ARCHER_SPEED, WALL_POSITION } from '../actions'
 
 /**
  * 计算 XZ 平面距离
@@ -69,10 +69,10 @@ export function updateEnemyArcherAI(world: World, _dt: number) {
       }
     }
 
-    // 3. 没找到守军，检查是否到达城墙攻击线
+    // 3. 没找到守军，检查城墙是否在攻击范围内
     if (!target) {
-      // 到达城门检测线即可攻击城墙
-      if (pos.z >= WALL_ATTACK_LINE_Z) {
+      const distToWall = WALL_POSITION.z - pos.z
+      if (distToWall <= attack.range) {
         const wall = world.queryFirst(IsWall, Position)
         if (wall) {
           enemy.add(Targeting(wall))

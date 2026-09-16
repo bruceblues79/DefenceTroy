@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Position, Velocity, Projectile, IsProjectile, Targeting, Health } from '../traits'
+import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health } from '../traits'
 
 const HIT_THRESHOLD = 0.15 // 命中判定距离（米）
 
@@ -30,14 +30,29 @@ export function updateProjectiles(world: World, _dt: number) {
       return
     }
 
-    // 计算朝向目标的方向
+    // 城墙目标：直线向前飞行，z 到位即命中
+    if (target.has(IsWall)) {
+      const distToWall = targetPos.z - pos.z
+      if (distToWall <= HIT_THRESHOLD) {
+        if (targetHealth) {
+          target.set(Health, { current: Math.max(0, targetHealth.current - proj.damage) })
+        }
+        toDestroy.push(projectile)
+        return
+      }
+      vel.x = 0
+      vel.y = 0
+      vel.z = proj.speed
+      return
+    }
+
+    // 单位目标：追踪飞行
     const dx = targetPos.x - pos.x
     const dy = targetPos.y - pos.y
     const dz = targetPos.z - pos.z
     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
     if (dist < HIT_THRESHOLD) {
-      // 命中！造成伤害并销毁抛射物
       if (targetHealth) {
         target.set(Health, { current: Math.max(0, targetHealth.current - proj.damage) })
       }
@@ -45,7 +60,6 @@ export function updateProjectiles(world: World, _dt: number) {
       return
     }
 
-    // 设置速度朝向目标
     const speed = proj.speed
     vel.x = (dx / dist) * speed
     vel.y = (dy / dist) * speed
