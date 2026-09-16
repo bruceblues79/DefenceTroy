@@ -11,7 +11,7 @@ import {
   createSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall, IsEnemy } from '../core/traits'
+import { IsWall, IsEnemy, IsDefender, IsProjectile } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
@@ -57,6 +57,12 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
       initializedRef.current = false
       battleReadyRef.current = false
       spawnSystemRef.current?.stop()
+
+      // 销毁所有战斗实体，防止重开/返回主菜单后残留（world 是全局单例）
+      world.query(IsWall).forEach((e) => e.destroy())
+      world.query(IsEnemy).forEach((e) => e.destroy())
+      world.query(IsDefender).forEach((e) => e.destroy())
+      world.query(IsProjectile).forEach((e) => e.destroy())
     }
   }, [world])
 
