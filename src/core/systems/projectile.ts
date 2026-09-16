@@ -12,7 +12,7 @@ export function updateProjectiles(world: World, _dt: number) {
 
   const toDestroy: Entity[] = []
 
-  projectiles.readEach(([pos, vel, proj], projectile) => {
+  projectiles.updateEach(([pos, vel, proj], projectile) => {
     const target = projectile.targetFor(Targeting)
 
     // 目标不存在 → 销毁

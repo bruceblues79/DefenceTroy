@@ -10,7 +10,7 @@ export function updateAttack(world: World, dt: number) {
   const attackers = world.query(Attack, Targeting('*'))
   const actions = spawnActions(world)
 
-  attackers.readEach(([attack], attacker) => {
+  attackers.updateEach(([attack], attacker) => {
     // 确认目标仍然存在且存活
     const target = attacker.targetFor(Targeting)
     if (!target) return
