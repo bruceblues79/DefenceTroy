@@ -2,11 +2,11 @@ import type { World } from 'koota'
 import { spawnActions, ENEMY_SPAWN_X, ENEMY_SPAWN_Z } from '../actions'
 
 const SPAWN_INTERVAL = 0.5 // 每只间隔秒数
-const TOTAL_COUNT = 9 // 总共刷 9 只
+const TOTAL_COUNT = 4 // 总共刷 4 只
 
 /**
  * 刷怪系统
- * 间隔刷出 9 只敌人，随机选出生槽位（不重复）
+ * 间隔刷出 4 只敌弓兵，随机选出生槽位（不重复）
  */
 export function createSpawnSystem() {
   let timer = 0
