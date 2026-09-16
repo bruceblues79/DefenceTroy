@@ -13,7 +13,7 @@ interface CharacterProxyProps {
  * 通用角色占位物
  * 从 ECS 读取 Position trait，渲染一个 box 作为单位占位
  */
-export default function CharacterProxy({ entity, color, size = [0.5, 1, 0.5] }: CharacterProxyProps) {
+export default function CharacterProxy({ entity, color, size = [0.45, 1, 0.45] }: CharacterProxyProps) {
   const pos = useTrait(entity, Position)
   if (!pos) return null
 
