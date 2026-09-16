@@ -113,7 +113,7 @@ export default function App() {
           minAzimuthAngle={0}
           maxAzimuthAngle={0}
           minPolarAngle={0}
-          maxPolarAngle={THREE.MathUtils.degToRad(30)}
+          maxPolarAngle={THREE.MathUtils.degToRad(10)}
         />
         <directionalLight
           position={[2, 9, 3]}
