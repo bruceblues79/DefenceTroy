@@ -16,14 +16,13 @@ export function updateDeath(world: World, _dt: number) {
 
   if (dying.length === 0) return
 
-  // 清理所有指向死亡实体的 Targeting 关系
-  const allWithTarget = world.query(Targeting('*'))
-  allWithTarget.readEach((_, entity) => {
-    const target = entity.targetFor(Targeting)
-    if (target && dying.includes(target)) {
-      entity.remove(Targeting('*'))
-    }
-  })
+  // 对每个死亡实体，清理所有指向它的 Targeting 关系
+  for (const deadEntity of dying) {
+    const attackers = world.query(Targeting(deadEntity))
+    attackers.readEach((_, attacker) => {
+      attacker.remove(Targeting('*'))
+    })
+  }
 
   // 销毁死亡实体
   for (const entity of dying) {

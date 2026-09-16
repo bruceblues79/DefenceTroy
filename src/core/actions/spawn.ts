@@ -41,12 +41,8 @@ export const WALL_SLOTS = Array.from({ length: 9 }, (_, i) => {
   return -halfWidth + step * i
 })
 
-// 敌人 6 个出生点位（x 坐标）
-export const ENEMY_SPAWN_X = Array.from({ length: 6 }, (_, i) => {
-  const halfWidth = 4
-  const step = (halfWidth * 2) / 5
-  return -halfWidth + step * i
-})
+// 敌人生成点位（x 坐标，-2 到 2，0.5 平分，共 9 个）
+export const ENEMY_SPAWN_X = Array.from({ length: 9 }, (_, i) => -2 + i * 0.5)
 export const ENEMY_SPAWN_Z = -4.5
 
 export const spawnActions = createActions((world) => ({
