@@ -4,11 +4,13 @@ import { useEffect, useRef } from 'react'
 import {
   updateMovement,
   updateEnemyArcherAI,
+  updateEnemyInfantryAI,
   updateDefenderArcherAI,
   updateAttack,
   updateProjectiles,
   updateDeath,
   createSpawnSystem,
+  createInfantrySpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
 import { IsWall, IsEnemy, IsDefender, IsProjectile } from '../core/traits'
@@ -26,6 +28,7 @@ interface BattleSystemsProps {
 export default function BattleSystems({ paused = false, onGameOver }: BattleSystemsProps) {
   const world = useWorld()
   const spawnSystemRef = useRef<ReturnType<typeof createSpawnSystem> | null>(null)
+  const infantrySpawnSystemRef = useRef<ReturnType<typeof createInfantrySpawnSystem> | null>(null)
   const initializedRef = useRef(false)
   const gameOverFiredRef = useRef(false)
   const battleReadyRef = useRef(false)
@@ -50,6 +53,10 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     spawnSystemRef.current = createSpawnSystem()
     spawnSystemRef.current.start()
 
+    // 初始化步兵刷怪系统（3 只，随机槽位）
+    infantrySpawnSystemRef.current = createInfantrySpawnSystem()
+    infantrySpawnSystemRef.current.start()
+
     // 标记战场就绪，允许 useFrame 逻辑执行
     battleReadyRef.current = true
 
@@ -57,6 +64,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
       initializedRef.current = false
       battleReadyRef.current = false
       spawnSystemRef.current?.stop()
+      infantrySpawnSystemRef.current?.stop()
 
       // 销毁所有战斗实体，防止重开/返回主菜单后残留（world 是全局单例）
       world.query(IsWall).forEach((e) => e.destroy())
@@ -74,22 +82,27 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
 
     // 系统执行顺序：AI → 攻击 → 移动 → 抛射物 → 死亡 → 刷怪
     updateEnemyArcherAI(world, dt)
+    updateEnemyInfantryAI(world, dt)
     updateDefenderArcherAI(world, dt)
     updateAttack(world, dt)
     updateMovement(world, dt)
     updateProjectiles(world, dt)
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
+    infantrySpawnSystemRef.current?.update(world, dt)
 
     // 城墙被毁或敌人全灭 → 触发 gameOver（只触发一次）
     if (!gameOverFiredRef.current) {
       const wall = world.queryFirst(IsWall)
-      // 只在刷怪完成后才检测敌人全灭（spawnSystem 完成后 spawned >= 9）
-      const spawnDone = spawnSystemRef.current?.isDone?.() ?? false
+      // 只在两类刷怪都完成后才检测敌人全灭
+      const spawnDone =
+        (spawnSystemRef.current?.isDone?.() ?? false) &&
+        (infantrySpawnSystemRef.current?.isDone?.() ?? false)
       const enemies = spawnDone ? world.queryFirst(IsEnemy) : true
       if (!wall || !enemies) {
         gameOverFiredRef.current = true
         spawnSystemRef.current?.stop()
+        infantrySpawnSystemRef.current?.stop()
         onGameOver?.()
       }
     }

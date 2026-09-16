@@ -9,6 +9,7 @@ import {
   IsDefender,
   IsWall,
   IsArcher,
+  IsMelee,
   IsProjectile,
   Targeting,
 } from '../traits'
@@ -24,6 +25,15 @@ export const ENEMY_ARCHER_RANGE = 5
 export const ENEMY_ARCHER_DAMAGE = 5
 export const ENEMY_ARCHER_INTERVAL = 1.5
 export const ENEMY_ARCHER_ATTACK_POINT = 0.8
+
+// 敌方步兵（近战型，贴墙攻击城墙）
+export const ENEMY_INFANTRY_HP = 50
+export const ENEMY_INFANTRY_SPEED = 0.8
+export const ENEMY_INFANTRY_RANGE = 0.3
+export const ENEMY_INFANTRY_DAMAGE = 8
+export const ENEMY_INFANTRY_INTERVAL = 1.2
+export const ENEMY_INFANTRY_ATTACK_POINT = 0.5
+export const ENEMY_INFANTRY_STOP_OFFSET = 0.2 // 城墙前 0.2m 停下
 
 export const DEFENDER_ARCHER_HP = 50
 export const DEFENDER_ARCHER_RANGE = 6
@@ -68,6 +78,23 @@ export const spawnActions = createActions((world) => ({
       }),
       IsEnemy,
       IsArcher,
+    )
+  },
+
+  /** 生成敌方步兵（近战型，贴墙攻击城墙） */
+  spawnEnemyInfantry(x: number, z: number = ENEMY_SPAWN_Z) {
+    return world.spawn(
+      Position({ x, y: 0, z }),
+      Velocity({ x: 0, y: 0, z: 0 }),
+      Health({ current: ENEMY_INFANTRY_HP, max: ENEMY_INFANTRY_HP }),
+      Attack({
+        range: ENEMY_INFANTRY_RANGE,
+        damage: ENEMY_INFANTRY_DAMAGE,
+        interval: ENEMY_INFANTRY_INTERVAL,
+        attackPoint: ENEMY_INFANTRY_ATTACK_POINT,
+      }),
+      IsEnemy,
+      IsMelee,
     )
   },
 

@@ -42,7 +42,7 @@ export function updateDefenderArcherAI(world: World, _dt: number) {
       let nearestEnemy: Entity | null = null
       let nearestDist = Infinity
 
-      world.query(IsEnemy, IsArcher, Position).readEach(([enemyPos], enemy) => {
+      world.query(IsEnemy, Position).readEach(([enemyPos], enemy) => {
         const dist = distanceXZ(pos.x, pos.z, enemyPos.x, enemyPos.z)
         if (dist <= attack.range && dist < nearestDist) {
           nearestDist = dist

@@ -4,8 +4,10 @@
 
 export { updateMovement } from './movement'
 export { updateEnemyArcherAI } from './enemy-archer-ai'
+export { updateEnemyInfantryAI } from './enemy-infantry-ai'
 export { updateDefenderArcherAI } from './defender-archer-ai'
 export { updateAttack } from './attack'
 export { updateProjectiles } from './projectile'
 export { updateDeath } from './death'
 export { createSpawnSystem } from './spawn'
+export { createInfantrySpawnSystem } from './infantry-spawn'

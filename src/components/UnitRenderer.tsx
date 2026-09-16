@@ -3,6 +3,7 @@ import {
   IsEnemy,
   IsDefender,
   IsArcher,
+  IsMelee,
   IsWall,
   IsProjectile,
   Position,
@@ -19,6 +20,8 @@ import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
 export default function UnitRenderer() {
   // 敌人弓手
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
+  // 敌人步兵（近战）
+  const enemyInfantry = useQuery(IsEnemy, IsMelee, Position)
   // 守军弓手
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
   // 抛射物
@@ -39,6 +42,11 @@ export default function UnitRenderer() {
       {/* 敌人弓手（黄色） */}
       {enemyArchers.map((entity) => (
         <CharacterProxy key={entity.id()} entity={entity} color="#e6c200" />
+      ))}
+
+      {/* 敌人步兵（深灰） */}
+      {enemyInfantry.map((entity) => (
+        <CharacterProxy key={entity.id()} entity={entity} color="#3a3a3a" />
       ))}
 
       {/* 守军弓手（蓝色） */}

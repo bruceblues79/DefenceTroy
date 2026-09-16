@@ -9,6 +9,7 @@ export const IsWall = trait()
 
 // 单位类型标签
 export const IsArcher = trait()
+export const IsMelee = trait()
 
 // 抛射物标签
 export const IsProjectile = trait()
