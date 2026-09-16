@@ -126,7 +126,7 @@ export default function App() {
           shadow-camera-near={1}
           shadow-camera-far={30}
         />
-        <Environment files={`${import.meta.env.BASE_URL}assets/battle_field.hdr`} />
+        <Environment files={`${import.meta.env.BASE_URL}assets/hdr/battle_field.hdr`} />
         {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
         {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
         {gameState === 'play' && (
