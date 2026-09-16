@@ -2,7 +2,7 @@ import type { World } from 'koota'
 import { spawnActions, ENEMY_SPAWN_X, ENEMY_SPAWN_Z } from '../actions'
 
 const SPAWN_INTERVAL = 3 // 秒
-const SPAWN_COUNT = 2 // 每次刷怪数量
+const SPAWN_COUNT = 9 // 每次刷怪数量
 
 /**
  * 刷怪系统
