@@ -28,12 +28,14 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
   const spawnSystemRef = useRef<ReturnType<typeof createSpawnSystem> | null>(null)
   const initializedRef = useRef(false)
   const gameOverFiredRef = useRef(false)
+  const battleReadyRef = useRef(false)
 
   // 初始化战场：生成城墙 + 2 只守军 + 启动刷怪
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
     gameOverFiredRef.current = false
+    battleReadyRef.current = false
 
     const actions = spawnActions(world)
 
@@ -48,14 +50,18 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     spawnSystemRef.current = createSpawnSystem()
     spawnSystemRef.current.start()
 
+    // 标记战场就绪，允许 useFrame 逻辑执行
+    battleReadyRef.current = true
+
     return () => {
       initializedRef.current = false
+      battleReadyRef.current = false
       spawnSystemRef.current?.stop()
     }
   }, [world])
 
   useFrame((_, delta) => {
-    if (paused) return
+    if (paused || !battleReadyRef.current) return
 
     // 限制最大 delta，避免切换标签页后跳帧
     const dt = Math.min(delta, 0.1)

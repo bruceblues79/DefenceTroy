@@ -40,6 +40,13 @@ export function updateEnemyArcherAI(world: World, _dt: number) {
       if (!targetPos || (targetHealth && targetHealth.current <= 0)) {
         enemy.remove(Targeting('*'))
         target = undefined
+      } else if (target.has(IsWall)) {
+        // 城墙是宽面，用 z 距离判定
+        const distToWall = WALL_POSITION.z - pos.z
+        if (distToWall > attack.range) {
+          enemy.remove(Targeting('*'))
+          target = undefined
+        }
       } else {
         const dist = distanceXZ(pos.x, pos.z, targetPos.x, targetPos.z)
         // 目标在射程外 → 清除，重新索敌
