@@ -1,6 +1,7 @@
 import { Billboard } from '@react-three/drei'
 import { type ThreeEvent } from '@react-three/fiber'
 import GameMenu from './GameMenu'
+import SettlementMenu from './SettlementMenu'
 import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 
@@ -10,21 +11,25 @@ const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#cc2222']
 
 export default function BattleFieldSpace({
   paused,
+  gameOver,
   onPause,
   onResume,
   onRestart,
   onExitToMenu,
+  onGameOver,
 }: {
   paused: boolean
+  gameOver: boolean
   onPause: () => void
   onResume: () => void
   onRestart: () => void
   onExitToMenu: () => void
+  onGameOver: () => void
 }) {
   return (
     <group>
       {/* 战斗系统驱动（无渲染） */}
-      <BattleSystems paused={paused} />
+      <BattleSystems paused={paused || gameOver} onGameOver={onGameOver} />
 
       {/* ground: plane 5×9, beach sand */}
       <mesh name="ground" position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -36,7 +41,7 @@ export default function BattleFieldSpace({
       <UnitRenderer />
 
       {/* five buttons: 0.84 square planes, billboard to face camera */}
-      {BUTTON_NAMES.map((name, i) => (
+      {!gameOver && BUTTON_NAMES.map((name, i) => (
         <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
           <mesh
             name={name}
@@ -55,8 +60,12 @@ export default function BattleFieldSpace({
         </Billboard>
       ))}
 
-      {paused && (
+      {paused && !gameOver && (
         <GameMenu onResume={onResume} onRestart={onRestart} onExitToMenu={onExitToMenu} />
+      )}
+
+      {gameOver && (
+        <SettlementMenu onRestart={onRestart} onExitToMenu={onExitToMenu} />
       )}
     </group>
   )

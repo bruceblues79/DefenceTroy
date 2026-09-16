@@ -11,9 +11,11 @@ import {
   createSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
+import { IsWall } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
+  onGameOver?: () => void
 }
 
 /**
@@ -21,15 +23,17 @@ interface BattleSystemsProps {
  * 在 useFrame 中按顺序执行所有 ECS 系统
  * 返回 null，不渲染任何内容
  */
-export default function BattleSystems({ paused = false }: BattleSystemsProps) {
+export default function BattleSystems({ paused = false, onGameOver }: BattleSystemsProps) {
   const world = useWorld()
   const spawnSystemRef = useRef<ReturnType<typeof createSpawnSystem> | null>(null)
   const initializedRef = useRef(false)
+  const gameOverFiredRef = useRef(false)
 
   // 初始化战场：生成城墙 + 2 只守军 + 启动刷怪
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
+    gameOverFiredRef.current = false
 
     const actions = spawnActions(world)
 
@@ -64,6 +68,16 @@ export default function BattleSystems({ paused = false }: BattleSystemsProps) {
     updateProjectiles(world, dt)
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
+
+    // 城墙不存在 → 触发 gameOver（只触发一次）
+    if (!gameOverFiredRef.current) {
+      const wall = world.queryFirst(IsWall)
+      if (!wall) {
+        gameOverFiredRef.current = true
+        spawnSystemRef.current?.stop()
+        onGameOver?.()
+      }
+    }
   })
 
   return null
