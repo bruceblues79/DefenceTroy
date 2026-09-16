@@ -1,10 +1,24 @@
 import { Billboard } from '@react-three/drei'
+import { type ThreeEvent } from '@react-three/fiber'
+import GameMenu from './GameMenu'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_throw', 'btn_shop', 'btn_menu'] as const
-// 5 buttons evenly spaced across 5m centered at x=0: centers at -2, -1, 0, 1, 2
-const BUTTON_X = [-2, -1, 0, 1, 2]
+const BUTTON_X = [-1.95, -0.975, 0, 0.975, 1.95]
+const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#cc2222']
 
-export default function BattleFieldSpace() {
+export default function BattleFieldSpace({
+  paused,
+  onPause,
+  onResume,
+  onRestart,
+  onExitToMenu,
+}: {
+  paused: boolean
+  onPause: () => void
+  onResume: () => void
+  onRestart: () => void
+  onExitToMenu: () => void
+}) {
   return (
     <group>
       {/* ground: plane 5×9, beach sand */}
@@ -14,26 +28,40 @@ export default function BattleFieldSpace() {
       </mesh>
 
       {/* wall: box 4.5×4×0.84, earth yellow */}
-      <mesh name="wall" position={[0, 0, 2.75]} castShadow receiveShadow>
+      <mesh name="wall" position={[0, 0, 2.95]} castShadow receiveShadow>
         <boxGeometry args={[4.5, 4, 0.84]} />
         <meshStandardMaterial color="#a68b5b" />
       </mesh>
 
-      {/* five buttons: 0.84 square planes, red, billboard to face camera */}
+      {/* five buttons: 0.84 square planes, billboard to face camera */}
       {BUTTON_NAMES.map((name, i) => (
-        <Billboard key={name} position={[BUTTON_X[i], 2.0, 3.75]}>
-          <mesh name={name}>
-            <planeGeometry args={[0.84, 0.84]} />
-            <meshBasicMaterial color="#cc2222" />
+        <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
+          <mesh
+            name={name}
+            onClick={
+              name === 'btn_menu' && !paused
+                ? (e: ThreeEvent<MouseEvent>) => {
+                    e.stopPropagation()
+                    onPause()
+                  }
+                : undefined
+            }
+          >
+            <planeGeometry args={[0.8, 0.8]} />
+            <meshBasicMaterial color={BUTTON_COLORS[i]} />
           </mesh>
         </Billboard>
       ))}
 
       {/* soldier proxy: box 0.5×1×0.5, placed on wall center */}
-      <mesh name="solder_proxy" position={[0, 2.5, 2.75]} castShadow receiveShadow>
+      <mesh name="solder_proxy" position={[0, 2.5, 2.95]} castShadow receiveShadow>
         <boxGeometry args={[0.5, 1, 0.5]} />
         <meshStandardMaterial color="#cd7f32" />
       </mesh>
+
+      {paused && (
+        <GameMenu onResume={onResume} onRestart={onRestart} onExitToMenu={onExitToMenu} />
+      )}
     </group>
   )
 }
