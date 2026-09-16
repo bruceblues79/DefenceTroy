@@ -28,14 +28,14 @@ export default function BattleFieldSpace({
       </mesh>
 
       {/* wall: box 4.5×4×0.84, earth yellow */}
-      <mesh name="wall" position={[0, 0, 2.75]} castShadow receiveShadow>
+      <mesh name="wall" position={[0, 0, 2.95]} castShadow receiveShadow>
         <boxGeometry args={[4.5, 4, 0.84]} />
         <meshStandardMaterial color="#a68b5b" />
       </mesh>
 
       {/* five buttons: 0.84 square planes, billboard to face camera */}
       {BUTTON_NAMES.map((name, i) => (
-        <Billboard key={name} position={[BUTTON_X[i], 2.0, 3.75]}>
+        <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
           <mesh
             name={name}
             onClick={
@@ -54,7 +54,7 @@ export default function BattleFieldSpace({
       ))}
 
       {/* soldier proxy: box 0.5×1×0.5, placed on wall center */}
-      <mesh name="solder_proxy" position={[0, 2.5, 2.75]} castShadow receiveShadow>
+      <mesh name="solder_proxy" position={[0, 2.5, 2.95]} castShadow receiveShadow>
         <boxGeometry args={[0.5, 1, 0.5]} />
         <meshStandardMaterial color="#cd7f32" />
       </mesh>
