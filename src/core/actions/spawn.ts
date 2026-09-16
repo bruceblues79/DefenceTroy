@@ -29,11 +29,10 @@ export const ENEMY_ARCHER_ATTACK_POINT = 0.8
 // 敌方步兵（近战型，贴墙攻击城墙）
 export const ENEMY_INFANTRY_HP = 50
 export const ENEMY_INFANTRY_SPEED = 0.8
-export const ENEMY_INFANTRY_RANGE = 0.3
+export const ENEMY_INFANTRY_RANGE = 2.75 // 攻击范围=停止线，距城墙 z ≤ 此值即停下攻击
 export const ENEMY_INFANTRY_DAMAGE = 8
 export const ENEMY_INFANTRY_INTERVAL = 1.2
 export const ENEMY_INFANTRY_ATTACK_POINT = 0.5
-export const ENEMY_INFANTRY_STOP_OFFSET = 0.45 // 城墙前 0.45m 停下（z=2.5）
 
 export const DEFENDER_ARCHER_HP = 50
 export const DEFENDER_ARCHER_RANGE = 6
