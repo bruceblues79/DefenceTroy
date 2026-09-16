@@ -63,18 +63,22 @@ function FullscreenPrompt() {
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
   const [paused, setPaused] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
   const [cameraReady, setCameraReady] = useState(false)
   const orbitRef = useRef<any>(null)
   const handleStart = useCallback(() => setGameState('loading'), [])
   const handleLoaded = useCallback(() => setGameState('play'), [])
   const handlePause = useCallback(() => setPaused(true), [])
   const handleResume = useCallback(() => setPaused(false), [])
+  const handleGameOver = useCallback(() => setGameOver(true), [])
   const handleRestart = useCallback(() => {
     setPaused(false)
+    setGameOver(false)
     setGameState('loading')
   }, [])
   const handleExitToMenu = useCallback(() => {
     setPaused(false)
+    setGameOver(false)
     setGameState('menu')
   }, [])
 
@@ -106,7 +110,7 @@ export default function App() {
           ref={orbitRef}
           target={[0, 0, 0]}
           enablePan={false}
-          enableRotate={gameState === 'play' && cameraReady && !paused}
+          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver}
           enableDamping={false}
           minZoom={60}
           maxZoom={100}
@@ -132,10 +136,12 @@ export default function App() {
         {gameState === 'play' && (
           <BattleFieldSpace
             paused={paused}
+            gameOver={gameOver}
             onPause={handlePause}
             onResume={handleResume}
             onRestart={handleRestart}
             onExitToMenu={handleExitToMenu}
+            onGameOver={handleGameOver}
           />
         )}
       </Canvas>
