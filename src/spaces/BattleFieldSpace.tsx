@@ -3,7 +3,7 @@ import { type ThreeEvent } from '@react-three/fiber'
 import GameMenu from './GameMenu'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_throw', 'btn_shop', 'btn_menu'] as const
-const BUTTON_X = [-2, -1, 0, 1, 2]
+const BUTTON_X = [-2.25, -1.125, 0, 1.125, 2.25]
 const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#cc2222']
 
 export default function BattleFieldSpace({
@@ -47,7 +47,7 @@ export default function BattleFieldSpace({
                 : undefined
             }
           >
-            <planeGeometry args={[0.84, 0.84]} />
+            <planeGeometry args={[0.8, 0.8]} />
             <meshBasicMaterial color={BUTTON_COLORS[i]} />
           </mesh>
         </Billboard>
