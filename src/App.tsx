@@ -62,10 +62,21 @@ function FullscreenPrompt() {
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
+  const [paused, setPaused] = useState(false)
   const [cameraReady, setCameraReady] = useState(false)
   const orbitRef = useRef<any>(null)
   const handleStart = useCallback(() => setGameState('loading'), [])
   const handleLoaded = useCallback(() => setGameState('play'), [])
+  const handlePause = useCallback(() => setPaused(true), [])
+  const handleResume = useCallback(() => setPaused(false), [])
+  const handleRestart = useCallback(() => {
+    setPaused(false)
+    setGameState('loading')
+  }, [])
+  const handleExitToMenu = useCallback(() => {
+    setPaused(false)
+    setGameState('menu')
+  }, [])
 
   useEffect(() => {
     if (gameState !== 'play') return
@@ -95,7 +106,7 @@ export default function App() {
           ref={orbitRef}
           target={[0, 0, 0]}
           enablePan={false}
-          enableRotate={gameState === 'play' && cameraReady}
+          enableRotate={gameState === 'play' && cameraReady && !paused}
           enableDamping={false}
           minZoom={60}
           maxZoom={100}
@@ -118,7 +129,15 @@ export default function App() {
         <Environment files={`${import.meta.env.BASE_URL}assets/battle_field.hdr`} />
         {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
         {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
-        {gameState === 'play' && <BattleFieldSpace />}
+        {gameState === 'play' && (
+          <BattleFieldSpace
+            paused={paused}
+            onPause={handlePause}
+            onResume={handleResume}
+            onRestart={handleRestart}
+            onExitToMenu={handleExitToMenu}
+          />
+        )}
       </Canvas>
     </WorldProvider>
   )
