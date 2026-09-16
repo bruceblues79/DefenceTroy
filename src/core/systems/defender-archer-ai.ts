@@ -12,7 +12,8 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
 
 /**
  * 守军弓兵 AI 系统
- * 行为：静止在城墙上，自动攻击射程内距城墙最近的敌人
+ * 行为：静止在城墙上，攻击射程内距离自己最近的敌人
+ * 锁定目标后打到底，目标死亡/离开射程后重新寻敌
  */
 export function updateDefenderArcherAI(world: World, _dt: number) {
   const defenders = world.query(IsDefender, IsArcher, Position, Attack)
@@ -36,15 +37,15 @@ export function updateDefenderArcherAI(world: World, _dt: number) {
       }
     }
 
-    // 2. 搜索射程内距城墙最近（z 最大）的敌人
+    // 2. 无目标时，搜索射程内距离自己最近的敌人
     if (!target) {
       let nearestEnemy: Entity | null = null
-      let nearestZ = -Infinity // 距城墙最近 = z 值最大
+      let nearestDist = Infinity
 
       world.query(IsEnemy, IsArcher, Position).readEach(([enemyPos], enemy) => {
         const dist = distanceXZ(pos.x, pos.z, enemyPos.x, enemyPos.z)
-        if (dist <= attack.range && enemyPos.z > nearestZ) {
-          nearestZ = enemyPos.z
+        if (dist <= attack.range && dist < nearestDist) {
+          nearestDist = dist
           nearestEnemy = enemy
         }
       })
