@@ -35,5 +35,8 @@ export function createSpawnSystem() {
         spawned++
       }
     },
+    isDone() {
+      return spawned >= TOTAL_COUNT
+    },
   }
 }

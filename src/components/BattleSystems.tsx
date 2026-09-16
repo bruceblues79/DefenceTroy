@@ -11,7 +11,7 @@ import {
   createSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall } from '../core/traits'
+import { IsWall, IsEnemy } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
@@ -75,10 +75,13 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
 
-    // 城墙不存在 → 触发 gameOver（只触发一次）
+    // 城墙被毁或敌人全灭 → 触发 gameOver（只触发一次）
     if (!gameOverFiredRef.current) {
       const wall = world.queryFirst(IsWall)
-      if (!wall) {
+      // 只在刷怪完成后才检测敌人全灭（spawnSystem 完成后 spawned >= 9）
+      const spawnDone = spawnSystemRef.current?.isDone?.() ?? false
+      const enemies = spawnDone ? world.queryFirst(IsEnemy) : true
+      if (!wall || !enemies) {
         gameOverFiredRef.current = true
         spawnSystemRef.current?.stop()
         onGameOver?.()
