@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Position, CanAttackUnits, Health, IsDefender, IsArcher, IsEnemy, Targeting } from '../traits'
+import { Position, CanAttackUnits, Health, IsDefender, IsSpearman, IsEnemy, Targeting } from '../traits'
 
 /**
  * 计算 XZ 平面距离
@@ -11,12 +11,12 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
 }
 
 /**
- * 守军弓兵 AI 系统
+ * 守军矛兵 AI 系统
  * 行为：静止在城墙上，攻击射程内距离自己最近的敌人
- * 锁定目标后打到底，目标死亡/离开射程后重新寻敌
+ * 与守军弓兵结构一致，区别在于射程/伤害参数（由 CanAttackUnits 提供）
  */
-export function updateDefenderArcherAI(world: World, _dt: number) {
-  const defenders = world.query(IsDefender, IsArcher, Position, CanAttackUnits)
+export function updateDefenderSpearmanAI(world: World, _dt: number) {
+  const defenders = world.query(IsDefender, IsSpearman, Position, CanAttackUnits)
 
   defenders.readEach(([pos, unitsAtk], defender) => {
     // 1. 检查当前目标是否有效

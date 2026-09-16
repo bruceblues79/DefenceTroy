@@ -4,12 +4,15 @@ import {
   Velocity,
   Health,
   Attack,
+  CanAttackUnits,
+  CanAttackWall,
   Projectile,
   IsEnemy,
   IsDefender,
   IsWall,
   IsArcher,
   IsMelee,
+  IsSpearman,
   IsProjectile,
   Targeting,
 } from '../traits'
@@ -19,26 +22,51 @@ export const WALL_POSITION = { x: 0, y: 0, z: 2.95 }
 export const WALL_WIDTH = 4.5
 export const WALL_HP = 500
 
+// 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=1）
 export const ENEMY_ARCHER_HP = 30
 export const ENEMY_ARCHER_SPEED = 0.5
-export const ENEMY_ARCHER_RANGE = 5
-export const ENEMY_ARCHER_DAMAGE = 5
-export const ENEMY_ARCHER_INTERVAL = 1.5
-export const ENEMY_ARCHER_ATTACK_POINT = 0.8
+export const ENEMY_ARCHER_UNITS_RANGE = 5
+export const ENEMY_ARCHER_UNITS_DAMAGE = 5
+export const ENEMY_ARCHER_UNITS_INTERVAL = 1.5
+export const ENEMY_ARCHER_UNITS_ATTACK_POINT = 0.8
+export const ENEMY_ARCHER_WALL_Z = 1
+export const ENEMY_ARCHER_WALL_DAMAGE = 5
+export const ENEMY_ARCHER_WALL_INTERVAL = 1.5
+export const ENEMY_ARCHER_WALL_ATTACK_POINT = 0.8
 
-// 敌方步兵（近战型，贴墙攻击城墙）
+// 敌方步兵：只攻击城门（wallZ=1.95），近战
 export const ENEMY_INFANTRY_HP = 50
 export const ENEMY_INFANTRY_SPEED = 0.8
-export const ENEMY_INFANTRY_RANGE = 1 // 攻击范围=停止线，距城墙 z ≤ 此值即停下攻击
-export const ENEMY_INFANTRY_DAMAGE = 8
-export const ENEMY_INFANTRY_INTERVAL = 1.2
-export const ENEMY_INFANTRY_ATTACK_POINT = 0.5
+export const ENEMY_INFANTRY_WALL_Z = 1.95
+export const ENEMY_INFANTRY_WALL_DAMAGE = 8
+export const ENEMY_INFANTRY_WALL_INTERVAL = 1.2
+export const ENEMY_INFANTRY_WALL_ATTACK_POINT = 0.5
 
+// 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=1.475）
+export const ENEMY_SPEARMAN_HP = 40
+export const ENEMY_SPEARMAN_SPEED = 0.6
+export const ENEMY_SPEARMAN_UNITS_RANGE = 2.5
+export const ENEMY_SPEARMAN_UNITS_DAMAGE = 12
+export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.3
+export const ENEMY_SPEARMAN_UNITS_ATTACK_POINT = 0.7
+export const ENEMY_SPEARMAN_WALL_Z = 1.475
+export const ENEMY_SPEARMAN_WALL_DAMAGE = 12
+export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.3
+export const ENEMY_SPEARMAN_WALL_ATTACK_POINT = 0.7
+
+// 守军弓兵：只攻击单位（range=6）
 export const DEFENDER_ARCHER_HP = 50
-export const DEFENDER_ARCHER_RANGE = 6
-export const DEFENDER_ARCHER_DAMAGE = 8
-export const DEFENDER_ARCHER_INTERVAL = 1.2
-export const DEFENDER_ARCHER_ATTACK_POINT = 0.6
+export const DEFENDER_ARCHER_UNITS_RANGE = 6
+export const DEFENDER_ARCHER_UNITS_DAMAGE = 8
+export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
+export const DEFENDER_ARCHER_UNITS_ATTACK_POINT = 0.6
+
+// 守军矛兵：只攻击单位（range=3，弓兵1/2）
+export const DEFENDER_SPEARMAN_HP = 60
+export const DEFENDER_SPEARMAN_UNITS_RANGE = 3
+export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 15
+export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.1
+export const DEFENDER_SPEARMAN_UNITS_ATTACK_POINT = 0.6
 
 export const PROJECTILE_SPEED = 15
 
@@ -63,53 +91,103 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成敌人弓手 */
+  /** 生成敌人弓手：攻击单位 + 攻击城门 */
   spawnEnemyArcher(x: number, z: number = ENEMY_SPAWN_Z) {
     return world.spawn(
       Position({ x, y: 0, z }),
       Velocity({ x: 0, y: 0, z: 0 }),
       Health({ current: ENEMY_ARCHER_HP, max: ENEMY_ARCHER_HP }),
-      Attack({
-        range: ENEMY_ARCHER_RANGE,
-        damage: ENEMY_ARCHER_DAMAGE,
-        interval: ENEMY_ARCHER_INTERVAL,
-        attackPoint: ENEMY_ARCHER_ATTACK_POINT,
+      Attack(),
+      CanAttackUnits({
+        range: ENEMY_ARCHER_UNITS_RANGE,
+        damage: ENEMY_ARCHER_UNITS_DAMAGE,
+        interval: ENEMY_ARCHER_UNITS_INTERVAL,
+        attackPoint: ENEMY_ARCHER_UNITS_ATTACK_POINT,
+      }),
+      CanAttackWall({
+        wallZ: ENEMY_ARCHER_WALL_Z,
+        damage: ENEMY_ARCHER_WALL_DAMAGE,
+        interval: ENEMY_ARCHER_WALL_INTERVAL,
+        attackPoint: ENEMY_ARCHER_WALL_ATTACK_POINT,
       }),
       IsEnemy,
       IsArcher,
     )
   },
 
-  /** 生成敌方步兵（近战型，贴墙攻击城墙） */
+  /** 生成敌方步兵：只攻击城门（近战） */
   spawnEnemyInfantry(x: number, z: number = ENEMY_SPAWN_Z) {
     return world.spawn(
       Position({ x, y: 0, z }),
       Velocity({ x: 0, y: 0, z: 0 }),
       Health({ current: ENEMY_INFANTRY_HP, max: ENEMY_INFANTRY_HP }),
-      Attack({
-        range: ENEMY_INFANTRY_RANGE,
-        damage: ENEMY_INFANTRY_DAMAGE,
-        interval: ENEMY_INFANTRY_INTERVAL,
-        attackPoint: ENEMY_INFANTRY_ATTACK_POINT,
+      Attack(),
+      CanAttackWall({
+        wallZ: ENEMY_INFANTRY_WALL_Z,
+        damage: ENEMY_INFANTRY_WALL_DAMAGE,
+        interval: ENEMY_INFANTRY_WALL_INTERVAL,
+        attackPoint: ENEMY_INFANTRY_WALL_ATTACK_POINT,
       }),
       IsEnemy,
       IsMelee,
     )
   },
 
-  /** 生成守军弓手 */
+  /** 生成敌方矛兵：攻击单位 + 攻击城门 */
+  spawnEnemySpearman(x: number, z: number = ENEMY_SPAWN_Z) {
+    return world.spawn(
+      Position({ x, y: 0, z }),
+      Velocity({ x: 0, y: 0, z: 0 }),
+      Health({ current: ENEMY_SPEARMAN_HP, max: ENEMY_SPEARMAN_HP }),
+      Attack(),
+      CanAttackUnits({
+        range: ENEMY_SPEARMAN_UNITS_RANGE,
+        damage: ENEMY_SPEARMAN_UNITS_DAMAGE,
+        interval: ENEMY_SPEARMAN_UNITS_INTERVAL,
+        attackPoint: ENEMY_SPEARMAN_UNITS_ATTACK_POINT,
+      }),
+      CanAttackWall({
+        wallZ: ENEMY_SPEARMAN_WALL_Z,
+        damage: ENEMY_SPEARMAN_WALL_DAMAGE,
+        interval: ENEMY_SPEARMAN_WALL_INTERVAL,
+        attackPoint: ENEMY_SPEARMAN_WALL_ATTACK_POINT,
+      }),
+      IsEnemy,
+      IsSpearman,
+    )
+  },
+
+  /** 生成守军弓手：只攻击单位 */
   spawnDefenderArcher(x: number, y: number = 2.5, z: number = WALL_POSITION.z) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: DEFENDER_ARCHER_HP, max: DEFENDER_ARCHER_HP }),
-      Attack({
-        range: DEFENDER_ARCHER_RANGE,
-        damage: DEFENDER_ARCHER_DAMAGE,
-        interval: DEFENDER_ARCHER_INTERVAL,
-        attackPoint: DEFENDER_ARCHER_ATTACK_POINT,
+      Attack(),
+      CanAttackUnits({
+        range: DEFENDER_ARCHER_UNITS_RANGE,
+        damage: DEFENDER_ARCHER_UNITS_DAMAGE,
+        interval: DEFENDER_ARCHER_UNITS_INTERVAL,
+        attackPoint: DEFENDER_ARCHER_UNITS_ATTACK_POINT,
       }),
       IsDefender,
       IsArcher,
+    )
+  },
+
+  /** 生成守军矛兵：只攻击单位 */
+  spawnDefenderSpearman(x: number, y: number = 2.5, z: number = WALL_POSITION.z) {
+    return world.spawn(
+      Position({ x, y, z }),
+      Health({ current: DEFENDER_SPEARMAN_HP, max: DEFENDER_SPEARMAN_HP }),
+      Attack(),
+      CanAttackUnits({
+        range: DEFENDER_SPEARMAN_UNITS_RANGE,
+        damage: DEFENDER_SPEARMAN_UNITS_DAMAGE,
+        interval: DEFENDER_SPEARMAN_UNITS_INTERVAL,
+        attackPoint: DEFENDER_SPEARMAN_UNITS_ATTACK_POINT,
+      }),
+      IsDefender,
+      IsSpearman,
     )
   },
 

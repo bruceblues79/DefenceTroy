@@ -4,6 +4,7 @@ import {
   IsDefender,
   IsArcher,
   IsMelee,
+  IsSpearman,
   IsWall,
   IsProjectile,
   Position,
@@ -22,8 +23,12 @@ export default function UnitRenderer() {
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
   // 敌人步兵（近战）
   const enemyInfantry = useQuery(IsEnemy, IsMelee, Position)
+  // 敌人矛兵
+  const enemySpearmen = useQuery(IsEnemy, IsSpearman, Position)
   // 守军弓手
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
+  // 守军矛兵
+  const defenderSpearmen = useQuery(IsDefender, IsSpearman, Position)
   // 抛射物
   const projectiles = useQuery(IsProjectile, Position)
   // 城墙（单个实体）
@@ -49,9 +54,19 @@ export default function UnitRenderer() {
         <CharacterProxy key={entity.id()} entity={entity} color="#3a3a3a" />
       ))}
 
+      {/* 敌人矛兵（深红） */}
+      {enemySpearmen.map((entity) => (
+        <CharacterProxy key={entity.id()} entity={entity} color="#b33939" />
+      ))}
+
       {/* 守军弓手（蓝色） */}
       {defenderArchers.map((entity) => (
         <CharacterProxy key={entity.id()} entity={entity} color="#4a90d9" />
+      ))}
+
+      {/* 守军矛兵（青金） */}
+      {defenderSpearmen.map((entity) => (
+        <CharacterProxy key={entity.id()} entity={entity} color="#4a9d8f" />
       ))}
 
       {/* 抛射物（箭矢） */}

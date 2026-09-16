@@ -5,12 +5,15 @@ import {
   updateMovement,
   updateEnemyArcherAI,
   updateEnemyInfantryAI,
+  updateEnemySpearmanAI,
   updateDefenderArcherAI,
+  updateDefenderSpearmanAI,
   updateAttack,
   updateProjectiles,
   updateDeath,
   createSpawnSystem,
   createInfantrySpawnSystem,
+  createSpearmanSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
 import { IsWall, IsEnemy, IsDefender, IsProjectile } from '../core/traits'
@@ -29,6 +32,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
   const world = useWorld()
   const spawnSystemRef = useRef<ReturnType<typeof createSpawnSystem> | null>(null)
   const infantrySpawnSystemRef = useRef<ReturnType<typeof createInfantrySpawnSystem> | null>(null)
+  const spearmanSpawnSystemRef = useRef<ReturnType<typeof createSpearmanSpawnSystem> | null>(null)
   const initializedRef = useRef(false)
   const gameOverFiredRef = useRef(false)
   const battleReadyRef = useRef(false)
@@ -45,9 +49,10 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     // 生成城墙
     actions.spawnWall()
 
-    // 生成 2 只守军弓手（选 9 个点位中的第 3 和第 7 个，左右分布）
+    // 生成 2 只守军弓手（左右分布）+ 1 只守军矛兵（中间）
     actions.spawnDefenderArcher(WALL_SLOTS[2])
     actions.spawnDefenderArcher(WALL_SLOTS[6])
+    actions.spawnDefenderSpearman(WALL_SLOTS[4])
 
     // 初始化刷怪系统
     spawnSystemRef.current = createSpawnSystem()
@@ -57,6 +62,10 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     infantrySpawnSystemRef.current = createInfantrySpawnSystem()
     infantrySpawnSystemRef.current.start()
 
+    // 初始化矛兵刷怪系统（3 只，随机槽位）
+    spearmanSpawnSystemRef.current = createSpearmanSpawnSystem()
+    spearmanSpawnSystemRef.current.start()
+
     // 标记战场就绪，允许 useFrame 逻辑执行
     battleReadyRef.current = true
 
@@ -65,6 +74,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
       battleReadyRef.current = false
       spawnSystemRef.current?.stop()
       infantrySpawnSystemRef.current?.stop()
+      spearmanSpawnSystemRef.current?.stop()
 
       // 销毁所有战斗实体，防止重开/返回主菜单后残留（world 是全局单例）
       world.query(IsWall).forEach((e) => e.destroy())
@@ -83,26 +93,31 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     // 系统执行顺序：AI → 攻击 → 移动 → 抛射物 → 死亡 → 刷怪
     updateEnemyArcherAI(world, dt)
     updateEnemyInfantryAI(world, dt)
+    updateEnemySpearmanAI(world, dt)
     updateDefenderArcherAI(world, dt)
+    updateDefenderSpearmanAI(world, dt)
     updateAttack(world, dt)
     updateMovement(world, dt)
     updateProjectiles(world, dt)
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
     infantrySpawnSystemRef.current?.update(world, dt)
+    spearmanSpawnSystemRef.current?.update(world, dt)
 
     // 城墙被毁或敌人全灭 → 触发 gameOver（只触发一次）
     if (!gameOverFiredRef.current) {
       const wall = world.queryFirst(IsWall)
-      // 只在两类刷怪都完成后才检测敌人全灭
+      // 只在三类刷怪都完成后才检测敌人全灭
       const spawnDone =
         (spawnSystemRef.current?.isDone?.() ?? false) &&
-        (infantrySpawnSystemRef.current?.isDone?.() ?? false)
+        (infantrySpawnSystemRef.current?.isDone?.() ?? false) &&
+        (spearmanSpawnSystemRef.current?.isDone?.() ?? false)
       const enemies = spawnDone ? world.queryFirst(IsEnemy) : true
       if (!wall || !enemies) {
         gameOverFiredRef.current = true
         spawnSystemRef.current?.stop()
         infantrySpawnSystemRef.current?.stop()
+        spearmanSpawnSystemRef.current?.stop()
         onGameOver?.()
       }
     }

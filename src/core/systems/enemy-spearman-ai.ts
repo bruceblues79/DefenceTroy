@@ -6,12 +6,12 @@ import {
   CanAttackWall,
   Health,
   IsEnemy,
-  IsArcher,
+  IsSpearman,
   IsDefender,
   IsWall,
   Targeting,
 } from '../traits'
-import { ENEMY_ARCHER_SPEED } from '../actions'
+import { ENEMY_SPEARMAN_SPEED } from '../actions'
 
 /**
  * 计算 XZ 平面距离
@@ -23,12 +23,12 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
 }
 
 /**
- * 敌方弓兵 AI 系统
+ * 敌方矛兵 AI 系统
  * 行为：优先攻击射程内守军；无守军时前进到 CanAttackWall.wallZ 攻击城墙
- * 优先级：攻击单位 > 攻击城门
+ * 与敌弓兵结构一致，区别在于射程/伤害参数（由 CanAttackUnits/CanAttackWall 提供）
  */
-export function updateEnemyArcherAI(world: World, _dt: number) {
-  const enemies = world.query(IsEnemy, IsArcher, Position, CanAttackUnits, CanAttackWall, Velocity)
+export function updateEnemySpearmanAI(world: World, _dt: number) {
+  const enemies = world.query(IsEnemy, IsSpearman, Position, CanAttackUnits, CanAttackWall, Velocity)
 
   enemies.updateEach(([pos, unitsAtk, wallAtk, vel], enemy) => {
     // 1. 检查当前目标是否有效
@@ -41,13 +41,11 @@ export function updateEnemyArcherAI(world: World, _dt: number) {
         enemy.remove(Targeting('*'))
         target = undefined
       } else if (target.has(IsWall)) {
-        // 城墙目标：用 wallZ 判定是否还在攻城位
         if (pos.z < wallAtk.wallZ) {
           enemy.remove(Targeting('*'))
           target = undefined
         }
       } else {
-        // 单位目标：XZ 距离超出射程则清除
         const dist = distanceXZ(pos.x, pos.z, targetPos.x, targetPos.z)
         if (dist > unitsAtk.range) {
           enemy.remove(Targeting('*'))
@@ -92,7 +90,7 @@ export function updateEnemyArcherAI(world: World, _dt: number) {
       vel.z = 0
     } else {
       vel.x = 0
-      vel.z = ENEMY_ARCHER_SPEED
+      vel.z = ENEMY_SPEARMAN_SPEED
     }
   })
 }

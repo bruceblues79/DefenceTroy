@@ -1,24 +1,21 @@
 import type { World } from 'koota'
-import { Position, Velocity, Attack, IsEnemy, IsMelee, IsWall, Targeting } from '../traits'
-import { ENEMY_INFANTRY_SPEED, WALL_POSITION } from '../actions'
+import { Position, Velocity, CanAttackWall, IsEnemy, IsMelee, IsWall, Targeting } from '../traits'
+import { ENEMY_INFANTRY_SPEED } from '../actions'
 
 /**
  * 敌方步兵 AI 系统
- * 行为：直线向城墙前进，距城墙 z ≤ attack.range 时停下并攻击城墙
- * 与敌方弓兵 AI 的城墙判定对称（用 attack.range 做停止+攻击线）
+ * 行为：直线向城墙前进，pos.z >= CanAttackWall.wallZ 时停下攻击城墙
+ * 纯城墙型单位，不攻击守军
  */
 export function updateEnemyInfantryAI(world: World, _dt: number) {
-  const infantry = world.query(IsEnemy, IsMelee, Position, Attack, Velocity)
+  const infantry = world.query(IsEnemy, IsMelee, Position, CanAttackWall, Velocity)
 
-  infantry.updateEach(([pos, attack, vel], unit) => {
-    const distToWall = WALL_POSITION.z - pos.z
-
-    // 进入攻击范围 → 停下并锁定城墙
-    if (distToWall <= attack.range) {
+  infantry.updateEach(([pos, wallAtk, vel], unit) => {
+    // 抵达攻城 z 位置 → 停下并锁定城墙
+    if (pos.z >= wallAtk.wallZ) {
       vel.x = 0
       vel.z = 0
 
-      // 锁定城墙（若无目标）
       const currentTarget = unit.targetFor(Targeting)
       if (!currentTarget) {
         const wall = world.queryFirst(IsWall, Position)
