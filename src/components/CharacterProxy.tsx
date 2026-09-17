@@ -10,18 +10,20 @@ interface CharacterProxyProps {
   size?: [number, number, number]
   /** 拖拽按下回调（仅守军单位传入，敌人不传） */
   onPointerDown?: (e: ThreeEvent<PointerEvent>) => void
+  /** 拖拽松开回调（敌人单位传入，作为拖拽落点用于更换攻击目标） */
+  onPointerUp?: (e: ThreeEvent<PointerEvent>) => void
 }
 
 /**
  * 通用角色占位物
  * 从 ECS 读取 Position trait，渲染一个 box 作为单位占位
  */
-export default function CharacterProxy({ entity, color, size = [0.45, 1, 0.45], onPointerDown }: CharacterProxyProps) {
+export default function CharacterProxy({ entity, color, size = [0.45, 1, 0.45], onPointerDown, onPointerUp }: CharacterProxyProps) {
   const pos = useTrait(entity, Position)
   if (!pos) return null
 
   return (
-    <mesh position={[pos.x, pos.y, pos.z]} castShadow receiveShadow onPointerDown={onPointerDown}>
+    <mesh position={[pos.x, pos.y, pos.z]} castShadow receiveShadow onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       <boxGeometry args={size} />
       <meshStandardMaterial color={color} />
     </mesh>

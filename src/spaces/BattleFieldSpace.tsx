@@ -9,7 +9,7 @@ import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import DragUnitProxy from '../components/DragUnitProxy'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION } from '../core/actions'
-import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health } from '../core/traits'
+import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
 const BUTTON_X = [-1.95, -0.975, 0, 0.975, 1.95]
@@ -142,6 +142,31 @@ export default function BattleFieldSpace({
     spawnDefender(drag.type, WALL_SLOTS[slotIndex], deployHp)
   }
 
+  // ── 拖拽落点：敌人单位（手动更换攻击目标） ──
+  const handleDropToEnemy = (enemy: Entity) => (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
+    const drag = dragState
+    if (!drag) return
+    setDragState(null)
+
+    // 仅守军单位拖拽，且非投石车（投石车用 CanBombard 自动周期轰炸，不走 Targeting）
+    if (drag.source !== 'unit') return
+    if (drag.entity.has(IsCatapult)) return
+
+    const defenderPos = drag.entity.get(Position)
+    const enemyPos = enemy.get(Position)
+    const canAttack = drag.entity.get(CanAttackUnits)
+    if (!defenderPos || !enemyPos || !canAttack) return
+
+    // 距离 ≤ 攻击射程才允许换目标
+    const dx = defenderPos.x - enemyPos.x
+    const dz = defenderPos.z - enemyPos.z
+    if (Math.sqrt(dx * dx + dz * dz) > canAttack.range) return
+
+    // Targeting 是 exclusive relation，add 时自动移除旧目标
+    drag.entity.add(Targeting(enemy))
+  }
+
   // ── 拖拽落点：按钮行（回收） ──
   const handleDropToBarracks = () => {
     const drag = dragState
@@ -183,6 +208,7 @@ export default function BattleFieldSpace({
         onDefenderDragStart={startUnitDrag}
         onSlotOver={() => {}}
         onSlotUp={handleDropToSlot}
+        onEnemyPointerUp={handleDropToEnemy}
       />
 
       {/* 按钮行整体回收检测条带（invisible，仅作 raycaster 命中） */}

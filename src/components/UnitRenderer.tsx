@@ -29,13 +29,15 @@ interface UnitRendererProps {
   onSlotOver?: (slotIndex: number | null) => void
   /** WallSlot 拖拽落点松开回调 */
   onSlotUp?: (slotIndex: number) => void
+  /** 拖拽松开在敌人身上回调（用于手动指定攻击目标） */
+  onEnemyPointerUp?: (entity: Entity) => (e: ThreeEvent<PointerEvent>) => void
 }
 
 /**
  * 单位渲染器
  * 用 ECS 查询批量渲染所有战场实体：敌人、守军、城墙、抛射物、WallSlot
  */
-export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp }: UnitRendererProps) {
+export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp, onEnemyPointerUp }: UnitRendererProps) {
   // 敌人弓手
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
   // 敌人步兵（近战）
@@ -88,7 +90,11 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
       {/* 敌人弓手（黄色） */}
       {enemyArchers.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy entity={entity} color="#e6c200" />
+          <CharacterProxy
+            entity={entity}
+            color="#e6c200"
+            onPointerUp={onEnemyPointerUp?.(entity)}
+          />
           <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
         </group>
       ))}
@@ -96,7 +102,11 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
       {/* 敌人步兵（深灰） */}
       {enemyInfantry.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy entity={entity} color="#3a3a3a" />
+          <CharacterProxy
+            entity={entity}
+            color="#3a3a3a"
+            onPointerUp={onEnemyPointerUp?.(entity)}
+          />
           <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
         </group>
       ))}
@@ -104,7 +114,11 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
       {/* 敌人矛兵（深红） */}
       {enemySpearmen.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy entity={entity} color="#b33939" />
+          <CharacterProxy
+            entity={entity}
+            color="#b33939"
+            onPointerUp={onEnemyPointerUp?.(entity)}
+          />
           <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
         </group>
       ))}
