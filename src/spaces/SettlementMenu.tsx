@@ -32,7 +32,7 @@ export default function SettlementMenu({
         >
           <planeGeometry args={[2.5, 1]} />
           <meshBasicMaterial color="#4a90d9" />
-          <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">done</Text>
+          <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">win</Text>
         </mesh>
       </Billboard>
     )

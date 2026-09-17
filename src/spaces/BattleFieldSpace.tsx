@@ -90,6 +90,7 @@ export default function BattleFieldSpace({
 
   // ── 拖拽起点 ──
   const startUnitDrag = (entity: Entity) => {
+    if (paused || gameOver) return
     setDragState({ source: 'unit', entity, type: unitTypeOf(entity) })
   }
 
@@ -212,7 +213,7 @@ export default function BattleFieldSpace({
       />
 
       {/* 按钮行整体回收检测条带（invisible，仅作 raycaster 命中） */}
-      {!gameOver && (
+      {!gameOver && !paused && (
         <mesh
           position={[0, 1.99, 4.0]}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -227,7 +228,7 @@ export default function BattleFieldSpace({
       )}
 
       {/* five buttons: 0.84 square planes, billboard to face camera */}
-      {!gameOver &&
+      {!gameOver && !paused &&
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
