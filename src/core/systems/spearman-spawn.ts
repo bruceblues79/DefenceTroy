@@ -2,13 +2,13 @@ import type { World } from 'koota'
 import { spawnActions, ENEMY_SPAWN_X, ENEMY_SPAWN_Z } from '../actions'
 
 const SPAWN_INTERVAL = 0.5 // 每只间隔秒数
-const TOTAL_COUNT = 4 // 总共刷 4 只
+const TOTAL_COUNT = 3 // 总共刷 3 只
 
 /**
- * 刷怪系统
- * 间隔刷出 4 只敌弓兵，随机选出生槽位（不重复）
+ * 敌方矛兵刷怪系统
+ * 间隔刷出 3 只敌方矛兵，从 ENEMY_SPAWN_X 9 槽位随机选 3 个不重复
  */
-export function createSpawnSystem() {
+export function createSpearmanSpawnSystem() {
   let timer = 0
   let spawned = 0
   let started = false
@@ -19,7 +19,7 @@ export function createSpawnSystem() {
       started = true
       timer = 0
       spawned = 0
-      slots = [...ENEMY_SPAWN_X].sort(() => Math.random() - 0.5)
+      slots = [...ENEMY_SPAWN_X].sort(() => Math.random() - 0.5).slice(0, TOTAL_COUNT)
     },
     stop() {
       started = false
@@ -31,7 +31,7 @@ export function createSpawnSystem() {
       if (timer >= SPAWN_INTERVAL) {
         timer = 0
         const x = slots[spawned]
-        spawnActions(world).spawnEnemyArcher(x, ENEMY_SPAWN_Z)
+        spawnActions(world).spawnEnemySpearman(x, ENEMY_SPAWN_Z)
         spawned++
       }
     },
