@@ -65,6 +65,7 @@ export default function App() {
   const [paused, setPaused] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [cameraReady, setCameraReady] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const orbitRef = useRef<any>(null)
   const handleStart = useCallback(() => setGameState('loading'), [])
   const handleLoaded = useCallback(() => setGameState('play'), [])
@@ -110,7 +111,8 @@ export default function App() {
           ref={orbitRef}
           target={[0, 0, 0]}
           enablePan={false}
-          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver}
+          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver && !dragging}
+          enableZoom={!dragging}
           enableDamping={false}
           minZoom={60}
           maxZoom={100}
@@ -142,6 +144,7 @@ export default function App() {
             onRestart={handleRestart}
             onExitToMenu={handleExitToMenu}
             onGameOver={handleGameOver}
+            onDragStateChange={setDragging}
           />
         )}
       </Canvas>

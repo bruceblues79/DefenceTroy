@@ -1,4 +1,6 @@
 import { useQuery, useQueryFirst } from 'koota/react'
+import type { Entity } from 'koota'
+import { type ThreeEvent } from '@react-three/fiber'
 import {
   IsEnemy,
   IsDefender,
@@ -12,16 +14,26 @@ import {
   Position,
   Health,
 } from '../core/traits'
+import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
 import CharacterProxy from './CharacterProxy'
 import ArrowProxy from './ArrowProxy'
 import BoulderProxy from './BoulderProxy'
-import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
+import WallSlots from './WallSlots'
+
+interface UnitRendererProps {
+  /** 守军拖拽按下回调（BattleFieldSpace 提供，内部判定兵种） */
+  onDefenderDragStart?: (entity: Entity) => void
+  /** WallSlot 拖拽落点 hover 回调 */
+  onSlotOver?: (slotIndex: number | null) => void
+  /** WallSlot 拖拽落点松开回调 */
+  onSlotUp?: (slotIndex: number) => void
+}
 
 /**
  * 单位渲染器
- * 用 ECS 查询批量渲染所有战场实体：敌人、守军、城墙、抛射物
+ * 用 ECS 查询批量渲染所有战场实体：敌人、守军、城墙、抛射物、WallSlot
  */
-export default function UnitRenderer() {
+export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp }: UnitRendererProps) {
   // 敌人弓手
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
   // 敌人步兵（近战）
@@ -41,6 +53,14 @@ export default function UnitRenderer() {
   // 城墙（单个实体）
   const wall = useQueryFirst(IsWall, Health)
 
+  // 守军 onPointerDown 包装：仅传给守军，敌人不传
+  const onDefenderPointerDown = onDefenderDragStart
+    ? (entity: Entity) => (e: ThreeEvent<PointerEvent>) => {
+        e.stopPropagation()
+        onDefenderDragStart(entity)
+      }
+    : undefined
+
   return (
     <group>
       {/* 城墙 */}
@@ -50,6 +70,9 @@ export default function UnitRenderer() {
           <meshStandardMaterial color="#a68b5b" />
         </mesh>
       )}
+
+      {/* 城墙插槽占位平面（仅未占用 slot 显示） */}
+      <WallSlots onSlotOver={onSlotOver ?? (() => {})} onSlotUp={onSlotUp ?? (() => {})} />
 
       {/* 敌人弓手（黄色） */}
       {enemyArchers.map((entity) => (
@@ -68,17 +91,33 @@ export default function UnitRenderer() {
 
       {/* 守军弓手（蓝色） */}
       {defenderArchers.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#4a90d9" />
+        <CharacterProxy
+          key={entity.id()}
+          entity={entity}
+          color="#4a90d9"
+          onPointerDown={onDefenderPointerDown?.(entity)}
+        />
       ))}
 
       {/* 守军矛兵（青金） */}
       {defenderSpearmen.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#4a9d8f" />
+        <CharacterProxy
+          key={entity.id()}
+          entity={entity}
+          color="#4a9d8f"
+          onPointerDown={onDefenderPointerDown?.(entity)}
+        />
       ))}
 
       {/* 守军投石车（深棕） */}
       {defenderCatapults.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#6b4226" size={[0.6, 0.8, 0.6]} />
+        <CharacterProxy
+          key={entity.id()}
+          entity={entity}
+          color="#6b4226"
+          size={[0.6, 0.8, 0.6]}
+          onPointerDown={onDefenderPointerDown?.(entity)}
+        />
       ))}
 
       {/* 箭矢抛射物 */}
