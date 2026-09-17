@@ -8,15 +8,17 @@ import {
   updateEnemySpearmanAI,
   updateDefenderArcherAI,
   updateDefenderSpearmanAI,
+  updateCatapultBombard,
   updateAttack,
   updateProjectiles,
+  updateBoulders,
   updateDeath,
   createSpawnSystem,
   createInfantrySpawnSystem,
   createSpearmanSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall, IsEnemy, IsDefender, IsProjectile } from '../core/traits'
+import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
@@ -49,10 +51,11 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     // 生成城墙
     actions.spawnWall()
 
-    // 生成 2 只守军弓手（左右分布）+ 1 只守军矛兵（中间）
+    // 生成 2 弓手 + 1 矛兵 + 1 投石车
     actions.spawnDefenderArcher(WALL_SLOTS[2])
     actions.spawnDefenderArcher(WALL_SLOTS[6])
     actions.spawnDefenderSpearman(WALL_SLOTS[4])
+    actions.spawnDefenderCatapult(WALL_SLOTS[0])
 
     // 初始化刷怪系统
     spawnSystemRef.current = createSpawnSystem()
@@ -81,6 +84,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
       world.query(IsEnemy).forEach((e) => e.destroy())
       world.query(IsDefender).forEach((e) => e.destroy())
       world.query(IsProjectile).forEach((e) => e.destroy())
+      world.query(IsBoulder).forEach((e) => e.destroy())
     }
   }, [world])
 
@@ -96,9 +100,11 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     updateEnemySpearmanAI(world, dt)
     updateDefenderArcherAI(world, dt)
     updateDefenderSpearmanAI(world, dt)
+    updateCatapultBombard(world, dt)
     updateAttack(world, dt)
     updateMovement(world, dt)
     updateProjectiles(world, dt)
+    updateBoulders(world, dt)
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
     infantrySpawnSystemRef.current?.update(world, dt)

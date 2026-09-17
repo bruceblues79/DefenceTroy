@@ -11,6 +11,8 @@ export const IsWall = trait()
 export const IsArcher = trait()
 export const IsMelee = trait()
 export const IsSpearman = trait()
+export const IsCatapult = trait()
 
 // 抛射物标签
 export const IsProjectile = trait()
+export const IsBoulder = trait()

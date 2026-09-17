@@ -41,3 +41,19 @@ export const CanAttackWall = trait({
   interval: 1.2,
   attackPoint: 0.5,
 })
+
+/**
+ * 投石车轰炸能力
+ * targetZ: 石块落地 z 坐标
+ * radius: AOE 伤害半径
+ * damage: 每次伤害
+ * interval: 完整攻击周期（秒）
+ * attackPoint: 攻击触发点（秒）
+ */
+export const CanBombard = trait({
+  targetZ: 0,
+  radius: 0.5,
+  damage: 40,
+  interval: 2,
+  attackPoint: 0.5,
+})

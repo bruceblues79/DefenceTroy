@@ -6,6 +6,7 @@ import {
   Attack,
   CanAttackUnits,
   CanAttackWall,
+  CanBombard,
   Projectile,
   IsEnemy,
   IsDefender,
@@ -13,7 +14,9 @@ import {
   IsArcher,
   IsMelee,
   IsSpearman,
+  IsCatapult,
   IsProjectile,
+  IsBoulder,
   Targeting,
 } from '../traits'
 
@@ -68,7 +71,16 @@ export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 15
 export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.1
 export const DEFENDER_SPEARMAN_UNITS_ATTACK_POINT = 0.6
 
+// 守军投石车：自动周期轰炸 z=0 线，AOE 0.5m 半径
+export const DEFENDER_CATAPULT_HP = 150
+export const DEFENDER_CATAPULT_TARGET_Z = 0
+export const DEFENDER_CATAPULT_RADIUS = 0.5
+export const DEFENDER_CATAPULT_DAMAGE = 40
+export const DEFENDER_CATAPULT_INTERVAL = 2
+export const DEFENDER_CATAPULT_ATTACK_POINT = 0.5
+
 export const PROJECTILE_SPEED = 15
+export const BOULDER_SPEED = 8
 
 // 城墙 9 个部署点位（x 坐标）
 export const WALL_SLOTS = Array.from({ length: 9 }, (_, i) => {
@@ -201,6 +213,36 @@ export const spawnActions = createActions((world) => ({
       Projectile({ damage, speed }),
       IsProjectile,
       Targeting(targetEntity),
+    )
+  },
+
+  /** 生成守军投石车：自动周期轰炸 */
+  spawnDefenderCatapult(x: number, y: number = 2.5, z: number = WALL_POSITION.z) {
+    return world.spawn(
+      Position({ x, y, z }),
+      Health({ current: DEFENDER_CATAPULT_HP, max: DEFENDER_CATAPULT_HP }),
+      Attack(),
+      CanBombard({
+        targetZ: DEFENDER_CATAPULT_TARGET_Z,
+        radius: DEFENDER_CATAPULT_RADIUS,
+        damage: DEFENDER_CATAPULT_DAMAGE,
+        interval: DEFENDER_CATAPULT_INTERVAL,
+        attackPoint: DEFENDER_CATAPULT_ATTACK_POINT,
+      }),
+      IsDefender,
+      IsCatapult,
+    )
+  },
+
+  /** 生成石块抛射物（AOE，非追踪） */
+  spawnBoulder(fromEntity: Entity, targetZ: number, radius: number, damage: number, speed: number = BOULDER_SPEED) {
+    const fromPos = fromEntity.get(Position)
+    if (!fromPos) return null
+    return world.spawn(
+      Position({ x: fromPos.x, y: fromPos.y, z: fromPos.z }),
+      Velocity({ x: 0, y: 0, z: 0 }),
+      Projectile({ damage, speed, targetZ, aoeRadius: radius }),
+      IsBoulder,
     )
   },
 }))
