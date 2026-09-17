@@ -1,10 +1,15 @@
 import { createActions, type Entity } from 'koota'
-import { Health, Targeting, Position, Attack } from '../traits'
+import { Health, Targeting, Position, Attack, CanAttackUnits, CanBombard } from '../traits'
 
-/** 重置单位战斗状态（攻击计时归零，清除目标，由下一帧 AI 系统重新寻敌/周期） */
+/** 重置单位战斗状态：清除目标，攻击计时归零，冷却设为满值（换位/重部署后先走冷却再攻击） */
 function resetUnitCombatState(entity: Entity) {
   const attack = entity.get(Attack)
-  if (attack) entity.set(Attack, { cooldown: 0, attackTimer: 0, isAttacking: false, hasFired: false })
+  if (attack) {
+    const unitsAtk = entity.get(CanAttackUnits)
+    const bombard = entity.get(CanBombard)
+    const interval = unitsAtk?.interval ?? bombard?.interval ?? 0
+    entity.set(Attack, { cooldown: interval, attackTimer: 0, isAttacking: false, hasFired: false })
+  }
   if (entity.targetFor(Targeting)) entity.remove(Targeting('*'))
 }
 

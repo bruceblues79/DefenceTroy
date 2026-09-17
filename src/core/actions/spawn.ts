@@ -171,12 +171,12 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成守军弓手：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量） */
+  /** 生成守军弓手：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
   spawnDefenderArcher(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_ARCHER_HP, max: DEFENDER_ARCHER_HP }),
-      Attack(),
+      Attack({ cooldown: DEFENDER_ARCHER_UNITS_INTERVAL }),
       CanAttackUnits({
         range: DEFENDER_ARCHER_UNITS_RANGE,
         damage: DEFENDER_ARCHER_UNITS_DAMAGE,
@@ -188,12 +188,12 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成守军矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量） */
+  /** 生成守军矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
   spawnDefenderSpearman(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_SPEARMAN_HP, max: DEFENDER_SPEARMAN_HP }),
-      Attack(),
+      Attack({ cooldown: DEFENDER_SPEARMAN_UNITS_INTERVAL }),
       CanAttackUnits({
         range: DEFENDER_SPEARMAN_UNITS_RANGE,
         damage: DEFENDER_SPEARMAN_UNITS_DAMAGE,
@@ -218,12 +218,12 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成守军投石车：自动周期轰炸。可选 hp 用于从兵营回收后重新部署（保留血量） */
+  /** 生成守军投石车：自动周期轰炸。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
   spawnDefenderCatapult(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_CATAPULT_HP, max: DEFENDER_CATAPULT_HP }),
-      Attack(),
+      Attack({ cooldown: DEFENDER_CATAPULT_INTERVAL }),
       CanBombard({
         targetZ: DEFENDER_CATAPULT_TARGET_Z,
         radius: DEFENDER_CATAPULT_RADIUS,
