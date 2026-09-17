@@ -83,10 +83,12 @@ export const PROJECTILE_SPEED = 15
 export const BOULDER_SPEED = 8
 
 // 城墙 9 个部署点位（x 坐标）
+// 城墙宽 WALL_WIDTH，9 等分，单位站每格中心
+// 每格宽 = WALL_WIDTH / 9，中心偏移半格
 export const WALL_SLOTS = Array.from({ length: 9 }, (_, i) => {
   const halfWidth = WALL_WIDTH / 2
-  const step = WALL_WIDTH / 8
-  return -halfWidth + step * i
+  const cellWidth = WALL_WIDTH / 9
+  return -halfWidth + cellWidth / 2 + cellWidth * i
 })
 
 // 敌人生成点位（x 坐标，-2 到 2，0.5 平分，共 9 个）
