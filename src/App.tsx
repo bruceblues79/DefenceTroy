@@ -60,6 +60,47 @@ function FullscreenPrompt() {
   )
 }
 
+function useIsLandscape() {
+  const [landscape, setLandscape] = useState(
+    typeof window !== 'undefined' ? window.innerWidth > window.innerHeight : false
+  )
+  useEffect(() => {
+    const update = () => setLandscape(window.innerWidth > window.innerHeight)
+    update()
+    window.addEventListener('resize', update)
+    window.addEventListener('orientationchange', update)
+    return () => {
+      window.removeEventListener('resize', update)
+      window.removeEventListener('orientationchange', update)
+    }
+  }, [])
+  return landscape
+}
+
+function LandscapePrompt() {
+  const landscape = useIsLandscape()
+  if (!isMobile() || !landscape) return null
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 8,
+        left: 8,
+        zIndex: 10,
+        padding: '4px 8px',
+        fontSize: 12,
+        color: '#ccc',
+        background: 'rgba(0,0,0,0.4)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        borderRadius: 4,
+        pointerEvents: 'none',
+      }}
+    >
+      请竖屏游玩
+    </div>
+  )
+}
+
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
   const [paused, setPaused] = useState(false)
@@ -110,6 +151,7 @@ export default function App() {
   return (
     <WorldProvider world={world}>
       <FullscreenPrompt />
+      <LandscapePrompt />
       <Canvas dpr={[1, 2]} shadows>
         <color attach="background" args={['#6b7280']} />
         <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
