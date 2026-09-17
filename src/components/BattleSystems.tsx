@@ -19,7 +19,7 @@ import {
   createSpearmanSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder, IsEffect } from '../core/traits'
+import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder, IsEffect, Health } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
@@ -116,19 +116,21 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     // 城墙被毁或敌人全灭 → 触发 gameOver（只触发一次）
     if (!gameOverFiredRef.current) {
       const wall = world.queryFirst(IsWall)
+      const wallHealth = wall?.get(Health)
+      const wallDestroyed = !wallHealth || wallHealth.current <= 0
       // 只在三类刷怪都完成后才检测敌人全灭
       const spawnDone =
         (spawnSystemRef.current?.isDone?.() ?? false) &&
         (infantrySpawnSystemRef.current?.isDone?.() ?? false) &&
         (spearmanSpawnSystemRef.current?.isDone?.() ?? false)
       const enemies = spawnDone ? world.queryFirst(IsEnemy) : true
-      if (!wall || !enemies) {
+      if (wallDestroyed || !enemies) {
         gameOverFiredRef.current = true
         spawnSystemRef.current?.stop()
         infantrySpawnSystemRef.current?.stop()
         spearmanSpawnSystemRef.current?.stop()
-        // !wall = 城墙被毁 = 失败；!enemies = 敌人全灭 = 胜利
-        onGameOver?.(!wall ? 'defeat' : 'victory')
+        // 城墙被毁 = 失败；敌人全灭 = 胜利
+        onGameOver?.(wallDestroyed ? 'defeat' : 'victory')
       }
     }
   })

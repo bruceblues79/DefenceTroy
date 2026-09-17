@@ -84,8 +84,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </>
       )}
 
-      {/* 城墙插槽占位平面（仅未占用 slot 显示） */}
-      <WallSlots onSlotOver={onSlotOver ?? (() => {})} onSlotUp={onSlotUp ?? (() => {})} />
+      {/* 城墙插槽占位平面（仅未占用 slot 显示）；城墙被毁时随城墙一起消失 */}
+      {wall && <WallSlots onSlotOver={onSlotOver ?? (() => {})} onSlotUp={onSlotUp ?? (() => {})} />}
 
       {/* 敌人弓手（黄色） */}
       {enemyArchers.map((entity) => (

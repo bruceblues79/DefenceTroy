@@ -4,7 +4,7 @@ import { Health, Targeting, IsWall, IsDefender } from '../traits'
 /**
  * 死亡系统
  * 销毁生命值 <= 0 的实体，同时清理指向它的 Targeting 关系
- * 城墙被毁时：所有守军立即死亡
+ * 城墙被毁时：所有守军立即死亡（城墙破则守军随城墙消失）
  */
 export function updateDeath(world: World, _dt: number) {
   const dying: Entity[] = []
