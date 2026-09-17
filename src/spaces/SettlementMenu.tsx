@@ -1,4 +1,4 @@
-import { Billboard } from '@react-three/drei'
+import { Billboard, Text } from '@react-three/drei'
 
 type GameResult = 'victory' | 'defeat'
 
@@ -32,6 +32,7 @@ export default function SettlementMenu({
         >
           <planeGeometry args={[2.5, 1]} />
           <meshBasicMaterial color="#4a90d9" />
+          <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">done</Text>
         </mesh>
       </Billboard>
     )
@@ -47,10 +48,12 @@ export default function SettlementMenu({
       <mesh position={[0, 0.625, 0.02]} onClick={(e) => { e.stopPropagation(); onRestart() }}>
         <planeGeometry args={[2.5, 1]} />
         <meshBasicMaterial color="#eab308" />
+        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">retry</Text>
       </mesh>
       <mesh position={[0, -0.625, 0.02]} onClick={(e) => { e.stopPropagation(); onExitToMenu() }}>
         <planeGeometry args={[2.5, 1]} />
         <meshBasicMaterial color="#dc2626" />
+        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
       </mesh>
     </Billboard>
   )

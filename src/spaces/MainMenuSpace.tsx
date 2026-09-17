@@ -1,5 +1,5 @@
 import { type ThreeEvent } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import { useGLTF, Text } from '@react-three/drei'
 import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -24,8 +24,13 @@ function resolveNodeName(obj: THREE.Object3D): string | null {
 function MainPageModel({ onStart }: { onStart: () => void }) {
   const { scene } = useGLTF(GLB_URL)
 
-  const cloned = useMemo(() => {
+  const { root, startPos, backPos } = useMemo(() => {
     const root = scene.clone(true)
+    root.updateWorldMatrix(true, true)
+    const positions: { start: THREE.Vector3 | null; back: THREE.Vector3 | null } = {
+      start: null,
+      back: null,
+    }
     root.traverse((obj) => {
       if (!(obj instanceof THREE.Mesh)) return
       const nodeName = resolveNodeName(obj)
@@ -35,8 +40,13 @@ function MainPageModel({ onStart }: { onStart: () => void }) {
         toneMapped: false,
       })
       obj.userData.nodeName = nodeName
+      if (nodeName === 'button_start') {
+        positions.start = new THREE.Vector3().setFromMatrixPosition(obj.matrixWorld)
+      } else if (nodeName === 'button_back') {
+        positions.back = new THREE.Vector3().setFromMatrixPosition(obj.matrixWorld)
+      }
     })
-    return root
+    return { root, startPos: positions.start, backPos: positions.back }
   }, [scene])
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -55,7 +65,35 @@ function MainPageModel({ onStart }: { onStart: () => void }) {
     }
   }
 
-  return <primitive object={cloned} onClick={handleClick} />
+  return (
+    <>
+      <primitive object={root} onClick={handleClick} />
+      {startPos && (
+        <Text
+          position={[startPos.x, startPos.y + 0.02, startPos.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.15}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          play
+        </Text>
+      )}
+      {backPos && (
+        <Text
+          position={[backPos.x, backPos.y + 0.02, backPos.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          fontSize={0.15}
+          color="#ffffff"
+          anchorX="center"
+          anchorY="middle"
+        >
+          quit
+        </Text>
+      )}
+    </>
+  )
 }
 
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {

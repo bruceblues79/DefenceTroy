@@ -260,6 +260,17 @@ export default function BattleFieldSpace({
                   {count}
                 </Text>
               )}
+              {name === 'btn_menu' && (
+                <Text
+                  position={[0, 0, 0.01]}
+                  fontSize={0.4}
+                  color="#ffffff"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  M
+                </Text>
+              )}
             </Billboard>
           )
         })}

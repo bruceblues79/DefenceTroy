@@ -1,4 +1,4 @@
-import { Billboard } from '@react-three/drei'
+import { Billboard, Text } from '@react-three/drei'
 
 export default function GameMenu({
   onResume,
@@ -18,14 +18,17 @@ export default function GameMenu({
       <mesh position={[0, 1.25, 0.02]} onClick={(e) => { e.stopPropagation(); onResume() }}>
         <planeGeometry args={[2.5, 1]} />
         <meshBasicMaterial color="#2563eb" />
+        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">resume</Text>
       </mesh>
       <mesh position={[0, 0, 0.02]} onClick={(e) => { e.stopPropagation(); onRestart() }}>
         <planeGeometry args={[2.5, 1]} />
         <meshBasicMaterial color="#eab308" />
+        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">restart</Text>
       </mesh>
       <mesh position={[0, -1.25, 0.02]} onClick={(e) => { e.stopPropagation(); onExitToMenu() }}>
         <planeGeometry args={[2.5, 1]} />
         <meshBasicMaterial color="#dc2626" />
+        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
       </mesh>
     </Billboard>
   )
