@@ -19,6 +19,8 @@ import CharacterProxy from './CharacterProxy'
 import ArrowProxy from './ArrowProxy'
 import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
+import HealthBarProxy from './HealthBarProxy'
+import EffectProxy from './EffectProxy'
 
 interface UnitRendererProps {
   /** 守军拖拽按下回调（BattleFieldSpace 提供，内部判定兵种） */
@@ -65,10 +67,19 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
     <group>
       {/* 城墙 */}
       {wall && (
-        <mesh position={[WALL_POSITION.x, WALL_POSITION.y, WALL_POSITION.z]} castShadow receiveShadow>
-          <boxGeometry args={[WALL_WIDTH, 4, 0.84]} />
-          <meshStandardMaterial color="#a68b5b" />
-        </mesh>
+        <>
+          <mesh position={[WALL_POSITION.x, WALL_POSITION.y, WALL_POSITION.z]} castShadow receiveShadow>
+            <boxGeometry args={[WALL_WIDTH, 4, 0.84]} />
+            <meshStandardMaterial color="#a68b5b" />
+          </mesh>
+          {/* 城墙血条：z=3.5（按钮 z=4 与城墙 z=2.95 中点），y=2.5 浮空，细窄 */}
+          <HealthBarProxy
+            entity={wall}
+            offset={[0, 2.5, 0.55]}
+            width={4.3}
+            height={0.08}
+          />
+        </>
       )}
 
       {/* 城墙插槽占位平面（仅未占用 slot 显示） */}
@@ -76,48 +87,63 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 敌人弓手（黄色） */}
       {enemyArchers.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#e6c200" />
+        <group key={entity.id()}>
+          <CharacterProxy entity={entity} color="#e6c200" />
+          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+        </group>
       ))}
 
       {/* 敌人步兵（深灰） */}
       {enemyInfantry.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#3a3a3a" />
+        <group key={entity.id()}>
+          <CharacterProxy entity={entity} color="#3a3a3a" />
+          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+        </group>
       ))}
 
       {/* 敌人矛兵（深红） */}
       {enemySpearmen.map((entity) => (
-        <CharacterProxy key={entity.id()} entity={entity} color="#b33939" />
+        <group key={entity.id()}>
+          <CharacterProxy entity={entity} color="#b33939" />
+          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+        </group>
       ))}
 
       {/* 守军弓手（蓝色） */}
       {defenderArchers.map((entity) => (
-        <CharacterProxy
-          key={entity.id()}
-          entity={entity}
-          color="#4a90d9"
-          onPointerDown={onDefenderPointerDown?.(entity)}
-        />
+        <group key={entity.id()}>
+          <CharacterProxy
+            entity={entity}
+            color="#4a90d9"
+            onPointerDown={onDefenderPointerDown?.(entity)}
+          />
+          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+        </group>
       ))}
 
       {/* 守军矛兵（青金） */}
       {defenderSpearmen.map((entity) => (
-        <CharacterProxy
-          key={entity.id()}
-          entity={entity}
-          color="#4a9d8f"
-          onPointerDown={onDefenderPointerDown?.(entity)}
-        />
+        <group key={entity.id()}>
+          <CharacterProxy
+            entity={entity}
+            color="#4a9d8f"
+            onPointerDown={onDefenderPointerDown?.(entity)}
+          />
+          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+        </group>
       ))}
 
-      {/* 守军投石车（深棕） */}
+      {/* 守军投石车（深棕）盒子高 0.8，半高 0.4，血条 y = pos.y + 0.5 */}
       {defenderCatapults.map((entity) => (
-        <CharacterProxy
-          key={entity.id()}
-          entity={entity}
-          color="#6b4226"
-          size={[0.6, 0.8, 0.6]}
-          onPointerDown={onDefenderPointerDown?.(entity)}
-        />
+        <group key={entity.id()}>
+          <CharacterProxy
+            entity={entity}
+            color="#6b4226"
+            size={[0.6, 0.8, 0.6]}
+            onPointerDown={onDefenderPointerDown?.(entity)}
+          />
+          <HealthBarProxy entity={entity} offset={[0, 0.5, 0]} width={0.55} />
+        </group>
       ))}
 
       {/* 箭矢抛射物 */}
@@ -129,6 +155,9 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
       {boulders.map((entity) => (
         <BoulderProxy key={entity.id()} entity={entity} />
       ))}
+
+      {/* 视觉效果（AOE 命中圆片等） */}
+      <EffectProxy />
     </group>
   )
 }

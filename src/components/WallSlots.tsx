@@ -29,8 +29,10 @@ export default function WallSlots({ onSlotOver, onSlotUp }: WallSlotsProps) {
 
   return (
     <group>
-      {WALL_SLOTS.map((x, i) =>
-        occupied.has(i) ? null : (
+      {WALL_SLOTS.map((x, i) => {
+        // 已占用 slot 渲染透明 plane（仅作拖拽落点命中区，不显示视觉占位）
+        const isOccupied = occupied.has(i)
+        return (
           <mesh
             key={i}
             name={`wall_slot_${i}`}
@@ -47,10 +49,14 @@ export default function WallSlots({ onSlotOver, onSlotUp }: WallSlotsProps) {
             }}
           >
             <planeGeometry args={[0.4, 0.4]} />
-            <meshBasicMaterial color="#888888" />
+            <meshBasicMaterial
+              color="#888888"
+              transparent
+              opacity={isOccupied ? 0 : 1}
+            />
           </mesh>
         )
-      )}
+      })}
     </group>
   )
 }

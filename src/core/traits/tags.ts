@@ -16,3 +16,6 @@ export const IsCatapult = trait()
 // 抛射物标签
 export const IsProjectile = trait()
 export const IsBoulder = trait()
+
+// 视觉效果标签（短命实体，由 updateEffects 倒计时销毁）
+export const IsEffect = trait()

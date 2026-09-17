@@ -37,6 +37,7 @@ type DragState =
 export default function BattleFieldSpace({
   paused,
   gameOver,
+  gameResult,
   onPause,
   onResume,
   onRestart,
@@ -46,11 +47,12 @@ export default function BattleFieldSpace({
 }: {
   paused: boolean
   gameOver: boolean
+  gameResult: 'victory' | 'defeat' | null
   onPause: () => void
   onResume: () => void
   onRestart: () => void
   onExitToMenu: () => void
-  onGameOver: () => void
+  onGameOver: (result: 'victory' | 'defeat') => void
   onDragStateChange?: (dragging: boolean) => void
 }) {
   const world = useWorld()
@@ -244,7 +246,11 @@ export default function BattleFieldSpace({
       )}
 
       {gameOver && (
-        <SettlementMenu onRestart={onRestart} onExitToMenu={onExitToMenu} />
+        <SettlementMenu
+          result={gameResult ?? 'defeat'}
+          onRestart={onRestart}
+          onExitToMenu={onExitToMenu}
+        />
       )}
     </group>
   )

@@ -12,17 +12,18 @@ import {
   updateAttack,
   updateProjectiles,
   updateBoulders,
+  updateEffects,
   updateDeath,
   createSpawnSystem,
   createInfantrySpawnSystem,
   createSpearmanSpawnSystem,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder } from '../core/traits'
+import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder, IsEffect } from '../core/traits'
 
 interface BattleSystemsProps {
   paused?: boolean
-  onGameOver?: () => void
+  onGameOver?: (result: 'victory' | 'defeat') => void
 }
 
 /**
@@ -85,6 +86,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
       world.query(IsDefender).forEach((e) => e.destroy())
       world.query(IsProjectile).forEach((e) => e.destroy())
       world.query(IsBoulder).forEach((e) => e.destroy())
+      world.query(IsEffect).forEach((e) => e.destroy())
     }
   }, [world])
 
@@ -105,6 +107,7 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     updateMovement(world, dt)
     updateProjectiles(world, dt)
     updateBoulders(world, dt)
+    updateEffects(world, dt)
     updateDeath(world, dt)
     spawnSystemRef.current?.update(world, dt)
     infantrySpawnSystemRef.current?.update(world, dt)
@@ -124,7 +127,8 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
         spawnSystemRef.current?.stop()
         infantrySpawnSystemRef.current?.stop()
         spearmanSpawnSystemRef.current?.stop()
-        onGameOver?.()
+        // !wall = 城墙被毁 = 失败；!enemies = 敌人全灭 = 胜利
+        onGameOver?.(!wall ? 'defeat' : 'victory')
       }
     }
   })
