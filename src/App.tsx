@@ -64,21 +64,28 @@ export default function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
   const [paused, setPaused] = useState(false)
   const [gameOver, setGameOver] = useState(false)
+  const [gameResult, setGameResult] = useState<'victory' | 'defeat' | null>(null)
   const [cameraReady, setCameraReady] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const orbitRef = useRef<any>(null)
   const handleStart = useCallback(() => setGameState('loading'), [])
   const handleLoaded = useCallback(() => setGameState('play'), [])
   const handlePause = useCallback(() => setPaused(true), [])
   const handleResume = useCallback(() => setPaused(false), [])
-  const handleGameOver = useCallback(() => setGameOver(true), [])
+  const handleGameOver = useCallback((result: 'victory' | 'defeat') => {
+    setGameOver(true)
+    setGameResult(result)
+  }, [])
   const handleRestart = useCallback(() => {
     setPaused(false)
     setGameOver(false)
+    setGameResult(null)
     setGameState('loading')
   }, [])
   const handleExitToMenu = useCallback(() => {
     setPaused(false)
     setGameOver(false)
+    setGameResult(null)
     setGameState('menu')
   }, [])
 
@@ -110,7 +117,8 @@ export default function App() {
           ref={orbitRef}
           target={[0, 0, 0]}
           enablePan={false}
-          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver}
+          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver && !dragging}
+          enableZoom={!dragging}
           enableDamping={false}
           minZoom={60}
           maxZoom={100}
@@ -137,11 +145,13 @@ export default function App() {
           <BattleFieldSpace
             paused={paused}
             gameOver={gameOver}
+            gameResult={gameResult}
             onPause={handlePause}
             onResume={handleResume}
             onRestart={handleRestart}
             onExitToMenu={handleExitToMenu}
             onGameOver={handleGameOver}
+            onDragStateChange={setDragging}
           />
         )}
       </Canvas>
