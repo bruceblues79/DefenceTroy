@@ -30,31 +30,34 @@ export default function WallSlots({ onSlotOver, onSlotUp }: WallSlotsProps) {
   return (
     <group>
       {WALL_SLOTS.map((x, i) => {
-        // 已占用 slot 渲染透明 plane（仅作拖拽落点命中区，不显示视觉占位）
+        // 已占用 slot 不渲染视觉占位，但保留 0.6 命中区供拖拽互换
         const isOccupied = occupied.has(i)
         return (
-          <mesh
-            key={i}
-            name={`wall_slot_${i}`}
-            position={[x, 2.01, WALL_POSITION.z]}
-            rotation={[-Math.PI / 2, 0, 0]}
-            onPointerOver={(e: ThreeEvent<PointerEvent>) => {
-              e.stopPropagation()
-              onSlotOver(i)
-            }}
-            onPointerOut={() => onSlotOver(null)}
-            onPointerUp={(e: ThreeEvent<PointerEvent>) => {
-              e.stopPropagation()
-              onSlotUp(i)
-            }}
-          >
-            <planeGeometry args={[0.4, 0.4]} />
-            <meshBasicMaterial
-              color="#888888"
-              transparent
-              opacity={isOccupied ? 0 : 1}
-            />
-          </mesh>
+          <group key={i} position={[x, 2.01, WALL_POSITION.z]} rotation={[-Math.PI / 2, 0, 0]}>
+            {/* raycast 命中区 0.6×0.6，不可见 */}
+            <mesh
+              name={`wall_slot_${i}`}
+              onPointerOver={(e: ThreeEvent<PointerEvent>) => {
+                e.stopPropagation()
+                onSlotOver(i)
+              }}
+              onPointerOut={() => onSlotOver(null)}
+              onPointerUp={(e: ThreeEvent<PointerEvent>) => {
+                e.stopPropagation()
+                onSlotUp(i)
+              }}
+            >
+              <planeGeometry args={[0.6, 0.6]} />
+              <meshBasicMaterial transparent opacity={0} />
+            </mesh>
+            {/* 视觉占位 0.4×0.4，仅未占用时显示 */}
+            {!isOccupied && (
+              <mesh raycast={() => null}>
+                <planeGeometry args={[0.4, 0.4]} />
+                <meshBasicMaterial color="#888888" />
+              </mesh>
+            )}
+          </group>
         )
       })}
     </group>
