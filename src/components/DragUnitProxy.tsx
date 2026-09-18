@@ -34,7 +34,7 @@ export default function DragUnitProxy({ color }: DragUnitProxyProps) {
       rotation={[-Math.PI / 2, 0, 0]}
       raycast={() => null}
     >
-      <planeGeometry args={[0.3, 0.3]} />
+      <planeGeometry args={[0.9, 0.9]} />
       <meshBasicMaterial color={color} transparent opacity={0.5} depthTest={false} />
     </mesh>
   )

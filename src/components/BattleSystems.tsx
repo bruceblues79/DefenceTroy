@@ -24,6 +24,7 @@ import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder, IsEffect, Health 
 interface BattleSystemsProps {
   paused?: boolean
   onGameOver?: (result: 'victory' | 'defeat') => void
+  onEnemyKilled?: (count: number) => void
 }
 
 /**
@@ -31,7 +32,7 @@ interface BattleSystemsProps {
  * 在 useFrame 中按顺序执行所有 ECS 系统
  * 返回 null，不渲染任何内容
  */
-export default function BattleSystems({ paused = false, onGameOver }: BattleSystemsProps) {
+export default function BattleSystems({ paused = false, onGameOver, onEnemyKilled }: BattleSystemsProps) {
   const world = useWorld()
   const spawnSystemRef = useRef<ReturnType<typeof createSpawnSystem> | null>(null)
   const infantrySpawnSystemRef = useRef<ReturnType<typeof createInfantrySpawnSystem> | null>(null)
@@ -108,7 +109,11 @@ export default function BattleSystems({ paused = false, onGameOver }: BattleSyst
     updateProjectiles(world, dt)
     updateBoulders(world, dt)
     updateEffects(world, dt)
+    const enemiesBefore = world.query(IsEnemy).length
     updateDeath(world, dt)
+    // 击杀产金：updateDeath 前后敌人数量差即为击杀数
+    const killed = enemiesBefore - world.query(IsEnemy).length
+    if (killed > 0) onEnemyKilled?.(killed)
     spawnSystemRef.current?.update(world, dt)
     infantrySpawnSystemRef.current?.update(world, dt)
     spearmanSpawnSystemRef.current?.update(world, dt)

@@ -5,10 +5,11 @@ import { useEffect, useState } from 'react'
 import type { Entity } from 'koota'
 import GameMenu from './GameMenu'
 import SettlementMenu from './SettlementMenu'
+import ShopScreen, { type UnitType } from './ShopScreen'
 import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import DragUnitProxy from '../components/DragUnitProxy'
-import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION } from '../core/actions'
+import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEARMAN_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
 import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
@@ -25,9 +26,11 @@ const DRAG_COLORS: Record<UnitType, string> = {
   catapult: '#6b4226',
 }
 
-type UnitType = 'bow' | 'spear' | 'catapult'
 type StockUnit = { hp: number }
 type Barracks = Record<UnitType, StockUnit[]>
+
+// 雇佣满血常量
+const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEARMAN_HP, catapult: DEFENDER_CATAPULT_HP }
 
 type DragState =
   | { source: 'unit'; entity: Entity; type: UnitType }
@@ -58,11 +61,18 @@ export default function BattleFieldSpace({
   const world = useWorld()
   const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [], catapult: [] })
   const [dragState, setDragState] = useState<DragState>(null)
+  const [gold, setGold] = useState(50)
+  const [shopOpen, setShopOpen] = useState(false)
 
   // 通知 App 屏蔽 OrbitControls
   useEffect(() => {
     onDragStateChange?.(dragState !== null)
   }, [dragState, onDragStateChange])
+
+  // 胜负结算时自动关闭商店
+  useEffect(() => {
+    if (gameOver) setShopOpen(false)
+  }, [gameOver])
 
   /** 判定实体兵种 */
   const unitTypeOf = (e: Entity): UnitType => {
@@ -86,6 +96,13 @@ export default function BattleFieldSpace({
     if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2.5, WALL_POSITION.z, hp)
     else if (type === 'spear') spawn.spawnDefenderSpearman(slotX, 2.5, WALL_POSITION.z, hp)
     else spawn.spawnDefenderCatapult(slotX, 2.5, WALL_POSITION.z, hp)
+  }
+
+  /** 商店雇佣：金币足够则扣金币 + 入兵营（满血） */
+  const handleHire = (type: UnitType, cost: number) => {
+    if (gold < cost) return
+    setGold((g) => g - cost)
+    setBarracks((prev) => ({ ...prev, [type]: [...prev[type], { hp: UNIT_MAX_HP[type] }] }))
   }
 
   // ── 拖拽起点 ──
@@ -184,7 +201,7 @@ export default function BattleFieldSpace({
   return (
     <group>
       {/* 战斗系统驱动（无渲染） */}
-      <BattleSystems paused={paused || gameOver} onGameOver={onGameOver} />
+      <BattleSystems paused={paused || gameOver} onGameOver={onGameOver} onEnemyKilled={(n) => setGold((g) => g + n * 10)} />
 
       {/* ground: plane 5×9, beach sand */}
       <mesh name="ground" position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -239,9 +256,15 @@ export default function BattleFieldSpace({
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
+                    : name === 'btn_shop'
+                    ? (e: ThreeEvent<PointerEvent>) => {
+                        e.stopPropagation()
+                        setShopOpen((prev) => !prev)
+                      }
                     : name === 'btn_menu' && !paused
                     ? (e: ThreeEvent<PointerEvent>) => {
                         e.stopPropagation()
+                        setShopOpen(false)
                         onPause()
                       }
                     : undefined
@@ -278,6 +301,10 @@ export default function BattleFieldSpace({
 
       {/* 拖拽示意物：拖拽期间显示，跟随 pointer 在 y=6 平面 */}
       {dragState && <DragUnitProxy color={DRAG_COLORS[dragState.type]} />}
+
+      {shopOpen && !gameOver && (
+        <ShopScreen gold={gold} onHire={handleHire} onClose={() => setShopOpen(false)} />
+      )}
 
       {paused && !gameOver && (
         <GameMenu onResume={onResume} onRestart={onRestart} onExitToMenu={onExitToMenu} />
