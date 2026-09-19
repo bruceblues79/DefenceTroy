@@ -1,7 +1,7 @@
 import { Billboard, Text } from '@react-three/drei'
-import { type ThreeEvent } from '@react-three/fiber'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useWorld } from 'koota/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Entity } from 'koota'
 import GameMenu from './GameMenu'
 import SettlementMenu from './SettlementMenu'
@@ -32,6 +32,19 @@ type Barracks = Record<UnitType, StockUnit[]>
 
 // 雇佣满血常量
 const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEARMAN_HP, catapult: DEFENDER_CATAPULT_HP }
+
+/** 从 stock 中取出血量最大的单位，返回其 hp 与剔除后的数组（并列取首个） */
+const takeMaxHpStock = (stock: StockUnit[]): { hp: number; rest: StockUnit[] } => {
+  if (stock.length === 0) return { hp: 0, rest: [] }
+  let maxIdx = 0
+  for (let i = 1; i < stock.length; i++) {
+    if (stock[i].hp > stock[maxIdx].hp) maxIdx = i
+  }
+  return {
+    hp: stock[maxIdx].hp,
+    rest: [...stock.slice(0, maxIdx), ...stock.slice(maxIdx + 1)],
+  }
+}
 
 type DragState =
   | { source: 'unit'; entity: Entity; type: UnitType }
@@ -64,6 +77,29 @@ export default function BattleFieldSpace({
   const [dragState, setDragState] = useState<DragState>(null)
   const [gold, setGold] = useState(50)
   const [shopOpen, setShopOpen] = useState(false)
+  const regenAccumRef = useRef(0)
+
+  // 兵营单位线性回血：每秒1点，上限为该兵种 max HP；暂停/结算时停止
+  useFrame((_, delta) => {
+    if (paused || gameOver) return
+    regenAccumRef.current += delta
+    if (regenAccumRef.current < 1) return
+    const ticks = Math.floor(regenAccumRef.current)
+    regenAccumRef.current -= ticks
+    setBarracks((prev) => {
+      let changed = false
+      const next: Barracks = { bow: [], spear: [], catapult: [] }
+      for (const t of ['bow', 'spear', 'catapult'] as UnitType[]) {
+        const max = UNIT_MAX_HP[t]
+        next[t] = prev[t].map((u) => {
+          if (u.hp >= max) return u
+          changed = true
+          return { hp: Math.min(max, u.hp + ticks) }
+        })
+      }
+      return changed ? next : prev
+    })
+  })
 
   // 通知 App 屏蔽 OrbitControls
   useEffect(() => {
@@ -141,23 +177,19 @@ export default function BattleFieldSpace({
     const stock = barracks[drag.type]
     if (stock.length === 0) return
 
-    if (occupant) {
-      // 原兵回兵营（保留血量）
-      const occupantType = unitTypeOf(occupant)
-      const hp = occupant.get(Health)?.current ?? 0
-      setBarracks((prev) => ({
-        ...prev,
-        [occupantType]: [...prev[occupantType], { hp }],
-      }))
-      combat.recycleDefenderUnit(occupant)
-    }
+    // 先从兵营取血量最大的单位，再回收原兵，避免刚回营的原兵被立刻选中
+    const { hp: deployHp, rest } = takeMaxHpStock(stock)
+    setBarracks((prev) => {
+      const next = { ...prev, [drag.type]: rest }
+      if (occupant) {
+        const occupantType = unitTypeOf(occupant)
+        const hp = occupant.get(Health)?.current ?? 0
+        next[occupantType] = [...next[occupantType], { hp }]
+      }
+      return next
+    })
+    if (occupant) combat.recycleDefenderUnit(occupant)
 
-    // 部署拖拽兵种（shift一个 stock）
-    const { hp: deployHp } = stock[0]
-    setBarracks((prev) => ({
-      ...prev,
-      [drag.type]: prev[drag.type].slice(1),
-    }))
     spawnDefender(drag.type, WALL_SLOTS[slotIndex], deployHp)
   }
 
