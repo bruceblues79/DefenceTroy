@@ -54,8 +54,8 @@ export function updateEnemySpearmanAI(world: World, _dt: number) {
       }
     }
 
-    // 2. 优先搜索射程内守军单位
-    if (!target) {
+    // 2. 优先搜索射程内守军单位（即使当前锁定城墙，也要切换至守军）
+    if (!target || target.has(IsWall)) {
       let nearestDefender: Entity | null = null
       let nearestDist = Infinity
 
@@ -68,6 +68,7 @@ export function updateEnemySpearmanAI(world: World, _dt: number) {
       })
 
       if (nearestDefender) {
+        enemy.remove(Targeting('*'))
         enemy.add(Targeting(nearestDefender))
         target = nearestDefender
       }
