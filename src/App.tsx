@@ -153,7 +153,7 @@ export default function App() {
       <FullscreenPrompt />
       <LandscapePrompt />
       <Canvas dpr={[1, 2]} shadows>
-        <color attach="background" args={['#6b7280']} />
+        <color attach="background" args={['#888888']} />
         <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
         <OrbitControls
           ref={orbitRef}

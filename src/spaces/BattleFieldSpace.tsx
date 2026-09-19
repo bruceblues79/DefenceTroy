@@ -9,6 +9,7 @@ import ShopScreen, { type UnitType } from './ShopScreen'
 import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import DragUnitProxy from '../components/DragUnitProxy'
+import RoundedShapeButton from '../components/RoundedShapeButton'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEARMAN_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
 import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 
@@ -244,15 +245,19 @@ export default function BattleFieldSpace({
         </mesh>
       )}
 
-      {/* five buttons: 0.84 square planes, billboard to face camera */}
+      {/* five buttons: 0.8 square rounded planes, billboard to face camera */}
       {!gameOver && !paused &&
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
           return (
             <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
-              <mesh
+              <RoundedShapeButton
                 name={name}
+                width={0.8}
+                height={0.8}
+                cornerRadius={0.1}
+                color={BUTTON_COLORS[i]}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
@@ -269,10 +274,7 @@ export default function BattleFieldSpace({
                       }
                     : undefined
                 }
-              >
-                <planeGeometry args={[0.8, 0.8]} />
-                <meshBasicMaterial color={BUTTON_COLORS[i]} />
-              </mesh>
+              />
               {type && count > 0 && (
                 <Text
                   position={[0.3, 0.3, 0.01]}
