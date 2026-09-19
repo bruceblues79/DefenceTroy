@@ -1,4 +1,6 @@
 import { Billboard, Text } from '@react-three/drei'
+import RoundShapePlane from '../components/RoundShapePlane'
+import RoundedShapeButton from '../components/RoundedShapeButton'
 
 type GameResult = 'victory' | 'defeat'
 
@@ -19,21 +21,20 @@ export default function SettlementMenu({
   if (result === 'victory') {
     return (
       <Billboard position={[0, 3, 0]}>
-        <mesh position={[0, 0.01, 0]}>
-          <planeGeometry args={[3, 3]} />
-          <meshBasicMaterial color="#666666" />
-        </mesh>
-        <mesh
-          position={[0, 0, 0.02]}
-          onClick={(e) => {
-            e.stopPropagation()
-            onExitToMenu()
-          }}
-        >
-          <planeGeometry args={[2.5, 1]} />
-          <meshBasicMaterial color="#4a90d9" />
+        <RoundShapePlane width={3} height={3} cornerRadius={0.15} color="#666666" position={[0, 0.01, 0]} />
+        <group position={[0, 0, 0.02]}>
+          <RoundedShapeButton
+            width={2.5}
+            height={1}
+            cornerRadius={0.1}
+            color="#4a90d9"
+            onClick={(e) => {
+              e.stopPropagation()
+              onExitToMenu()
+            }}
+          />
           <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">win</Text>
-        </mesh>
+        </group>
       </Billboard>
     )
   }
@@ -41,20 +42,33 @@ export default function SettlementMenu({
   // defeat
   return (
     <Billboard position={[0, 3, 0]}>
-      <mesh position={[0, 0.01, 0]}>
-        <planeGeometry args={[3, 3]} />
-        <meshBasicMaterial color="#666666" />
-      </mesh>
-      <mesh position={[0, 0.625, 0.02]} onClick={(e) => { e.stopPropagation(); onRestart() }}>
-        <planeGeometry args={[2.5, 1]} />
-        <meshBasicMaterial color="#eab308" />
+      <RoundShapePlane width={3} height={3} cornerRadius={0.15} color="#666666" position={[0, 0.01, 0]} />
+      <group position={[0, 0.625, 0.02]}>
+        <RoundedShapeButton
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#eab308"
+          onClick={(e) => {
+            e.stopPropagation()
+            onRestart()
+          }}
+        />
         <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">retry</Text>
-      </mesh>
-      <mesh position={[0, -0.625, 0.02]} onClick={(e) => { e.stopPropagation(); onExitToMenu() }}>
-        <planeGeometry args={[2.5, 1]} />
-        <meshBasicMaterial color="#dc2626" />
+      </group>
+      <group position={[0, -0.625, 0.02]}>
+        <RoundedShapeButton
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#dc2626"
+          onClick={(e) => {
+            e.stopPropagation()
+            onExitToMenu()
+          }}
+        />
         <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
-      </mesh>
+      </group>
     </Billboard>
   )
 }

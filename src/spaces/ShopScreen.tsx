@@ -1,5 +1,7 @@
 import { Billboard, Text } from '@react-three/drei'
 import { useState } from 'react'
+import RoundShapePlane from '../components/RoundShapePlane'
+import RoundedShapeButton from '../components/RoundedShapeButton'
 
 export type UnitType = 'bow' | 'spear' | 'catapult'
 
@@ -35,10 +37,15 @@ export default function ShopScreen({
   return (
     <Billboard position={[0, 7, 0]}>
       {/* 金币显示（面板上方） */}
-      <mesh position={[0, 2.85, 0]} renderOrder={3}>
-        <planeGeometry args={[1.6, 0.4]} />
-        <meshBasicMaterial color="#333333" depthTest={false} />
-      </mesh>
+      <RoundShapePlane
+        width={1.6}
+        height={0.4}
+        cornerRadius={0.08}
+        color="#333333"
+        depthTest={false}
+        renderOrder={3}
+        position={[0, 2.85, 0]}
+      />
       <Text
         position={[0, 2.85, 0.01]}
         fontSize={0.22}
@@ -52,25 +59,31 @@ export default function ShopScreen({
       </Text>
 
       {/* 面板背景 */}
-      <mesh position={[0, 0, 0]} renderOrder={1}>
-        <planeGeometry args={[3, 5]} />
-        <meshBasicMaterial color="#888888" depthTest={false} />
-      </mesh>
+      <RoundShapePlane
+        width={3}
+        height={5}
+        cornerRadius={0.15}
+        color="#888888"
+        depthTest={false}
+        renderOrder={1}
+      />
 
       {/* 雇佣区（仅 hire 页） */}
       {page === 'hire' &&
         HIRE_ITEMS.map((item, i) => (
-          <mesh
-            key={item.type}
-            position={[0, HIRE_ROW_Y[i], 0.01]}
-            renderOrder={2}
-            onClick={(e) => {
-              e.stopPropagation()
-              onHire(item.type, item.cost)
-            }}
-          >
-            <planeGeometry args={[2.8, 1.2]} />
-            <meshBasicMaterial color={item.color} depthTest={false} />
+          <group key={item.type} position={[0, HIRE_ROW_Y[i], 0.01]}>
+            <RoundedShapeButton
+              width={2.8}
+              height={1.2}
+              cornerRadius={0.1}
+              color={item.color}
+              depthTest={false}
+              renderOrder={2}
+              onClick={(e) => {
+                e.stopPropagation()
+                onHire(item.type, item.cost)
+              }}
+            />
             <Text
               position={[0, 0, 0.01]}
               fontSize={0.3}
@@ -82,24 +95,26 @@ export default function ShopScreen({
             >
               {item.label}
             </Text>
-          </mesh>
+          </group>
         ))}
 
       {/* 操作区：H(雇佣页) / G(神迹页) / C(关闭) */}
       {OP_BUTTONS.map((label, i) => (
-        <mesh
-          key={label}
-          position={[OP_BUTTON_X[i], -1.975, 0.01]}
-          renderOrder={2}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (label === 'H') setPage('hire')
-            else if (label === 'G') setPage('miracle')
-            else onClose()
-          }}
-        >
-          <planeGeometry args={[0.8, 0.8]} />
-          <meshBasicMaterial color="#555555" depthTest={false} />
+        <group key={label} position={[OP_BUTTON_X[i], -1.975, 0.01]}>
+          <RoundedShapeButton
+            width={0.8}
+            height={0.8}
+            cornerRadius={0.1}
+            color="#555555"
+            depthTest={false}
+            renderOrder={2}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (label === 'H') setPage('hire')
+              else if (label === 'G') setPage('miracle')
+              else onClose()
+            }}
+          />
           <Text
             position={[0, 0, 0.01]}
             fontSize={0.35}
@@ -111,7 +126,7 @@ export default function ShopScreen({
           >
             {label}
           </Text>
-        </mesh>
+        </group>
       ))}
     </Billboard>
   )

@@ -1,105 +1,46 @@
-import { type ThreeEvent } from '@react-three/fiber'
-import { useGLTF, Text } from '@react-three/drei'
-import { Suspense, useMemo } from 'react'
-import * as THREE from 'three'
+import { Text } from '@react-three/drei'
+import RoundedShapeButton from '../components/RoundedShapeButton'
 
-const GLB_URL = `${import.meta.env.BASE_URL}assets/glb/main_page.glb`
-
-// 节点名 → 颜色（直接用 GLB 中的节点名做 key）
-const NODE_COLORS: Record<string, string> = {
-  button_start: '#2563eb', // 开始游戏按钮：蓝
-  button_back: '#dc2626', // 返回主站按钮：红
-  main_page: '#ffffff', // 主页面底板：白（保留顶点色）
-}
-
-function resolveNodeName(obj: THREE.Object3D): string | null {
-  let cur: THREE.Object3D | null = obj
-  while (cur) {
-    if (cur.name in NODE_COLORS) return cur.name
-    cur = cur.parent
-  }
-  return null
-}
-
-function MainPageModel({ onStart }: { onStart: () => void }) {
-  const { scene } = useGLTF(GLB_URL)
-
-  const { root, startPos, backPos } = useMemo(() => {
-    const root = scene.clone(true)
-    root.updateWorldMatrix(true, true)
-    const positions: { start: THREE.Vector3 | null; back: THREE.Vector3 | null } = {
-      start: null,
-      back: null,
-    }
-    root.traverse((obj) => {
-      if (!(obj instanceof THREE.Mesh)) return
-      const nodeName = resolveNodeName(obj)
-      obj.material = new THREE.MeshBasicMaterial({
-        color: nodeName ? NODE_COLORS[nodeName] : '#ffffff',
-        vertexColors: true,
-        toneMapped: false,
-      })
-      obj.userData.nodeName = nodeName
-      if (nodeName === 'button_start') {
-        positions.start = new THREE.Vector3().setFromMatrixPosition(obj.matrixWorld)
-      } else if (nodeName === 'button_back') {
-        positions.back = new THREE.Vector3().setFromMatrixPosition(obj.matrixWorld)
-      }
-    })
-    return { root, startPos: positions.start, backPos: positions.back }
-  }, [scene])
-
-  const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation()
-    let cur: THREE.Object3D | null = e.object
-    while (cur) {
-      const name = cur.userData?.nodeName as string | undefined
-      if (name) {
-        if (name === 'button_back') {
-          window.location.href = 'https://svalbardpost.xyz/'
-        }
-        if (name === 'button_start') onStart()
-        return
-      }
-      cur = cur.parent
-    }
-  }
-
-  return (
-    <>
-      <primitive object={root} onClick={handleClick} />
-      {startPos && (
-        <Text
-          position={[startPos.x, startPos.y + 0.02, startPos.z]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.15}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-        >
-          play
-        </Text>
-      )}
-      {backPos && (
-        <Text
-          position={[backPos.x, backPos.y + 0.02, backPos.z]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          fontSize={0.15}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-        >
-          quit
-        </Text>
-      )}
-    </>
-  )
-}
-
+/**
+ * 主菜单
+ * 不再使用 GLB 模型,改为程序化圆角按钮。
+ * 无背景 panel,依赖场景背景色(中灰 #888888)。
+ * 两按钮组中心位于 [0,2,2],quit 在上 play 在下,平铺朝上适配顶视相机。
+ */
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
   return (
-    <Suspense fallback={null}>
-      <MainPageModel onStart={onStart} />
-    </Suspense>
+    <group>
+      {/* quit 按钮（红） — 返回主站,上方 */}
+      <group position={[0, 2, 2.75]} rotation={[-Math.PI / 2, 0, 0]}>
+        <RoundedShapeButton
+          name="button_back"
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#dc2626"
+          onClick={(e) => {
+            e.stopPropagation()
+            window.location.href = 'https://svalbardpost.xyz/'
+          }}
+        />
+        <Text position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
+      </group>
+
+      {/* play 按钮（蓝）,下方 */}
+      <group position={[0, 2, 1.25]} rotation={[-Math.PI / 2, 0, 0]}>
+        <RoundedShapeButton
+          name="button_start"
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#2563eb"
+          onClick={(e) => {
+            e.stopPropagation()
+            onStart()
+          }}
+        />
+        <Text position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">play</Text>
+      </group>
+    </group>
   )
 }

@@ -1,4 +1,6 @@
 import { Billboard, Text } from '@react-three/drei'
+import RoundShapePlane from '../components/RoundShapePlane'
+import RoundedShapeButton from '../components/RoundedShapeButton'
 
 export default function GameMenu({
   onResume,
@@ -11,25 +13,46 @@ export default function GameMenu({
 }) {
   return (
     <Billboard position={[0, 3, 0]}>
-      <mesh position={[0, 0.01, 0]}>
-        <planeGeometry args={[3, 4]} />
-        <meshBasicMaterial color="#888888" />
-      </mesh>
-      <mesh position={[0, 1.25, 0.02]} onClick={(e) => { e.stopPropagation(); onResume() }}>
-        <planeGeometry args={[2.5, 1]} />
-        <meshBasicMaterial color="#2563eb" />
+      <RoundShapePlane width={3} height={4} cornerRadius={0.15} color="#888888" position={[0, 0.01, 0]} />
+      <group position={[0, 1.25, 0.02]}>
+        <RoundedShapeButton
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#2563eb"
+          onClick={(e) => {
+            e.stopPropagation()
+            onResume()
+          }}
+        />
         <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">resume</Text>
-      </mesh>
-      <mesh position={[0, 0, 0.02]} onClick={(e) => { e.stopPropagation(); onRestart() }}>
-        <planeGeometry args={[2.5, 1]} />
-        <meshBasicMaterial color="#eab308" />
+      </group>
+      <group position={[0, 0, 0.02]}>
+        <RoundedShapeButton
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#eab308"
+          onClick={(e) => {
+            e.stopPropagation()
+            onRestart()
+          }}
+        />
         <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">restart</Text>
-      </mesh>
-      <mesh position={[0, -1.25, 0.02]} onClick={(e) => { e.stopPropagation(); onExitToMenu() }}>
-        <planeGeometry args={[2.5, 1]} />
-        <meshBasicMaterial color="#dc2626" />
+      </group>
+      <group position={[0, -1.25, 0.02]}>
+        <RoundedShapeButton
+          width={2.5}
+          height={1}
+          cornerRadius={0.1}
+          color="#dc2626"
+          onClick={(e) => {
+            e.stopPropagation()
+            onExitToMenu()
+          }}
+        />
         <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
-      </mesh>
+      </group>
     </Billboard>
   )
 }
