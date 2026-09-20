@@ -37,7 +37,7 @@ export const ENEMY_ARCHER_WALL_Z = -0.6
 export const ENEMY_ARCHER_WALL_DAMAGE = 2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
 export const ENEMY_ARCHER_WALL_ATTACK_POINT = 0.8
-export const ENEMY_ARCHER_REWARD = 20
+export const ENEMY_ARCHER_REWARD = 15
 
 // 敌方步兵：只攻击城门（wallZ=1.95），近战
 export const ENEMY_INFANTRY_HP = 100
@@ -46,7 +46,7 @@ export const ENEMY_INFANTRY_WALL_Z = 1.95
 export const ENEMY_INFANTRY_WALL_DAMAGE = 5
 export const ENEMY_INFANTRY_WALL_INTERVAL = 1.2
 export const ENEMY_INFANTRY_WALL_ATTACK_POINT = 0.5
-export const ENEMY_INFANTRY_REWARD = 20
+export const ENEMY_INFANTRY_REWARD = 10
 
 // 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=0.825）
 export const ENEMY_SPEARMAN_HP = 150
@@ -59,7 +59,7 @@ export const ENEMY_SPEARMAN_WALL_Z = 0.825
 export const ENEMY_SPEARMAN_WALL_DAMAGE = 10
 export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.2
 export const ENEMY_SPEARMAN_WALL_ATTACK_POINT = 0.7
-export const ENEMY_SPEARMAN_REWARD = 30
+export const ENEMY_SPEARMAN_REWARD = 25
 
 // 守军弓兵：只攻击单位（range=6）
 export const DEFENDER_ARCHER_HP = 200

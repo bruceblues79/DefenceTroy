@@ -7,9 +7,9 @@ export type UnitType = 'bow' | 'spear' | 'catapult'
 
 // 雇佣商品：兵种 / 标签 / 花费 / 染色（与守军代理一致）
 const HIRE_ITEMS = [
-  { type: 'bow' as UnitType, label: 'archer 50g', cost: 50, color: '#4a90d9' },
-  { type: 'spear' as UnitType, label: 'spearman 75g', cost: 75, color: '#4a9d8f' },
-  { type: 'catapult' as UnitType, label: 'catapult 120g', cost: 120, color: '#6b4226' },
+  { type: 'bow' as UnitType, label: 'archer 200g', cost: 200, color: '#4a90d9' },
+  { type: 'spear' as UnitType, label: 'spearman 350g', cost: 350, color: '#4a9d8f' },
+  { type: 'catapult' as UnitType, label: 'catapult 600g', cost: 600, color: '#6b4226' },
 ]
 
 // 雇佣区 3 行 Y 中心（Y∈[-1.45,2.5]，均分 3 行，位于面板上半）
