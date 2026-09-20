@@ -267,6 +267,7 @@ export default function BattleFieldSpace({
         paused={paused || gameOver}
         engine={engine}
         barracksDefenderCount={barracksCount}
+        onEnemyKilled={(n) => setGold((g) => g + n * 10)}
         onGameOver={onGameOver}
       />
 
@@ -377,9 +378,14 @@ export default function BattleFieldSpace({
           body={prompt.kind === 'intro' ? prompt.round.intro.body : prompt.round.ending.body}
           tip={prompt.kind === 'intro' ? prompt.round.intro.tip : undefined}
           onOk={() => {
-            if (prompt.kind === 'intro') engine.confirmIntro()
-            else engine.confirmEnding()
-            setPrompt({ kind: 'none' })
+            if (prompt.kind === 'intro') {
+              engine.confirmIntro()
+              setPrompt({ kind: 'none' })
+            } else {
+              // ending: confirmEnding 会同步触发 onIntro（下一轮）或 onAllDone（胜利）
+              // 不主动清空，让对应回调设置 prompt（胜利时 useEffect 清空）
+              engine.confirmEnding()
+            }
           }}
         />
       )}

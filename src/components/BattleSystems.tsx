@@ -25,6 +25,8 @@ interface BattleSystemsProps {
   /** 兵营中守军总数，用于「无守军且无兵营」失败判定 */
   barracksDefenderCount: number
   onGameOver?: (result: 'victory' | 'defeat') => void
+  /** 击杀敌人回调（每只击杀的敌人触发一次） */
+  onEnemyKilled?: (count: number) => void
 }
 
 /**
@@ -32,7 +34,7 @@ interface BattleSystemsProps {
  * 在 useFrame 中按顺序执行所有 ECS 系统，并驱动轮次引擎。
  * 返回 null，不渲染任何内容。
  */
-export default function BattleSystems({ paused = false, engine, barracksDefenderCount, onGameOver }: BattleSystemsProps) {
+export default function BattleSystems({ paused = false, engine, barracksDefenderCount, onGameOver, onEnemyKilled }: BattleSystemsProps) {
   const world = useWorld()
   const initializedRef = useRef(false)
   const gameOverFiredRef = useRef(false)
@@ -93,7 +95,11 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     updateProjectiles(world, dt)
     updateBoulders(world, dt)
     updateEffects(world, dt)
+    const enemiesBefore = world.query(IsEnemy).length
     updateDeath(world, dt)
+    // 击杀产金：updateDeath 前后敌人数量差即为击杀数
+    const killed = enemiesBefore - world.query(IsEnemy).length
+    if (killed > 0) onEnemyKilled?.(killed)
 
     // 轮次引擎：发兵 / 小波间等待
     engine.update(world, dt)
