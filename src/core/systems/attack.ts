@@ -56,12 +56,12 @@ export function updateAttack(world: World, dt: number) {
         }
       }
 
-      // 攻击周期结束
+      // 攻击周期结束，立即进入下一次攻击（interval 已含完整周期时长）
       if (attack.attackTimer >= interval) {
         attack.isAttacking = false
         attack.attackTimer = 0
         attack.hasFired = false
-        attack.cooldown = interval
+        attack.cooldown = 0
       }
     } else if (attack.cooldown > 0) {
       // 冷却中

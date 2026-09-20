@@ -267,7 +267,7 @@ export default function BattleFieldSpace({
         paused={paused || gameOver}
         engine={engine}
         barracksDefenderCount={barracksCount}
-        onEnemyKilled={(n) => setGold((g) => g + n * 10)}
+        onRewardGained={(gold) => setGold((g) => g + gold)}
         onGameOver={onGameOver}
       />
 

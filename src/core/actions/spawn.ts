@@ -7,6 +7,7 @@ import {
   CanAttackUnits,
   CanAttackWall,
   CanBombard,
+  Reward,
   Projectile,
   IsEnemy,
   IsDefender,
@@ -26,56 +27,59 @@ export const WALL_WIDTH = 4.5
 export const WALL_HP = 99999
 
 // 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.6）
-export const ENEMY_ARCHER_HP = 30
+export const ENEMY_ARCHER_HP = 100
 export const ENEMY_ARCHER_SPEED = 0.5
 export const ENEMY_ARCHER_UNITS_RANGE = 5
-export const ENEMY_ARCHER_UNITS_DAMAGE = 5
-export const ENEMY_ARCHER_UNITS_INTERVAL = 1.5
+export const ENEMY_ARCHER_UNITS_DAMAGE = 15
+export const ENEMY_ARCHER_UNITS_INTERVAL = 1.2
 export const ENEMY_ARCHER_UNITS_ATTACK_POINT = 0.8
 export const ENEMY_ARCHER_WALL_Z = -0.6
-export const ENEMY_ARCHER_WALL_DAMAGE = 5
-export const ENEMY_ARCHER_WALL_INTERVAL = 1.5
+export const ENEMY_ARCHER_WALL_DAMAGE = 2
+export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
 export const ENEMY_ARCHER_WALL_ATTACK_POINT = 0.8
+export const ENEMY_ARCHER_REWARD = 20
 
 // 敌方步兵：只攻击城门（wallZ=1.95），近战
-export const ENEMY_INFANTRY_HP = 50
+export const ENEMY_INFANTRY_HP = 100
 export const ENEMY_INFANTRY_SPEED = 0.8
 export const ENEMY_INFANTRY_WALL_Z = 1.95
-export const ENEMY_INFANTRY_WALL_DAMAGE = 8
+export const ENEMY_INFANTRY_WALL_DAMAGE = 5
 export const ENEMY_INFANTRY_WALL_INTERVAL = 1.2
 export const ENEMY_INFANTRY_WALL_ATTACK_POINT = 0.5
+export const ENEMY_INFANTRY_REWARD = 20
 
 // 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=0.825）
-export const ENEMY_SPEARMAN_HP = 40
+export const ENEMY_SPEARMAN_HP = 150
 export const ENEMY_SPEARMAN_SPEED = 0.6
 export const ENEMY_SPEARMAN_UNITS_RANGE = 2.5
-export const ENEMY_SPEARMAN_UNITS_DAMAGE = 12
-export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.3
+export const ENEMY_SPEARMAN_UNITS_DAMAGE = 30
+export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.2
 export const ENEMY_SPEARMAN_UNITS_ATTACK_POINT = 0.7
 export const ENEMY_SPEARMAN_WALL_Z = 0.825
-export const ENEMY_SPEARMAN_WALL_DAMAGE = 12
-export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.3
+export const ENEMY_SPEARMAN_WALL_DAMAGE = 10
+export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.2
 export const ENEMY_SPEARMAN_WALL_ATTACK_POINT = 0.7
+export const ENEMY_SPEARMAN_REWARD = 30
 
 // 守军弓兵：只攻击单位（range=6）
-export const DEFENDER_ARCHER_HP = 50
+export const DEFENDER_ARCHER_HP = 200
 export const DEFENDER_ARCHER_UNITS_RANGE = 6
-export const DEFENDER_ARCHER_UNITS_DAMAGE = 25
+export const DEFENDER_ARCHER_UNITS_DAMAGE = 50
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 export const DEFENDER_ARCHER_UNITS_ATTACK_POINT = 0.6
 
 // 守军矛兵：只攻击单位（range=3，弓兵1/2）
-export const DEFENDER_SPEARMAN_HP = 60
+export const DEFENDER_SPEARMAN_HP = 400
 export const DEFENDER_SPEARMAN_UNITS_RANGE = 3
-export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 15
-export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.1
+export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 75
+export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 2
 export const DEFENDER_SPEARMAN_UNITS_ATTACK_POINT = 0.6
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
-export const DEFENDER_CATAPULT_HP = 150
+export const DEFENDER_CATAPULT_HP = 1000
 export const DEFENDER_CATAPULT_TARGET_Z = -1
 export const DEFENDER_CATAPULT_RADIUS = 1.25
-export const DEFENDER_CATAPULT_DAMAGE = 40
+export const DEFENDER_CATAPULT_DAMAGE = 120
 export const DEFENDER_CATAPULT_INTERVAL = 2
 export const DEFENDER_CATAPULT_ATTACK_POINT = 0.5
 
@@ -124,6 +128,7 @@ export const spawnActions = createActions((world) => ({
         interval: ENEMY_ARCHER_WALL_INTERVAL,
         attackPoint: ENEMY_ARCHER_WALL_ATTACK_POINT,
       }),
+      Reward({ value: ENEMY_ARCHER_REWARD }),
       IsEnemy,
       IsArcher,
     )
@@ -142,6 +147,7 @@ export const spawnActions = createActions((world) => ({
         interval: ENEMY_INFANTRY_WALL_INTERVAL,
         attackPoint: ENEMY_INFANTRY_WALL_ATTACK_POINT,
       }),
+      Reward({ value: ENEMY_INFANTRY_REWARD }),
       IsEnemy,
       IsMelee,
     )
@@ -166,6 +172,7 @@ export const spawnActions = createActions((world) => ({
         interval: ENEMY_SPEARMAN_WALL_INTERVAL,
         attackPoint: ENEMY_SPEARMAN_WALL_ATTACK_POINT,
       }),
+      Reward({ value: ENEMY_SPEARMAN_REWARD }),
       IsEnemy,
       IsSpearman,
     )

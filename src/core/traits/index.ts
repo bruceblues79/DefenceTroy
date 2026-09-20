@@ -5,7 +5,7 @@
 export { Position } from './position'
 export { Velocity } from './velocity'
 export { Health } from './health'
-export { Attack, CanAttackUnits, CanAttackWall, CanBombard } from './attack'
+export { Attack, CanAttackUnits, CanAttackWall, CanBombard, Reward } from './attack'
 export { Projectile } from './projectile'
 export { Effect } from './effect'
 export { IsEnemy, IsDefender, IsWall, IsArcher, IsMelee, IsSpearman, IsCatapult, IsProjectile, IsBoulder, IsEffect } from './tags'

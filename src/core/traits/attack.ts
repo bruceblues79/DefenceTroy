@@ -57,3 +57,8 @@ export const CanBombard = trait({
   interval: 2,
   attackPoint: 0.5,
 })
+
+/**
+ * 被击杀奖励金币数
+ */
+export const Reward = trait({ value: 0 })
