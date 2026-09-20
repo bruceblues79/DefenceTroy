@@ -10,8 +10,11 @@ import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import DragUnitProxy from '../components/DragUnitProxy'
 import RoundedShapeButton from '../components/RoundedShapeButton'
+import RoundPromptPanel from '../components/RoundPromptPanel'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEARMAN_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
 import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
+import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
+import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
 const BUTTON_X = [-1.95, -0.975, 0, 0.975, 1.95]
@@ -51,6 +54,11 @@ type DragState =
   | { source: 'button'; type: UnitType }
   | null
 
+type PromptState =
+  | { kind: 'none' }
+  | { kind: 'intro'; round: RoundConfig }
+  | { kind: 'ending'; round: RoundConfig }
+
 export default function BattleFieldSpace({
   paused,
   gameOver,
@@ -75,9 +83,27 @@ export default function BattleFieldSpace({
   const world = useWorld()
   const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [], catapult: [] })
   const [dragState, setDragState] = useState<DragState>(null)
-  const [gold, setGold] = useState(50)
+  const [gold, setGold] = useState(0)
   const [shopOpen, setShopOpen] = useState(false)
+  const [prompt, setPrompt] = useState<PromptState>({ kind: 'none' })
   const regenAccumRef = useRef(0)
+
+  // 轮次引擎（创建一次，回调绑定 React state）
+  const engineRef = useRef<RoundEngine | null>(null)
+  if (!engineRef.current) {
+    engineRef.current = createRoundEngine(ROUNDS, {
+      onIntro: (round) => setPrompt({ kind: 'intro', round }),
+      onEnding: (round) => {
+        setGold((g) => g + round.gold)
+        setPrompt({ kind: 'ending', round })
+      },
+      onAllDone: () => onGameOver('victory'),
+    })
+  }
+  const engine = engineRef.current
+
+  const barracksCount = barracks.bow.length + barracks.spear.length + barracks.catapult.length
+  const promptOpen = prompt.kind !== 'none'
 
   // 兵营单位线性回血：每秒1点，上限为该兵种 max HP；暂停/结算时停止
   useFrame((_, delta) => {
@@ -101,14 +127,17 @@ export default function BattleFieldSpace({
     })
   })
 
-  // 通知 App 屏蔽 OrbitControls
+  // 通知 App 屏蔽 OrbitControls（拖拽或提示面板显示期间）
   useEffect(() => {
-    onDragStateChange?.(dragState !== null)
-  }, [dragState, onDragStateChange])
+    onDragStateChange?.(dragState !== null || promptOpen)
+  }, [dragState, promptOpen, onDragStateChange])
 
-  // 胜负结算时自动关闭商店
+  // 胜负结算时自动关闭商店与提示面板
   useEffect(() => {
-    if (gameOver) setShopOpen(false)
+    if (gameOver) {
+      setShopOpen(false)
+      setPrompt({ kind: 'none' })
+    }
   }, [gameOver])
 
   /** 判定实体兵种 */
@@ -144,13 +173,13 @@ export default function BattleFieldSpace({
 
   // ── 拖拽起点 ──
   const startUnitDrag = (entity: Entity) => {
-    if (paused || gameOver) return
+    if (paused || gameOver || promptOpen) return
     setDragState({ source: 'unit', entity, type: unitTypeOf(entity) })
   }
 
   const startButtonDrag = (e: ThreeEvent<PointerEvent>, type: UnitType) => {
     e.stopPropagation()
-    if (barracks[type].length === 0) return
+    if (promptOpen || barracks[type].length === 0) return
     setDragState({ source: 'button', type })
   }
 
@@ -234,7 +263,12 @@ export default function BattleFieldSpace({
   return (
     <group>
       {/* 战斗系统驱动（无渲染） */}
-      <BattleSystems paused={paused || gameOver} onGameOver={onGameOver} onEnemyKilled={(n) => setGold((g) => g + n * 10)} />
+      <BattleSystems
+        paused={paused || gameOver}
+        engine={engine}
+        barracksDefenderCount={barracksCount}
+        onGameOver={onGameOver}
+      />
 
       {/* ground: plane 5×9, beach sand */}
       <mesh name="ground" position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -263,7 +297,7 @@ export default function BattleFieldSpace({
       />
 
       {/* 按钮行整体回收检测条带（invisible，仅作 raycaster 命中） */}
-      {!gameOver && !paused && (
+      {!gameOver && !paused && !promptOpen && (
         <mesh
           position={[0, 1.99, 4.0]}
           rotation={[-Math.PI / 2, 0, 0]}
@@ -278,7 +312,7 @@ export default function BattleFieldSpace({
       )}
 
       {/* five buttons: 0.8 square rounded planes, billboard to face camera */}
-      {!gameOver && !paused &&
+      {!gameOver && !paused && !promptOpen &&
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
@@ -335,6 +369,20 @@ export default function BattleFieldSpace({
 
       {/* 拖拽示意物：拖拽期间显示，跟随 pointer 在 y=6 平面 */}
       {dragState && <DragUnitProxy color={DRAG_COLORS[dragState.type]} />}
+
+      {/* 轮次开场/结束提示面板 */}
+      {promptOpen && (
+        <RoundPromptPanel
+          title={prompt.kind === 'intro' ? prompt.round.intro.title : prompt.round.ending.title}
+          body={prompt.kind === 'intro' ? prompt.round.intro.body : prompt.round.ending.body}
+          tip={prompt.kind === 'intro' ? prompt.round.intro.tip : undefined}
+          onOk={() => {
+            if (prompt.kind === 'intro') engine.confirmIntro()
+            else engine.confirmEnding()
+            setPrompt({ kind: 'none' })
+          }}
+        />
+      )}
 
       {shopOpen && !gameOver && (
         <ShopScreen gold={gold} onHire={handleHire} onClose={() => setShopOpen(false)} />

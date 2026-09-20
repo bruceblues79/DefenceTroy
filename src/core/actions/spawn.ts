@@ -23,7 +23,7 @@ import {
 // 战场常量
 export const WALL_POSITION = { x: 0, y: 0, z: 2.95 }
 export const WALL_WIDTH = 4.5
-export const WALL_HP = 500
+export const WALL_HP = 99999
 
 // 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.6）
 export const ENEMY_ARCHER_HP = 30
@@ -60,7 +60,7 @@ export const ENEMY_SPEARMAN_WALL_ATTACK_POINT = 0.7
 // 守军弓兵：只攻击单位（range=6）
 export const DEFENDER_ARCHER_HP = 50
 export const DEFENDER_ARCHER_UNITS_RANGE = 6
-export const DEFENDER_ARCHER_UNITS_DAMAGE = 8
+export const DEFENDER_ARCHER_UNITS_DAMAGE = 25
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 export const DEFENDER_ARCHER_UNITS_ATTACK_POINT = 0.6
 

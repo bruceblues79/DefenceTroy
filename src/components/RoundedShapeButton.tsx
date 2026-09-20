@@ -1,5 +1,5 @@
 import { type ThreeEvent } from '@react-three/fiber'
-import { useTexture } from '@react-three/drei'
+import { Text, useTexture } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 
 interface RoundedShapeButtonProps {
@@ -25,6 +25,11 @@ interface RoundedShapeButtonProps {
   image?: string
   /** 图片是否透明,默认 true */
   imageTransparent?: boolean
+  // ── 可选文字标签 ──
+  /** 按钮文字;提供时在按钮表面 localZ +0.01 渲染 */
+  label?: string
+  labelColor?: string
+  labelFontSize?: number
 }
 
 /**
@@ -55,11 +60,25 @@ export default function RoundedShapeButton({
   onPointerUp,
   image,
   imageTransparent,
+  label,
+  labelColor = '#ffffff',
+  labelFontSize = 0.3,
   ...planeProps
 }: RoundedShapeButtonProps) {
   return (
     <RoundShapePlane {...planeProps} onClick={onClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
       {image && <ButtonImage url={image} transparent={imageTransparent} />}
+      {label && (
+        <Text
+          position={[0, 0, 0.01]}
+          fontSize={labelFontSize}
+          color={labelColor}
+          anchorX="center"
+          anchorY="middle"
+        >
+          {label}
+        </Text>
+      )}
     </RoundShapePlane>
   )
 }
