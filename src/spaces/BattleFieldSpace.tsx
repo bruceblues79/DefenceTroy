@@ -132,13 +132,15 @@ export default function BattleFieldSpace({
     onDragStateChange?.(dragState !== null || promptOpen)
   }, [dragState, promptOpen, onDragStateChange])
 
-  // 胜负结算时自动关闭商店与提示面板
+  // 胜负结算或提示面板出现时自动关闭商店
   useEffect(() => {
     if (gameOver) {
       setShopOpen(false)
       setPrompt({ kind: 'none' })
+    } else if (promptOpen) {
+      setShopOpen(false)
     }
-  }, [gameOver])
+  }, [gameOver, promptOpen])
 
   /** 判定实体兵种 */
   const unitTypeOf = (e: Entity): UnitType => {
@@ -364,6 +366,17 @@ export default function BattleFieldSpace({
                   M
                 </Text>
               )}
+              {name === 'btn_shop' && (
+                <Text
+                  position={[0, 0, 0.01]}
+                  fontSize={0.4}
+                  color="#ffffff"
+                  anchorX="center"
+                  anchorY="middle"
+                >
+                  S
+                </Text>
+              )}
             </Billboard>
           )
         })}
@@ -390,7 +403,7 @@ export default function BattleFieldSpace({
         />
       )}
 
-      {shopOpen && !gameOver && (
+      {shopOpen && !gameOver && !promptOpen && (
         <ShopScreen gold={gold} onHire={handleHire} onClose={() => setShopOpen(false)} />
       )}
 
