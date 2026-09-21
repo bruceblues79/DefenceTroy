@@ -21,12 +21,12 @@ export function updateCatapultBombard(world: World, dt: number) {
         actions.spawnBoulder(catapult, bombard.targetZ, bombard.radius, bombard.damage)
       }
 
-      // 攻击周期结束
+      // 攻击周期结束（interval 已含完整周期时长，无需额外冷却）
       if (attack.attackTimer >= bombard.interval) {
         attack.isAttacking = false
         attack.attackTimer = 0
         attack.hasFired = false
-        attack.cooldown = bombard.interval
+        attack.cooldown = 0
       }
     } else if (attack.cooldown > 0) {
       attack.cooldown -= dt
