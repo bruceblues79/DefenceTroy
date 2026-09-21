@@ -367,15 +367,26 @@ export default function BattleFieldSpace({
                 </Text>
               )}
               {name === 'btn_shop' && (
-                <Text
-                  position={[0, 0, 0.01]}
-                  fontSize={0.4}
-                  color="#ffffff"
-                  anchorX="center"
-                  anchorY="middle"
-                >
-                  S
-                </Text>
+                <>
+                  <Text
+                    position={[0, 0, 0.01]}
+                    fontSize={0.4}
+                    color="#ffffff"
+                    anchorX="center"
+                    anchorY="middle"
+                  >
+                    S
+                  </Text>
+                  <Text
+                    position={[0, 0.3, 0.01]}
+                    fontSize={0.2}
+                    color="#ffd700"
+                    anchorX="center"
+                    anchorY="middle"
+                  >
+                    {Math.min(gold, 9999)}
+                  </Text>
+                </>
               )}
             </Billboard>
           )
