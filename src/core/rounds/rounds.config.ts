@@ -74,7 +74,7 @@ export const ROUNDS: RoundConfig[] = [
       title: 'NO PLACE IS SAFE',
       body: 'The wall is no longer the only thing under threat. Troy\'s defenders can also be worn down.',
     },
-    gold: 300,
+    gold: 200,
   },
 
   // ── 第三轮 ──
@@ -102,6 +102,6 @@ export const ROUNDS: RoundConfig[] = [
       title: 'DIVIDED PRESSURE',
       body: 'The attack is no longer simple. Protecting one part of the defense may leave another exposed.',
     },
-    gold: 400,
+    gold: 300,
   },
 ]
