@@ -19,6 +19,7 @@ import {
   IsProjectile,
   IsBoulder,
   Targeting,
+  UnitType,
 } from '../traits'
 
 // 战场常量
@@ -28,60 +29,52 @@ export const WALL_HP = 99999
 
 // 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.6）
 export const ENEMY_ARCHER_HP = 200
-export const ENEMY_ARCHER_SPEED = 0.5
+export const ENEMY_ARCHER_SPEED = 0.6
 export const ENEMY_ARCHER_UNITS_RANGE = 5
-export const ENEMY_ARCHER_UNITS_DAMAGE = 20
+export const ENEMY_ARCHER_UNITS_DAMAGE = 24
 export const ENEMY_ARCHER_UNITS_INTERVAL = 1.2
-export const ENEMY_ARCHER_UNITS_ATTACK_POINT = 0.8
 export const ENEMY_ARCHER_WALL_Z = -0.6
-export const ENEMY_ARCHER_WALL_DAMAGE = 2
+export const ENEMY_ARCHER_WALL_DAMAGE = 1.2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
-export const ENEMY_ARCHER_WALL_ATTACK_POINT = 0.8
 export const ENEMY_ARCHER_REWARD = 80
 
 // 敌方步兵：只攻击城门（wallZ=1.95），近战
-export const ENEMY_INFANTRY_HP = 180
-export const ENEMY_INFANTRY_SPEED = 0.8
+export const ENEMY_INFANTRY_HP = 200
+export const ENEMY_INFANTRY_SPEED = 0.4
 export const ENEMY_INFANTRY_WALL_Z = 1.95
 export const ENEMY_INFANTRY_WALL_DAMAGE = 1
 export const ENEMY_INFANTRY_WALL_INTERVAL = 1.0
-export const ENEMY_INFANTRY_WALL_ATTACK_POINT = 0.5
-export const ENEMY_INFANTRY_REWARD = 72
+export const ENEMY_INFANTRY_REWARD = 80
 
 // 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=0.825）
-export const ENEMY_SPEARMAN_HP = 600
-export const ENEMY_SPEARMAN_SPEED = 0.6
+export const ENEMY_SPEARMAN_HP = 200
+export const ENEMY_SPEARMAN_SPEED = 0.8
 export const ENEMY_SPEARMAN_UNITS_RANGE = 2.5
-export const ENEMY_SPEARMAN_UNITS_DAMAGE = 60
+export const ENEMY_SPEARMAN_UNITS_DAMAGE = 32
 export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.6
-export const ENEMY_SPEARMAN_UNITS_ATTACK_POINT = 0.7
 export const ENEMY_SPEARMAN_WALL_Z = 0.825
-export const ENEMY_SPEARMAN_WALL_DAMAGE = 6
+export const ENEMY_SPEARMAN_WALL_DAMAGE = 1.6
 export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.6
-export const ENEMY_SPEARMAN_WALL_ATTACK_POINT = 0.7
-export const ENEMY_SPEARMAN_REWARD = 240
+export const ENEMY_SPEARMAN_REWARD = 80
 
 // 守军弓兵：只攻击单位（range=6）
 export const DEFENDER_ARCHER_HP = 200
 export const DEFENDER_ARCHER_UNITS_RANGE = 6
-export const DEFENDER_ARCHER_UNITS_DAMAGE = 20
+export const DEFENDER_ARCHER_UNITS_DAMAGE = 24
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
-export const DEFENDER_ARCHER_UNITS_ATTACK_POINT = 0.6
 
 // 守军矛兵：只攻击单位（range=3，弓兵1/2）
-export const DEFENDER_SPEARMAN_HP = 600
+export const DEFENDER_SPEARMAN_HP = 200
 export const DEFENDER_SPEARMAN_UNITS_RANGE = 3
-export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 60
+export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 32
 export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.6
-export const DEFENDER_SPEARMAN_UNITS_ATTACK_POINT = 0.6
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
-export const DEFENDER_CATAPULT_HP = 1000
+export const DEFENDER_CATAPULT_HP = 200
 export const DEFENDER_CATAPULT_TARGET_Z = -1
-export const DEFENDER_CATAPULT_RADIUS = 2
-export const DEFENDER_CATAPULT_DAMAGE = 100
+export const DEFENDER_CATAPULT_RADIUS = 1.5
+export const DEFENDER_CATAPULT_DAMAGE = 40
 export const DEFENDER_CATAPULT_INTERVAL = 2
-export const DEFENDER_CATAPULT_ATTACK_POINT = 0.5
 
 export const PROJECTILE_SPEED = 15
 export const BOULDER_SPEED = 8
@@ -105,6 +98,7 @@ export const spawnActions = createActions((world) => ({
     return world.spawn(
       Position({ x: WALL_POSITION.x, y: WALL_POSITION.y, z: WALL_POSITION.z }),
       Health({ current: WALL_HP, max: WALL_HP }),
+      UnitType({ kind: 'wall' }),
       IsWall,
     )
   },
@@ -120,15 +114,14 @@ export const spawnActions = createActions((world) => ({
         range: ENEMY_ARCHER_UNITS_RANGE,
         damage: ENEMY_ARCHER_UNITS_DAMAGE,
         interval: ENEMY_ARCHER_UNITS_INTERVAL,
-        attackPoint: ENEMY_ARCHER_UNITS_ATTACK_POINT,
       }),
       CanAttackWall({
         wallZ: ENEMY_ARCHER_WALL_Z,
         damage: ENEMY_ARCHER_WALL_DAMAGE,
         interval: ENEMY_ARCHER_WALL_INTERVAL,
-        attackPoint: ENEMY_ARCHER_WALL_ATTACK_POINT,
       }),
       Reward({ value: ENEMY_ARCHER_REWARD }),
+      UnitType({ kind: 'archer' }),
       IsEnemy,
       IsArcher,
     )
@@ -145,9 +138,9 @@ export const spawnActions = createActions((world) => ({
         wallZ: ENEMY_INFANTRY_WALL_Z,
         damage: ENEMY_INFANTRY_WALL_DAMAGE,
         interval: ENEMY_INFANTRY_WALL_INTERVAL,
-        attackPoint: ENEMY_INFANTRY_WALL_ATTACK_POINT,
       }),
       Reward({ value: ENEMY_INFANTRY_REWARD }),
+      UnitType({ kind: 'infantry' }),
       IsEnemy,
       IsMelee,
     )
@@ -164,15 +157,14 @@ export const spawnActions = createActions((world) => ({
         range: ENEMY_SPEARMAN_UNITS_RANGE,
         damage: ENEMY_SPEARMAN_UNITS_DAMAGE,
         interval: ENEMY_SPEARMAN_UNITS_INTERVAL,
-        attackPoint: ENEMY_SPEARMAN_UNITS_ATTACK_POINT,
       }),
       CanAttackWall({
         wallZ: ENEMY_SPEARMAN_WALL_Z,
         damage: ENEMY_SPEARMAN_WALL_DAMAGE,
         interval: ENEMY_SPEARMAN_WALL_INTERVAL,
-        attackPoint: ENEMY_SPEARMAN_WALL_ATTACK_POINT,
       }),
       Reward({ value: ENEMY_SPEARMAN_REWARD }),
+      UnitType({ kind: 'spearman' }),
       IsEnemy,
       IsSpearman,
     )
@@ -188,8 +180,8 @@ export const spawnActions = createActions((world) => ({
         range: DEFENDER_ARCHER_UNITS_RANGE,
         damage: DEFENDER_ARCHER_UNITS_DAMAGE,
         interval: DEFENDER_ARCHER_UNITS_INTERVAL,
-        attackPoint: DEFENDER_ARCHER_UNITS_ATTACK_POINT,
       }),
+      UnitType({ kind: 'archer' }),
       IsDefender,
       IsArcher,
     )
@@ -205,8 +197,8 @@ export const spawnActions = createActions((world) => ({
         range: DEFENDER_SPEARMAN_UNITS_RANGE,
         damage: DEFENDER_SPEARMAN_UNITS_DAMAGE,
         interval: DEFENDER_SPEARMAN_UNITS_INTERVAL,
-        attackPoint: DEFENDER_SPEARMAN_UNITS_ATTACK_POINT,
       }),
+      UnitType({ kind: 'spearman' }),
       IsDefender,
       IsSpearman,
     )
@@ -216,10 +208,11 @@ export const spawnActions = createActions((world) => ({
   spawnProjectile(fromEntity: Entity, targetEntity: Entity, damage: number, speed: number = PROJECTILE_SPEED) {
     const fromPos = fromEntity.get(Position)
     if (!fromPos) return null
+    const sourceKind = fromEntity.get(UnitType)?.kind ?? 'unknown'
     return world.spawn(
       Position({ x: fromPos.x, y: fromPos.y, z: fromPos.z }),
       Velocity({ x: 0, y: 0, z: 0 }),
-      Projectile({ damage, speed }),
+      Projectile({ damage, speed, sourceKind }),
       IsProjectile,
       Targeting(targetEntity),
     )
@@ -236,8 +229,8 @@ export const spawnActions = createActions((world) => ({
         radius: DEFENDER_CATAPULT_RADIUS,
         damage: DEFENDER_CATAPULT_DAMAGE,
         interval: DEFENDER_CATAPULT_INTERVAL,
-        attackPoint: DEFENDER_CATAPULT_ATTACK_POINT,
       }),
+      UnitType({ kind: 'catapult' }),
       IsDefender,
       IsCatapult,
     )
@@ -247,10 +240,11 @@ export const spawnActions = createActions((world) => ({
   spawnBoulder(fromEntity: Entity, targetZ: number, radius: number, damage: number, speed: number = BOULDER_SPEED) {
     const fromPos = fromEntity.get(Position)
     if (!fromPos) return null
+    const sourceKind = fromEntity.get(UnitType)?.kind ?? 'unknown'
     return world.spawn(
       Position({ x: fromPos.x, y: fromPos.y, z: fromPos.z }),
       Velocity({ x: 0, y: 0, z: 0 }),
-      Projectile({ damage, speed, targetZ, aoeRadius: radius }),
+      Projectile({ damage, speed, targetZ, aoeRadius: radius, sourceKind }),
       IsBoulder,
     )
   },

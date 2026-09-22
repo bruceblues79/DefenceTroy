@@ -8,7 +8,7 @@ function resetUnitCombatState(entity: Entity) {
     const unitsAtk = entity.get(CanAttackUnits)
     const bombard = entity.get(CanBombard)
     const interval = unitsAtk?.interval ?? bombard?.interval ?? 0
-    entity.set(Attack, { cooldown: interval, attackTimer: 0, isAttacking: false, hasFired: false })
+    entity.set(Attack, { cooldown: interval, attackTimer: 0, isAttacking: false })
   }
   if (entity.targetFor(Targeting)) entity.remove(Targeting('*'))
 }
