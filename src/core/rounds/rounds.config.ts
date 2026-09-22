@@ -32,8 +32,8 @@ export interface RoundConfig {
   gold: number
 }
 
-const SPAWN_INTERVAL = 0.5
-const WAVE_GAP = 3
+const SPAWN_INTERVAL = 1
+const WAVE_GAP = 5
 
 export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
@@ -67,7 +67,8 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -85,17 +86,17 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Drag deployed defenders between wall positions to rearrange the defense.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'spearman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'spearman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       {
         enemies: [
           { type: 'infantry', count: 2 },
-          { type: 'spearman', count: 2 },
           { type: 'archer', count: 2 },
         ],
         spawnInterval: SPAWN_INTERVAL,
       },
+      { enemies: [{ type: 'spearman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
