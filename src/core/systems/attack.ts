@@ -62,7 +62,7 @@ export function updateAttack(world: World, dt: number) {
         if (targetHealth) {
           const finalDamage = calculateDamage(
             attacker.get(UnitType)?.kind,
-            target.get(UnitType)?.kind,
+            target,
             damage,
           )
           target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })

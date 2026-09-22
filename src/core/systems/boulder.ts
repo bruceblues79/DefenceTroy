@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Position, Velocity, Projectile, IsBoulder, IsEnemy, Health, IsEffect, Effect, UnitType } from '../traits'
+import { Position, Velocity, Projectile, IsBoulder, IsEnemy, Health, IsEffect, Effect } from '../traits'
 import { calculateDamage } from '../combat/damage'
 
 /**
@@ -25,7 +25,7 @@ export function updateBoulders(world: World, _dt: number) {
         if (dist <= proj.aoeRadius) {
           const hp = enemy.get(Health)
           if (hp) {
-            const finalDamage = calculateDamage(proj.sourceKind, enemy.get(UnitType)?.kind, proj.damage)
+            const finalDamage = calculateDamage(proj.sourceKind, enemy, proj.damage)
             enemy.set(Health, { current: Math.max(0, hp.current - finalDamage) })
           }
         }

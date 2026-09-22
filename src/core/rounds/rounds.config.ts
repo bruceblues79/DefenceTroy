@@ -88,7 +88,7 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'spearman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'spearman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       {
         enemies: [
           { type: 'infantry', count: 2 },
@@ -96,7 +96,7 @@ export const ROUNDS: RoundConfig[] = [
         ],
         spawnInterval: SPAWN_INTERVAL,
       },
-      { enemies: [{ type: 'spearman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'spearman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {

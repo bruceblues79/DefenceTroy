@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health, UnitType } from '../traits'
+import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health } from '../traits'
 import { calculateDamage } from '../combat/damage'
 
 const HIT_THRESHOLD = 0.15 // 命中判定距离（米）
@@ -36,7 +36,7 @@ export function updateProjectiles(world: World, _dt: number) {
       const distToWall = targetPos.z - pos.z
       if (distToWall <= HIT_THRESHOLD) {
         if (targetHealth) {
-          const finalDamage = calculateDamage(proj.sourceKind, target.get(UnitType)?.kind, proj.damage)
+          const finalDamage = calculateDamage(proj.sourceKind, target, proj.damage)
           target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
         }
         toDestroy.push(projectile)
@@ -56,7 +56,7 @@ export function updateProjectiles(world: World, _dt: number) {
 
     if (dist < HIT_THRESHOLD) {
       if (targetHealth) {
-        const finalDamage = calculateDamage(proj.sourceKind, target.get(UnitType)?.kind, proj.damage)
+        const finalDamage = calculateDamage(proj.sourceKind, target, proj.damage)
         target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
       }
       toDestroy.push(projectile)
