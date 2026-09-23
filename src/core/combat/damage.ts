@@ -14,8 +14,8 @@ import { IsDefender, IsEnemy, IsWall, UnitType, type UnitKind } from '../traits'
 
 // 守军攻击敌军
 const DEFENDER_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:   { infantry: 1.5,  archer: 1.0,  spearman: 0.5  },
-  spearman: { infantry: 1.0,  archer: 0.5,  spearman: 1.5  },
+  archer:   { infantry: 1.0,  archer: 1.0,  spearman: 0.5  },
+  spearman: { infantry: 1.5,  archer: 0.5,  spearman: 1.25  },
   catapult: { infantry: 0.75, archer: 1.5,  spearman: 1.0  },
 }
 
