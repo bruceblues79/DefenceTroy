@@ -175,7 +175,7 @@ export const spawnActions = createActions((world) => ({
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_ARCHER_HP, max: DEFENDER_ARCHER_HP }),
-      Attack({ cooldown: DEFENDER_ARCHER_UNITS_INTERVAL }),
+      Attack(),
       CanAttackUnits({
         range: DEFENDER_ARCHER_UNITS_RANGE,
         damage: DEFENDER_ARCHER_UNITS_DAMAGE,
@@ -192,7 +192,7 @@ export const spawnActions = createActions((world) => ({
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_SPEARMAN_HP, max: DEFENDER_SPEARMAN_HP }),
-      Attack({ cooldown: DEFENDER_SPEARMAN_UNITS_INTERVAL }),
+      Attack(),
       CanAttackUnits({
         range: DEFENDER_SPEARMAN_UNITS_RANGE,
         damage: DEFENDER_SPEARMAN_UNITS_DAMAGE,
@@ -223,7 +223,7 @@ export const spawnActions = createActions((world) => ({
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_CATAPULT_HP, max: DEFENDER_CATAPULT_HP }),
-      Attack({ cooldown: DEFENDER_CATAPULT_INTERVAL }),
+      Attack(),
       CanBombard({
         targetZ: DEFENDER_CATAPULT_TARGET_Z,
         radius: DEFENDER_CATAPULT_RADIUS,

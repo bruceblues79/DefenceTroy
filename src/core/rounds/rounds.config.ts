@@ -64,6 +64,7 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Drag a deployed defender back to the barracks to recover health over time.',
     },
     waves: [
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
