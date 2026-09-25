@@ -8,7 +8,7 @@ export type UnitType = 'bow' | 'spear' | 'catapult'
 // 雇佣商品：兵种 / 标签 / 花费 / 染色（与守军代理一致）
 const HIRE_ITEMS = [
   { type: 'bow' as UnitType, label: 'archer 200g', cost: 200, color: '#4a90d9' },
-  { type: 'spear' as UnitType, label: 'spearman 200g', cost: 200, color: '#4a9d8f' },
+  { type: 'spear' as UnitType, label: 'spearbreaker 200g', cost: 200, color: '#4a9d8f' },
   { type: 'catapult' as UnitType, label: 'catapult 200g', cost: 200, color: '#6b4226' },
 ]
 

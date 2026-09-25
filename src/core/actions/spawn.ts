@@ -53,11 +53,13 @@ export const ENEMY_SAPPER_REWARD = 60
 
 // 敌方矛骑士：攻击单位（range=2.5）+ 攻击城门（wallZ=0.825）
 // 速度 = 弓兵 2×（0.6 → 1.2）；抗弓箭（守弓打他 ×0.25，见 combat/damage.ts）
+// UNITS_INTERVAL 与守方破矛兵对齐为 1.4：对位双方攻速相同，胜负只由克制倍率决定，
+// 不被攻速差干扰。砸墙间隔（WALL_INTERVAL）不参与此对齐，保持 1.6
 export const ENEMY_CAVALRY_HP = 200
 export const ENEMY_CAVALRY_SPEED = 1.2
 export const ENEMY_CAVALRY_UNITS_RANGE = 2.5
 export const ENEMY_CAVALRY_UNITS_DAMAGE = 32
-export const ENEMY_CAVALRY_UNITS_INTERVAL = 1.6
+export const ENEMY_CAVALRY_UNITS_INTERVAL = 1.4
 export const ENEMY_CAVALRY_WALL_Z = 0.825
 export const ENEMY_CAVALRY_WALL_DAMAGE = 1.6
 export const ENEMY_CAVALRY_WALL_INTERVAL = 1.6
@@ -79,7 +81,9 @@ export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 export const DEFENDER_SPEAR_BREAKER_HP = 200
 export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 3.3
 export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
-export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.2
+// 与矛骑士对齐为 1.4（原 1.2）：双方 DPS 基数相同，克制由倍率（受 0.25 / 出 2.0）说话。
+// 先手不受影响：0.8m 射程差 / 矛骑士速度 1.2 = 0.667s < 1.4，仍是恰好先手一枪
+export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.4
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
 export const DEFENDER_CATAPULT_HP = 200
@@ -211,7 +215,7 @@ export const spawnActions = createActions((world) => ({
         damage: DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE,
         interval: DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL,
       }),
-      UnitType({ kind: 'spearman' }),
+      UnitType({ kind: 'spearbreaker' }),
       IsDefender,
       IsSpearBreaker,
     )
