@@ -19,10 +19,6 @@ export function updateDefenderArcherAI(world: World, _dt: number) {
   const defenders = world.query(IsDefender, IsArcher, Position, CanAttackUnits)
 
   defenders.readEach(([pos, unitsAtk], defender) => {
-    // 有效射程 = range + firstStrike。守弓射程与攻弓完全相同，优势全靠先手距离：
-    // 敌人还在自己射程外时，守弓已经能锁定并射出第一箭
-    const reach = unitsAtk.range + unitsAtk.firstStrike
-
     // 1. 检查当前目标是否有效
     let target = defender.targetFor(Targeting)
 
@@ -34,7 +30,7 @@ export function updateDefenderArcherAI(world: World, _dt: number) {
         target = undefined
       } else {
         const dist = distanceXZ(pos.x, pos.z, targetPos.x, targetPos.z)
-        if (dist > reach) {
+        if (dist > unitsAtk.range) {
           defender.remove(Targeting('*'))
           target = undefined
         }
@@ -48,7 +44,7 @@ export function updateDefenderArcherAI(world: World, _dt: number) {
 
       world.query(IsEnemy, Position).readEach(([enemyPos], enemy) => {
         const dist = distanceXZ(pos.x, pos.z, enemyPos.x, enemyPos.z)
-        if (dist <= reach && dist < nearestDist) {
+        if (dist <= unitsAtk.range && dist < nearestDist) {
           nearestDist = dist
           nearestEnemy = enemy
         }

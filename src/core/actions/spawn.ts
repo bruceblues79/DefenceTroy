@@ -63,25 +63,23 @@ export const ENEMY_CAVALRY_WALL_DAMAGE = 1.6
 export const ENEMY_CAVALRY_WALL_INTERVAL = 1.6
 export const ENEMY_CAVALRY_REWARD = 60
 
-// 守军弓兵：只攻击单位。射程与攻弓完全相同（5），优势全部来自 firstStrike 的先手一箭
+// 守军弓兵：只攻击单位
+// 射程 5.7 = 攻弓 5.0 + 0.7。这 0.7 米是对手走到自己射程前守弓多打一箭的距离，
+// 0.7 < 攻弓速度 0.6 × 间隔 1.2 = 0.72，所以恰好一箭（再大就变两箭）。
+// 守方优势只体现在射程比对手略大，不改攻速、不加先手机制。
 export const DEFENDER_ARCHER_HP = 200
-export const DEFENDER_ARCHER_UNITS_RANGE = 5
+export const DEFENDER_ARCHER_UNITS_RANGE = 5.7
 export const DEFENDER_ARCHER_UNITS_DAMAGE = 24
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
-// 先手距离 = 攻弓速度 0.6 × 弓兵间隔 1.2 = 0.72，取 0.7 卡在「恰好一箭」内（再大就变两箭）
-export const DEFENDER_ARCHER_FIRST_STRIKE = 0.7
 
-// 守军破矛兵：只攻击单位。射程与矛骑士相同（2.5），同样靠 firstStrike 拿先手一枪
-// 射程 2.5 < 攻弓纵深 3.55 → 够不到攻弓，这是它「专而不强」的代价
+// 守军破矛兵：只攻击单位
+// 射程 3.3 = 矛骑士 2.5 + 0.8，同样只是「比对手远一点」，先手由此自然产生。
+// ⚠️ 上限被「不能碰到攻弓」卡死：攻弓纵深 3.55，所以 3.3 已经贴着上限（余量 0.25）。
+//    任何调大此值的改动都要先验算 < 3.55，否则破矛兵够得到攻弓，「专而不强」失效。
 export const DEFENDER_SPEAR_BREAKER_HP = 200
-export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 2.5
+export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 3.3
 export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
 export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.2
-// 先手距离：射程与矛骑士相同（2.5），靠这个值抢先一枪。
-// 注意上限被「不能碰到攻弓」卡死：理论「恰好一枪」= 矛骑士速度 1.2 × 间隔 1.2 = 1.44，
-// 但 2.5 + 1.44 = 3.94 > 攻弓纵深 3.55，破矛兵就够得到攻弓了，「专而不强」直接失效。
-// 所以压到 0.8：有效射程 3.3 < 3.55（留 0.25 余量），对矛骑士仍有 0.67s 先手 = 一枪。
-export const DEFENDER_SPEAR_BREAKER_FIRST_STRIKE = 0.8
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
 export const DEFENDER_CATAPULT_HP = 200
@@ -194,7 +192,6 @@ export const spawnActions = createActions((world) => ({
         range: DEFENDER_ARCHER_UNITS_RANGE,
         damage: DEFENDER_ARCHER_UNITS_DAMAGE,
         interval: DEFENDER_ARCHER_UNITS_INTERVAL,
-        firstStrike: DEFENDER_ARCHER_FIRST_STRIKE,
       }),
       UnitType({ kind: 'archer' }),
       IsDefender,
@@ -203,7 +200,7 @@ export const spawnActions = createActions((world) => ({
   },
 
   /** 生成守军破矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击
-   *  射程与矛骑士相同，靠 firstStrike 拿先手一枪；够不到攻弓是它「专而不强」的代价 */
+   *  射程 3.3 比矛骑士 2.5 略大（先手由此而来），但仍够不到攻弓（纵深 3.55） */
   spawnDefenderSpearBreaker(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
@@ -213,7 +210,6 @@ export const spawnActions = createActions((world) => ({
         range: DEFENDER_SPEAR_BREAKER_UNITS_RANGE,
         damage: DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE,
         interval: DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL,
-        firstStrike: DEFENDER_SPEAR_BREAKER_FIRST_STRIKE,
       }),
       UnitType({ kind: 'spearman' }),
       IsDefender,

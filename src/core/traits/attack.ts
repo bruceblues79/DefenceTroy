@@ -17,15 +17,14 @@ export const Attack = trait({
  * range: 攻击射程（米）
  * damage: 每次伤害
  * interval: 完整攻击周期（秒）
- * firstStrike: 先手距离（米）——在 range 之外额外获得的锁定范围，用于实现「射程相同也比对手
- *   早一击」。守方专属：攻城方靠冲脸，守方靠先手，所以只有守方配置非零值。
- *   取值 = 目标速度 × 自身 interval 时恰好先手一击（再大就会变成两击）。
+ *
+ * 守方的「先手一击」不靠独立机制实现：守方 range 本身就比对手略大一点点
+ * （守弓 5.7 vs 攻弓 5.0、破矛兵 3.3 vs 矛骑士 2.5），先手是射程差的自然结果。
  */
 export const CanAttackUnits = trait({
   range: 5,
   damage: 5,
   interval: 1.5,
-  firstStrike: 0,
 })
 
 /**
