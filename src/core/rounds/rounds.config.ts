@@ -66,7 +66,6 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },

@@ -36,7 +36,7 @@ export const ENEMY_ARCHER_UNITS_INTERVAL = 1.2
 export const ENEMY_ARCHER_WALL_Z = -0.6
 export const ENEMY_ARCHER_WALL_DAMAGE = 1.2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
-export const ENEMY_ARCHER_REWARD = 30
+export const ENEMY_ARCHER_REWARD = 60
 
 // 敌方步兵：只攻击城门（wallZ=1.95），近战
 export const ENEMY_INFANTRY_HP = 200
@@ -44,7 +44,7 @@ export const ENEMY_INFANTRY_SPEED = 0.4
 export const ENEMY_INFANTRY_WALL_Z = 1.95
 export const ENEMY_INFANTRY_WALL_DAMAGE = 1
 export const ENEMY_INFANTRY_WALL_INTERVAL = 1.0
-export const ENEMY_INFANTRY_REWARD = 30
+export const ENEMY_INFANTRY_REWARD = 60
 
 // 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=0.825）
 export const ENEMY_SPEARMAN_HP = 200
@@ -55,7 +55,7 @@ export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.6
 export const ENEMY_SPEARMAN_WALL_Z = 0.825
 export const ENEMY_SPEARMAN_WALL_DAMAGE = 1.6
 export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.6
-export const ENEMY_SPEARMAN_REWARD = 30
+export const ENEMY_SPEARMAN_REWARD = 60
 
 // 守军弓兵：只攻击单位（range=6）
 export const DEFENDER_ARCHER_HP = 200
@@ -67,7 +67,7 @@ export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 export const DEFENDER_SPEARMAN_HP = 200
 export const DEFENDER_SPEARMAN_UNITS_RANGE = 3
 export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 32
-export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.6
+export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.2
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
 export const DEFENDER_CATAPULT_HP = 200
