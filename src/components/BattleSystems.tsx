@@ -4,10 +4,10 @@ import { useEffect, useRef } from 'react'
 import {
   updateMovement,
   updateEnemyArcherAI,
-  updateEnemyInfantryAI,
-  updateEnemySpearmanAI,
+  updateEnemySapperAI,
+  updateEnemyCavalryAI,
   updateDefenderArcherAI,
-  updateDefenderSpearmanAI,
+  updateDefenderSpearBreakerAI,
   updateCatapultBombard,
   updateAttack,
   updateProjectiles,
@@ -52,9 +52,9 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     // 生成城墙
     actions.spawnWall()
 
-    // 初始守军：2 弓兵 + 1 矛兵（中间 slot）
+    // 初始守军：2 弓兵 + 1 破矛兵（中间 slot）
     actions.spawnDefenderArcher(WALL_SLOTS[3])
-    actions.spawnDefenderSpearman(WALL_SLOTS[4])
+    actions.spawnDefenderSpearBreaker(WALL_SLOTS[4])
     actions.spawnDefenderArcher(WALL_SLOTS[5])
 
     // 启动轮次引擎（触发第一轮开场提示）
@@ -86,10 +86,10 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
 
     // 系统执行顺序：AI → 攻击 → 移动 → 抛射物 → 死亡
     updateEnemyArcherAI(world, dt)
-    updateEnemyInfantryAI(world, dt)
-    updateEnemySpearmanAI(world, dt)
+    updateEnemySapperAI(world, dt)
+    updateEnemyCavalryAI(world, dt)
     updateDefenderArcherAI(world, dt)
-    updateDefenderSpearmanAI(world, dt)
+    updateDefenderSpearBreakerAI(world, dt)
     updateCatapultBombard(world, dt)
     updateAttack(world, dt)
     updateMovement(world, dt)

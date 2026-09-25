@@ -14,7 +14,8 @@ import {
   IsWall,
   IsArcher,
   IsMelee,
-  IsSpearman,
+  IsSpearBreaker,
+  IsCavalry,
   IsCatapult,
   IsProjectile,
   IsBoulder,
@@ -40,36 +41,47 @@ export const ENEMY_ARCHER_WALL_DAMAGE = 1.2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
 export const ENEMY_ARCHER_REWARD = 60
 
-// 敌方步兵：只攻击城门（wallZ=1.95），近战
-export const ENEMY_INFANTRY_HP = 200
-export const ENEMY_INFANTRY_SPEED = 0.4
-export const ENEMY_INFANTRY_WALL_Z = 1.95
-export const ENEMY_INFANTRY_WALL_DAMAGE = 1
-export const ENEMY_INFANTRY_WALL_INTERVAL = 1.0
-export const ENEMY_INFANTRY_REWARD = 60
+// 敌方攻城兵：只攻击城门（wallZ=1.95），近战
+// 定位：干扰 + 分散守军火力 + 送钱。不主动攻击守军，但会吸引守军自动索敌，
+// 混合波时逼玩家手动指定优先目标
+export const ENEMY_SAPPER_HP = 200
+export const ENEMY_SAPPER_SPEED = 0.4
+export const ENEMY_SAPPER_WALL_Z = 1.95
+export const ENEMY_SAPPER_WALL_DAMAGE = 1
+export const ENEMY_SAPPER_WALL_INTERVAL = 1.0
+export const ENEMY_SAPPER_REWARD = 60
 
-// 敌方矛兵：攻击单位（range=2.5，弓兵1/2）+ 攻击城门（wallZ=0.825）
-export const ENEMY_SPEARMAN_HP = 200
-export const ENEMY_SPEARMAN_SPEED = 0.8
-export const ENEMY_SPEARMAN_UNITS_RANGE = 2.5
-export const ENEMY_SPEARMAN_UNITS_DAMAGE = 32
-export const ENEMY_SPEARMAN_UNITS_INTERVAL = 1.6
-export const ENEMY_SPEARMAN_WALL_Z = 0.825
-export const ENEMY_SPEARMAN_WALL_DAMAGE = 1.6
-export const ENEMY_SPEARMAN_WALL_INTERVAL = 1.6
-export const ENEMY_SPEARMAN_REWARD = 60
+// 敌方矛骑士：攻击单位（range=2.5）+ 攻击城门（wallZ=0.825）
+// 速度 = 弓兵 2×（0.6 → 1.2）；抗弓箭（守弓打他 ×0.25，见 combat/damage.ts）
+export const ENEMY_CAVALRY_HP = 200
+export const ENEMY_CAVALRY_SPEED = 1.2
+export const ENEMY_CAVALRY_UNITS_RANGE = 2.5
+export const ENEMY_CAVALRY_UNITS_DAMAGE = 32
+export const ENEMY_CAVALRY_UNITS_INTERVAL = 1.6
+export const ENEMY_CAVALRY_WALL_Z = 0.825
+export const ENEMY_CAVALRY_WALL_DAMAGE = 1.6
+export const ENEMY_CAVALRY_WALL_INTERVAL = 1.6
+export const ENEMY_CAVALRY_REWARD = 60
 
-// 守军弓兵：只攻击单位（range=6）
+// 守军弓兵：只攻击单位。射程与攻弓完全相同（5），优势全部来自 firstStrike 的先手一箭
 export const DEFENDER_ARCHER_HP = 200
-export const DEFENDER_ARCHER_UNITS_RANGE = 6
+export const DEFENDER_ARCHER_UNITS_RANGE = 5
 export const DEFENDER_ARCHER_UNITS_DAMAGE = 24
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
+// 先手距离 = 攻弓速度 0.6 × 弓兵间隔 1.2 = 0.72，取 0.7 卡在「恰好一箭」内（再大就变两箭）
+export const DEFENDER_ARCHER_FIRST_STRIKE = 0.7
 
-// 守军矛兵：只攻击单位（range=3，弓兵1/2）
-export const DEFENDER_SPEARMAN_HP = 200
-export const DEFENDER_SPEARMAN_UNITS_RANGE = 3
-export const DEFENDER_SPEARMAN_UNITS_DAMAGE = 32
-export const DEFENDER_SPEARMAN_UNITS_INTERVAL = 1.2
+// 守军破矛兵：只攻击单位。射程与矛骑士相同（2.5），同样靠 firstStrike 拿先手一枪
+// 射程 2.5 < 攻弓纵深 3.55 → 够不到攻弓，这是它「专而不强」的代价
+export const DEFENDER_SPEAR_BREAKER_HP = 200
+export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 2.5
+export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
+export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.2
+// 先手距离：射程与矛骑士相同（2.5），靠这个值抢先一枪。
+// 注意上限被「不能碰到攻弓」卡死：理论「恰好一枪」= 矛骑士速度 1.2 × 间隔 1.2 = 1.44，
+// 但 2.5 + 1.44 = 3.94 > 攻弓纵深 3.55，破矛兵就够得到攻弓了，「专而不强」直接失效。
+// 所以压到 0.8：有效射程 3.3 < 3.55（留 0.25 余量），对矛骑士仍有 0.67s 先手 = 一枪。
+export const DEFENDER_SPEAR_BREAKER_FIRST_STRIKE = 0.8
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
 export const DEFENDER_CATAPULT_HP = 200
@@ -129,46 +141,46 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成敌方步兵：只攻击城门（近战） */
-  spawnEnemyInfantry(x: number, z: number = ENEMY_SPAWN_Z) {
+  /** 生成敌方攻城兵：只攻击城门（近战）。干扰/送钱型，不主动攻击守军 */
+  spawnEnemySapper(x: number, z: number = ENEMY_SPAWN_Z) {
     return world.spawn(
       Position({ x, y: 0, z }),
       Velocity({ x: 0, y: 0, z: 0 }),
-      Health({ current: ENEMY_INFANTRY_HP, max: ENEMY_INFANTRY_HP }),
+      Health({ current: ENEMY_SAPPER_HP, max: ENEMY_SAPPER_HP }),
       Attack(),
       CanAttackWall({
-        wallZ: ENEMY_INFANTRY_WALL_Z,
-        damage: ENEMY_INFANTRY_WALL_DAMAGE,
-        interval: ENEMY_INFANTRY_WALL_INTERVAL,
+        wallZ: ENEMY_SAPPER_WALL_Z,
+        damage: ENEMY_SAPPER_WALL_DAMAGE,
+        interval: ENEMY_SAPPER_WALL_INTERVAL,
       }),
-      Reward({ value: ENEMY_INFANTRY_REWARD }),
-      UnitType({ kind: 'infantry' }),
+      Reward({ value: ENEMY_SAPPER_REWARD }),
+      UnitType({ kind: 'sapper' }),
       IsEnemy,
       IsMelee,
     )
   },
 
-  /** 生成敌方矛兵：攻击单位 + 攻击城门 */
-  spawnEnemySpearman(x: number, z: number = ENEMY_SPAWN_Z) {
+  /** 生成敌方矛骑士：攻击单位 + 攻击城门。速度 2×，抗弓箭 */
+  spawnEnemyCavalry(x: number, z: number = ENEMY_SPAWN_Z) {
     return world.spawn(
       Position({ x, y: 0, z }),
       Velocity({ x: 0, y: 0, z: 0 }),
-      Health({ current: ENEMY_SPEARMAN_HP, max: ENEMY_SPEARMAN_HP }),
+      Health({ current: ENEMY_CAVALRY_HP, max: ENEMY_CAVALRY_HP }),
       Attack(),
       CanAttackUnits({
-        range: ENEMY_SPEARMAN_UNITS_RANGE,
-        damage: ENEMY_SPEARMAN_UNITS_DAMAGE,
-        interval: ENEMY_SPEARMAN_UNITS_INTERVAL,
+        range: ENEMY_CAVALRY_UNITS_RANGE,
+        damage: ENEMY_CAVALRY_UNITS_DAMAGE,
+        interval: ENEMY_CAVALRY_UNITS_INTERVAL,
       }),
       CanAttackWall({
-        wallZ: ENEMY_SPEARMAN_WALL_Z,
-        damage: ENEMY_SPEARMAN_WALL_DAMAGE,
-        interval: ENEMY_SPEARMAN_WALL_INTERVAL,
+        wallZ: ENEMY_CAVALRY_WALL_Z,
+        damage: ENEMY_CAVALRY_WALL_DAMAGE,
+        interval: ENEMY_CAVALRY_WALL_INTERVAL,
       }),
-      Reward({ value: ENEMY_SPEARMAN_REWARD }),
-      UnitType({ kind: 'spearman' }),
+      Reward({ value: ENEMY_CAVALRY_REWARD }),
+      UnitType({ kind: 'cavalry' }),
       IsEnemy,
-      IsSpearman,
+      IsCavalry,
     )
   },
 
@@ -182,6 +194,7 @@ export const spawnActions = createActions((world) => ({
         range: DEFENDER_ARCHER_UNITS_RANGE,
         damage: DEFENDER_ARCHER_UNITS_DAMAGE,
         interval: DEFENDER_ARCHER_UNITS_INTERVAL,
+        firstStrike: DEFENDER_ARCHER_FIRST_STRIKE,
       }),
       UnitType({ kind: 'archer' }),
       IsDefender,
@@ -189,20 +202,22 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成守军矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
-  spawnDefenderSpearman(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
+  /** 生成守军破矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击
+   *  射程与矛骑士相同，靠 firstStrike 拿先手一枪；够不到攻弓是它「专而不强」的代价 */
+  spawnDefenderSpearBreaker(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
-      Health({ current: hp ?? DEFENDER_SPEARMAN_HP, max: DEFENDER_SPEARMAN_HP }),
+      Health({ current: hp ?? DEFENDER_SPEAR_BREAKER_HP, max: DEFENDER_SPEAR_BREAKER_HP }),
       Attack(),
       CanAttackUnits({
-        range: DEFENDER_SPEARMAN_UNITS_RANGE,
-        damage: DEFENDER_SPEARMAN_UNITS_DAMAGE,
-        interval: DEFENDER_SPEARMAN_UNITS_INTERVAL,
+        range: DEFENDER_SPEAR_BREAKER_UNITS_RANGE,
+        damage: DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE,
+        interval: DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL,
+        firstStrike: DEFENDER_SPEAR_BREAKER_FIRST_STRIKE,
       }),
       UnitType({ kind: 'spearman' }),
       IsDefender,
-      IsSpearman,
+      IsSpearBreaker,
     )
   },
 

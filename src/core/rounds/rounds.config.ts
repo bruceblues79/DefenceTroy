@@ -2,7 +2,8 @@
 // 所有发兵相关参数集中于此，不得散落在发兵逻辑中。
 // 追加轮次只需向 ROUNDS 数组末尾追加，胜利结算自动移动到最后一个已配置轮次之后。
 
-export type EnemyType = 'infantry' | 'archer' | 'spearman'
+// sapper 攻城兵（干扰/送钱） / archer 弓兵（标准体） / cavalry 矛骑士（速度 2×，抗弓箭）
+export type EnemyType = 'sapper' | 'archer' | 'cavalry'
 
 export interface WaveEnemy {
   type: EnemyType
@@ -44,9 +45,9 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Open the shop to view available defenders. Preparation gold can be used to recruit them after this round.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 4 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 6 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 6 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -65,8 +66,8 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
@@ -86,17 +87,17 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Drag deployed defenders between wall positions to rearrange the defense.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'spearman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'cavalry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       {
         enemies: [
-          { type: 'infantry', count: 2 },
+          { type: 'sapper', count: 2 },
           { type: 'archer', count: 2 },
         ],
         spawnInterval: SPAWN_INTERVAL,
       },
-      { enemies: [{ type: 'spearman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'cavalry', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
