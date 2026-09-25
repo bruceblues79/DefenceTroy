@@ -25,6 +25,8 @@ import {
 // 战场常量
 export const WALL_POSITION = { x: 0, y: 0, z: 2.95 }
 export const WALL_WIDTH = 4.5
+// 城墙血量：有意设为近乎不可破，因此失败判定实际只走「守军全灭 + 兵营为空」这条路径。
+// 这是暂时性数值，等城墙攻防玩法定稿后再回填真实值 —— 不是 bug，不要顺手改小。
 export const WALL_HP = 99999
 
 // 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.6）
