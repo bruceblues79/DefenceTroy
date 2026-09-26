@@ -245,8 +245,10 @@ export default function BattleFieldSpace({
   // ── 拖拽落点：按钮行（回收） ──
   const handleDropToBarracks = () => {
     const drag = dragState
-    if (!drag || drag.source !== 'unit') return
+    // 先无条件清空：兵营按钮起的拖拽落回按钮行 = 取消。
+    // 本函数带 stopPropagation，不在这里清空的话，点一下有库存的按钮会留下一个跟着指针的拖拽示意物
     setDragState(null)
+    if (!drag || drag.source !== 'unit') return
     const hp = drag.entity.get(Health)?.current ?? 0
     setBarracks((prev) => ({
       ...prev,

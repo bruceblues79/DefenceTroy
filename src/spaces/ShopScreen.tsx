@@ -18,9 +18,12 @@ const HIRE_ROW_Y = [1.842, 0.525, -0.792]
 const OP_BUTTON_X = [-0.9, 0, 0.9]
 const OP_BUTTONS = ['H', 'G', 'C'] as const
 
+// 面板整体沿世界 +z 的偏移量（正交相机下等价于屏幕上往下挪，1 单位 = 80px）
+const SHOP_Z = 0.25
+
 /**
  * 商店面板
- * Billboard 位于 [0,-1.2,7]，因低于地面需 depthTest=false 保证可见
+ * Billboard 位于 [0,7,SHOP_Z]：悬在相机与战场之间，用 depthTest=false 保证压在最上层
  * 雇佣区(Y∈[-2.5,1.45]) 3 行兵种按钮；操作区(Y∈[1.45,2.5]) H/G/C 三按钮
  */
 export default function ShopScreen({
@@ -35,7 +38,7 @@ export default function ShopScreen({
   const [page, setPage] = useState<'hire' | 'miracle'>('hire')
 
   return (
-    <Billboard position={[0, 7, 0]}>
+    <Billboard position={[0, 7, SHOP_Z]}>
       {/* 金币显示（面板上方） */}
       <RoundShapePlane
         width={1.6}
