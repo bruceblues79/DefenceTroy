@@ -15,7 +15,7 @@ import {
   IsArcher,
   IsMelee,
   IsSpearBreaker,
-  IsCavalry,
+  IsPikeman,
   IsCatapult,
   IsProjectile,
   IsBoulder,
@@ -51,19 +51,19 @@ export const ENEMY_SAPPER_WALL_DAMAGE = 1
 export const ENEMY_SAPPER_WALL_INTERVAL = 1.0
 export const ENEMY_SAPPER_REWARD = 60
 
-// 敌方矛骑士：攻击单位（range=2.5）+ 攻击城门（wallZ=0.825）
+// 敌方长枪兵：攻击单位（range=2.5）+ 攻击城门（wallZ=0.825）
 // 速度 = 弓兵 2×（0.6 → 1.2）；抗弓箭（守弓打他 ×0.25，见 combat/damage.ts）
 // UNITS_INTERVAL 与守方破矛兵对齐为 1.4：对位双方攻速相同，胜负只由克制倍率决定，
 // 不被攻速差干扰。砸墙间隔（WALL_INTERVAL）不参与此对齐，保持 1.6
-export const ENEMY_CAVALRY_HP = 200
-export const ENEMY_CAVALRY_SPEED = 1.2
-export const ENEMY_CAVALRY_UNITS_RANGE = 2.5
-export const ENEMY_CAVALRY_UNITS_DAMAGE = 32
-export const ENEMY_CAVALRY_UNITS_INTERVAL = 1.4
-export const ENEMY_CAVALRY_WALL_Z = 0.825
-export const ENEMY_CAVALRY_WALL_DAMAGE = 1.6
-export const ENEMY_CAVALRY_WALL_INTERVAL = 1.6
-export const ENEMY_CAVALRY_REWARD = 60
+export const ENEMY_PIKEMAN_HP = 200
+export const ENEMY_PIKEMAN_SPEED = 1.2
+export const ENEMY_PIKEMAN_UNITS_RANGE = 2.5
+export const ENEMY_PIKEMAN_UNITS_DAMAGE = 32
+export const ENEMY_PIKEMAN_UNITS_INTERVAL = 1.4
+export const ENEMY_PIKEMAN_WALL_Z = 0.825
+export const ENEMY_PIKEMAN_WALL_DAMAGE = 1.6
+export const ENEMY_PIKEMAN_WALL_INTERVAL = 1.6
+export const ENEMY_PIKEMAN_REWARD = 60
 
 // 守军弓兵：只攻击单位
 // 射程 5.7 = 攻弓 5.0 + 0.7。这 0.7 米是对手走到自己射程前守弓多打一箭的距离，
@@ -75,14 +75,14 @@ export const DEFENDER_ARCHER_UNITS_DAMAGE = 24
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 
 // 守军破矛兵：只攻击单位
-// 射程 3.3 = 矛骑士 2.5 + 0.8，同样只是「比对手远一点」，先手由此自然产生。
+// 射程 3.3 = 长枪兵 2.5 + 0.8，同样只是「比对手远一点」，先手由此自然产生。
 // ⚠️ 上限被「不能碰到攻弓」卡死：攻弓纵深 3.55，所以 3.3 已经贴着上限（余量 0.25）。
 //    任何调大此值的改动都要先验算 < 3.55，否则破矛兵够得到攻弓，「专而不强」失效。
 export const DEFENDER_SPEAR_BREAKER_HP = 200
 export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 3.3
 export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
-// 与矛骑士对齐为 1.4（原 1.2）：双方 DPS 基数相同，克制由倍率（受 0.25 / 出 2.0）说话。
-// 先手不受影响：0.8m 射程差 / 矛骑士速度 1.2 = 0.667s < 1.4，仍是恰好先手一枪
+// 与长枪兵对齐为 1.4（原 1.2）：双方 DPS 基数相同，克制由倍率（受 0.25 / 出 2.0）说话。
+// 先手不受影响：0.8m 射程差 / 长枪兵速度 1.2 = 0.667s < 1.4，仍是恰好先手一枪
 export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.4
 
 // 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
@@ -162,27 +162,27 @@ export const spawnActions = createActions((world) => ({
     )
   },
 
-  /** 生成敌方矛骑士：攻击单位 + 攻击城门。速度 2×，抗弓箭 */
-  spawnEnemyCavalry(x: number, z: number = ENEMY_SPAWN_Z) {
+  /** 生成敌方长枪兵：攻击单位 + 攻击城门。速度 2×，抗弓箭 */
+  spawnEnemyPikeman(x: number, z: number = ENEMY_SPAWN_Z) {
     return world.spawn(
       Position({ x, y: 0, z }),
       Velocity({ x: 0, y: 0, z: 0 }),
-      Health({ current: ENEMY_CAVALRY_HP, max: ENEMY_CAVALRY_HP }),
+      Health({ current: ENEMY_PIKEMAN_HP, max: ENEMY_PIKEMAN_HP }),
       Attack(),
       CanAttackUnits({
-        range: ENEMY_CAVALRY_UNITS_RANGE,
-        damage: ENEMY_CAVALRY_UNITS_DAMAGE,
-        interval: ENEMY_CAVALRY_UNITS_INTERVAL,
+        range: ENEMY_PIKEMAN_UNITS_RANGE,
+        damage: ENEMY_PIKEMAN_UNITS_DAMAGE,
+        interval: ENEMY_PIKEMAN_UNITS_INTERVAL,
       }),
       CanAttackWall({
-        wallZ: ENEMY_CAVALRY_WALL_Z,
-        damage: ENEMY_CAVALRY_WALL_DAMAGE,
-        interval: ENEMY_CAVALRY_WALL_INTERVAL,
+        wallZ: ENEMY_PIKEMAN_WALL_Z,
+        damage: ENEMY_PIKEMAN_WALL_DAMAGE,
+        interval: ENEMY_PIKEMAN_WALL_INTERVAL,
       }),
-      Reward({ value: ENEMY_CAVALRY_REWARD }),
-      UnitType({ kind: 'cavalry' }),
+      Reward({ value: ENEMY_PIKEMAN_REWARD }),
+      UnitType({ kind: 'pikeman' }),
       IsEnemy,
-      IsCavalry,
+      IsPikeman,
     )
   },
 
@@ -204,7 +204,7 @@ export const spawnActions = createActions((world) => ({
   },
 
   /** 生成守军破矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击
-   *  射程 3.3 比矛骑士 2.5 略大（先手由此而来），但仍够不到攻弓（纵深 3.55） */
+   *  射程 3.3 比长枪兵 2.5 略大（先手由此而来），但仍够不到攻弓（纵深 3.55） */
   spawnDefenderSpearBreaker(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),

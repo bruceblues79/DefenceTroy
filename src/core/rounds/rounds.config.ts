@@ -2,8 +2,8 @@
 // 所有发兵相关参数集中于此，不得散落在发兵逻辑中。
 // 追加轮次只需向 ROUNDS 数组末尾追加，胜利结算自动移动到最后一个已配置轮次之后。
 
-// sapper 攻城兵（干扰/送钱） / archer 弓兵（标准体） / cavalry 矛骑士（速度 2×，抗弓箭）
-export type EnemyType = 'sapper' | 'archer' | 'cavalry'
+// sapper 攻城兵（干扰/送钱） / archer 弓兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭）
+export type EnemyType = 'sapper' | 'archer' | 'pikeman'
 
 export interface WaveEnemy {
   type: EnemyType
@@ -89,7 +89,7 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'cavalry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       {
         enemies: [
           { type: 'sapper', count: 2 },
@@ -97,7 +97,7 @@ export const ROUNDS: RoundConfig[] = [
         ],
         spawnInterval: SPAWN_INTERVAL,
       },
-      { enemies: [{ type: 'cavalry', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {

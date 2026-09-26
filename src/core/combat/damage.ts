@@ -13,23 +13,23 @@ import { IsDefender, IsEnemy, IsWall, UnitType, type UnitKind } from '../traits'
  *
  * 克制闭环（守方靠射程与先手，不只靠数值）：
  *   攻弓 ──(距墙纵深 3.55 > 破矛兵射程 3.3，破矛兵够不到)──▶ 破矛兵
- *   破矛兵 ──(受矛骑士 0.25 / 对矛骑士 2.0)──▶ 矛骑士
- *   矛骑士 ──(守弓打他只有 0.25 + 速度 2×)──▶ 守弓
+ *   破矛兵 ──(受长枪兵 0.25 / 对长枪兵 2.0)──▶ 长枪兵
+ *   长枪兵 ──(守弓打他只有 0.25 + 速度 2×)──▶ 守弓
  */
 
 // 守军攻击敌军（行 key：archer 守弓 / spearbreaker 破矛兵 / catapult 投石车；
-//               列 key：sapper 攻城兵 / archer 攻弓 / cavalry 矛骑士）
+//               列 key：sapper 攻城兵 / archer 攻弓 / pikeman 长枪兵）
 const DEFENDER_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:       { sapper: 1.0,  archer: 1.0,  cavalry: 0.25 },
-  spearbreaker: { sapper: 1.0,  archer: 0.5,  cavalry: 2.0  },
-  catapult:     { sapper: 0.75, archer: 1.5,  cavalry: 1.0  },
+  archer:       { sapper: 1.0,  archer: 1.0,  pikeman: 0.25 },
+  spearbreaker: { sapper: 1.0,  archer: 0.5,  pikeman: 2.0  },
+  catapult:     { sapper: 0.75, archer: 1.5,  pikeman: 1.0  },
 }
 
-// 敌军攻击守军（行 key：archer 攻弓 / cavalry 矛骑士；
+// 敌军攻击守军（行 key：archer 攻弓 / pikeman 长枪兵；
 //               列 key：archer 守弓 / spearbreaker 破矛兵 / catapult 投石车）
 const ENEMY_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
   archer:  { archer: 1.0, spearbreaker: 1.0,  catapult: 0.85 },
-  cavalry: { archer: 1.5, spearbreaker: 0.25, catapult: 1.25 },
+  pikeman: { archer: 1.5, spearbreaker: 0.25, catapult: 1.25 },
 }
 
 /**

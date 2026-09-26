@@ -19,7 +19,7 @@ export const Attack = trait({
  * interval: 完整攻击周期（秒）
  *
  * 守方的「先手一击」不靠独立机制实现：守方 range 本身就比对手略大一点点
- * （守弓 5.7 vs 攻弓 5.0、破矛兵 3.3 vs 矛骑士 2.5），先手是射程差的自然结果。
+ * （守弓 5.7 vs 攻弓 5.0、破矛兵 3.3 vs 长枪兵 2.5），先手是射程差的自然结果。
  */
 export const CanAttackUnits = trait({
   range: 5,

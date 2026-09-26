@@ -57,7 +57,7 @@ export function createRoundEngine(configs: RoundConfig[], cb: RoundEngineCallbac
     const actions = spawnActions(world)
     if (type === 'sapper') actions.spawnEnemySapper(x, ENEMY_SPAWN_Z)
     else if (type === 'archer') actions.spawnEnemyArcher(x, ENEMY_SPAWN_Z)
-    else actions.spawnEnemyCavalry(x, ENEMY_SPAWN_Z)
+    else actions.spawnEnemyPikeman(x, ENEMY_SPAWN_Z)
   }
 
   return {

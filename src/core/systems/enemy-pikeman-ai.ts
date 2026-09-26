@@ -6,12 +6,12 @@ import {
   CanAttackWall,
   Health,
   IsEnemy,
-  IsCavalry,
+  IsPikeman,
   IsDefender,
   IsWall,
   Targeting,
 } from '../traits'
-import { ENEMY_CAVALRY_SPEED } from '../actions'
+import { ENEMY_PIKEMAN_SPEED } from '../actions'
 
 /**
  * 计算 XZ 平面距离
@@ -23,13 +23,13 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
 }
 
 /**
- * 敌方矛骑士 AI 系统
+ * 敌方长枪兵 AI 系统
  * 行为：优先攻击射程内守军；无守军时前进到 CanAttackWall.wallZ 攻击城墙
  * 与敌弓兵结构一致，区别在于速度 2×、射程更短、抗弓箭（倍率见 combat/damage.ts）
  * 注意：这里「射程内无守军才砸墙」是关键 —— 保证破矛兵能拦住它，克制关系才成立
  */
-export function updateEnemyCavalryAI(world: World, _dt: number) {
-  const enemies = world.query(IsEnemy, IsCavalry, Position, CanAttackUnits, CanAttackWall, Velocity)
+export function updateEnemyPikemanAI(world: World, _dt: number) {
+  const enemies = world.query(IsEnemy, IsPikeman, Position, CanAttackUnits, CanAttackWall, Velocity)
 
   enemies.updateEach(([pos, unitsAtk, wallAtk, vel], enemy) => {
     // 1. 检查当前目标是否有效
@@ -92,7 +92,7 @@ export function updateEnemyCavalryAI(world: World, _dt: number) {
       vel.z = 0
     } else {
       vel.x = 0
-      vel.z = ENEMY_CAVALRY_SPEED
+      vel.z = ENEMY_PIKEMAN_SPEED
     }
   })
 }
