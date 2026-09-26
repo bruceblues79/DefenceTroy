@@ -23,6 +23,7 @@ import ArrowProxy from './ArrowProxy'
 import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
 import HealthBarProxy from './HealthBarProxy'
+import HealthRingProxy from './HealthRingProxy'
 import EffectProxy from './EffectProxy'
 
 /**
@@ -31,6 +32,14 @@ import EffectProxy from './EffectProxy'
  * （莫名多播一次 attack、尸体也拿不到死亡信号）。
  */
 const entityKey = (entity: Entity) => `${entity.id()}#${entity.generation()}`
+
+// 角色血环尺寸：半径 0.24 → 直径 0.48，小于守军 slot 间距 0.5，相邻两个环不粘连
+const RING_RADIUS = 0.24
+// 腰环高度：角色身高约 1.5，挂在半高。相机倾斜后头顶血条会和身体叠在一起，
+// 腰环还能避开城墙对贴墙单位（攻城兵 z≈1.95）的遮挡
+const RING_Y = 0.75
+// 投石车仍是 box 占位，只有 0.8 高，腰环相应下移到中部
+const RING_Y_CATAPULT = 0.45
 
 interface UnitRendererProps {
   /** 守军拖拽按下回调（BattleFieldSpace 提供，内部判定兵种） */
@@ -115,7 +124,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.8, 0]} width={0.4} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y} />
         </group>
       ))}
 
@@ -129,7 +138,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.8, 0]} width={0.4} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y} />
         </group>
       ))}
 
@@ -143,7 +152,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.8, 0]} width={0.4} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y} />
         </group>
       ))}
 
@@ -157,7 +166,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.8, 0]} width={0.4} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y} />
         </group>
       ))}
 
@@ -171,11 +180,11 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.8, 0]} width={0.4} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y} />
         </group>
       ))}
 
-      {/* 守军投石车（深棕）盒子高 0.8，半高 0.4，血条 y = pos.y + 0.5 */}
+      {/* 守军投石车（深棕）盒子高 0.8，半高 0.4 */}
       {defenderCatapults.map((entity) => (
         <group key={entityKey(entity)}>
           <CharacterProxy
@@ -184,7 +193,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             size={[0.6, 0.8, 0.6]}
             onPointerDown={onDefenderPointerDown?.(entity)}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.0, 0]} width={0.55} />
+          <HealthRingProxy entity={entity} radius={RING_RADIUS} yOffset={RING_Y_CATAPULT} />
         </group>
       ))}
 

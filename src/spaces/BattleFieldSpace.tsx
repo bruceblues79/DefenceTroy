@@ -68,7 +68,6 @@ export default function BattleFieldSpace({
   onRestart,
   onExitToMenu,
   onGameOver,
-  onDragStateChange,
 }: {
   paused: boolean
   gameOver: boolean
@@ -78,7 +77,6 @@ export default function BattleFieldSpace({
   onRestart: () => void
   onExitToMenu: () => void
   onGameOver: (result: 'victory' | 'defeat') => void
-  onDragStateChange?: (dragging: boolean) => void
 }) {
   const world = useWorld()
   const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [], catapult: [] })
@@ -126,11 +124,6 @@ export default function BattleFieldSpace({
       return changed ? next : prev
     })
   })
-
-  // 通知 App 屏蔽 OrbitControls（拖拽或提示面板显示期间）
-  useEffect(() => {
-    onDragStateChange?.(dragState !== null || promptOpen)
-  }, [dragState, promptOpen, onDragStateChange])
 
   // 胜负结算或提示面板出现时自动关闭商店
   useEffect(() => {
