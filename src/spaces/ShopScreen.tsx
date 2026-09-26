@@ -19,7 +19,7 @@ const OP_BUTTON_X = [-0.9, 0, 0.9]
 const OP_BUTTONS = ['H', 'G', 'C'] as const
 
 // 面板整体沿世界 +z 的偏移量（正交相机下等价于屏幕上往下挪，1 单位 = 80px）
-const SHOP_Z = 0.25
+const SHOP_Z = 0.75
 
 /**
  * 商店面板
