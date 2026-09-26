@@ -34,8 +34,9 @@ const entityKey = (entity: Entity) => `${entity.id()}#${entity.generation()}`
 
 // 血条挂头顶（模型缩放后身高约 0.6，条在头顶上方 0.2）
 const BAR_Y = 0.8
-// 沿角色 local -z（背后）再挪一点，别压在头顶正上方
-const BAR_BACK = 0.12
+// 血条统一往 +z（靠近相机侧、屏幕下方）挪，离开头顶正上方。
+// 用世界方向而非角色 local -z：守军 yaw=180°，它的 local -z 是 -z，会和敌人的偏移方向相反
+const BAR_Z = 0.2
 // 投石车仍是 box 占位，高 0.8，条相应抬高
 const BAR_Y_CATAPULT = 1.0
 
@@ -122,7 +123,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.enemyArcher} forwardOffset={BAR_BACK} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, BAR_Z]} width={0.4} />
         </group>
       ))}
 
@@ -136,7 +137,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.enemySapper} forwardOffset={BAR_BACK} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, BAR_Z]} width={0.4} />
         </group>
       ))}
 
@@ -150,7 +151,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.enemyPikeman} forwardOffset={BAR_BACK} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, BAR_Z]} width={0.4} />
         </group>
       ))}
 
@@ -164,7 +165,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.defenderArcher} forwardOffset={BAR_BACK} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, BAR_Z]} width={0.4} />
         </group>
       ))}
 
@@ -178,7 +179,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.defenderSpearBreaker} forwardOffset={BAR_BACK} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, BAR_Z]} width={0.4} />
         </group>
       ))}
 
@@ -191,7 +192,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             size={[0.6, 0.8, 0.6]}
             onPointerDown={onDefenderPointerDown?.(entity)}
           />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y_CATAPULT, 0]} width={0.55} />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y_CATAPULT, BAR_Z]} width={0.55} />
         </group>
       ))}
 
