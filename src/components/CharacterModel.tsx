@@ -32,8 +32,8 @@ export const MODEL_YAW: Record<ModelKey, number> = {
   defenderSpearBreaker: Math.PI,
 }
 
-/** 单位统一缩放：资产标准身高约 1.5m，游戏内按 0.5 缩到约 0.75m */
-const MODEL_SCALE = 0.5
+/** 单位统一缩放：资产标准身高约 1.5m，游戏内按 0.4 缩到约 0.6m */
+const MODEL_SCALE = 0.4
 
 type ClipName = 'guard' | 'move' | 'atk' | 'hurt' | 'die'
 
@@ -91,8 +91,9 @@ function findAction(actions: Record<string, THREE.AnimationAction | null>, suffi
  * 角色模型（ECS 驱动 + 自管动画状态机）
  *
  * 状态机不新增 ECS 字段，全部挂在既有 trait 上：
- * - attack：Attack.isAttacking 上升沿触发，播完回 guard/move
- * - hurt：Health.current 下降触发；guard/move 中打断重播，attack 中 0.4s 保护过后可插入
+ * - attack：Attack.isAttacking 上升沿触发，一条指令播一次，播完回 guard/move
+ * - hurt：Health.current 下降触发；guard/move 中打断重播，attack 中 0.4s 保护过后可插入，
+ *   插入后 attack 视为取消，hurt 播完回 guard/move（不续播 attack）
  * - move/guard：Velocity 是否为零
  * - die：血量归零后由逻辑层销毁实体，尸体由渲染层 CorpseModel 接着播（见 UnitRenderer）
  */
@@ -119,7 +120,6 @@ export default function CharacterModel({
     state: 'guard' as ClipName,
     endsAt: 0,
     protectUntil: 0,
-    attackRemaining: 0,
     wasAttacking: false,
     lastHp: Infinity,
     lastPos: [0, 0, 0] as [number, number, number],
@@ -168,7 +168,8 @@ export default function CharacterModel({
     const health = entity.get(Health)
     let damaged = false
     if (health) {
-      damaged = health.current < s.lastHp
+      // 首帧 lastHp 还是 Infinity，此时只记录基准值，不算受击（否则每个单位出生都会播一次 hurt）
+      damaged = Number.isFinite(s.lastHp) && health.current < s.lastHp
       s.lastHp = health.current
       if (health.current <= 0) {
         if (s.state !== 'die') {
@@ -189,46 +190,36 @@ export default function CharacterModel({
       s.state = base
     }
 
+    // 一次性动作（atk / hurt）播完即回基础动作，绝不自动续播 attack
+    if ((s.state === 'atk' || s.state === 'hurt') && t >= s.endsAt) {
+      playClip(base)
+      s.state = base
+      s.protectUntil = 0
+    }
+
     const attack = entity.get(Attack)
     const attacking = attack?.isAttacking ?? false
     const rising = attacking && !s.wasAttacking
     s.wasAttacking = attacking
 
-    // 状态到期
-    if (s.state === 'hurt' && t >= s.endsAt) {
-      if (s.attackRemaining > 0) {
-        // 受伤插在 attack 中途：从被打断的进度继续播完
-        const dur = clipOf('atk')?.getClip().duration ?? 0
-        playClip('atk', Math.max(0, dur - s.attackRemaining))
-        s.state = 'atk'
-        s.endsAt = t + s.attackRemaining
-        s.attackRemaining = 0
-      } else {
-        playClip(base)
-        s.state = base
-      }
-    } else if (s.state === 'atk' && t >= s.endsAt) {
-      playClip(base)
-      s.state = base
-    }
-
-    // 受伤：保护期内只掉血，过后打断当前动作重播 hurt
-    if (damaged && s.state !== 'die') {
-      if (s.state !== 'atk' || t >= s.protectUntil) {
-        s.attackRemaining = s.state === 'atk' ? Math.max(0, s.endsAt - t) : 0
-        playClip('hurt')
-        s.state = 'hurt'
-        s.endsAt = t + HURT_DURATION
-      }
-    }
-
-    // 攻击进入：每次触发都从头播（间隔短于 clip 时允许截断）
-    if (rising && s.state !== 'die' && s.state !== 'hurt') {
+    // 攻击指令：一条指令只播一次 atk。clip 长于 interval 时会被下一条指令截断重播
+    if (rising && s.state !== 'die') {
       playClip('atk')
       s.state = 'atk'
       s.endsAt = t + (clipOf('atk')?.getClip().duration ?? 0)
       s.protectUntil = t + ATTACK_PROTECT
-      s.attackRemaining = 0
+    }
+
+    // 受伤：attack 起手 0.4s 保护期内只掉血；过后打断当前动作播 hurt，
+    // 被打断的 attack 就此取消（播完 hurt 回 guard/move，不再续播）
+    if (damaged && s.state !== 'die') {
+      const inProtect = s.state === 'atk' && t < s.protectUntil
+      if (!inProtect) {
+        playClip('hurt')
+        s.state = 'hurt'
+        s.endsAt = t + HURT_DURATION
+        s.protectUntil = 0
+      }
     }
 
     // 站立/移动态随速度切换
@@ -245,9 +236,9 @@ export default function CharacterModel({
       <group scale={MODEL_SCALE}>
         <primitive object={model} />
       </group>
-      {/* 命中区：模型细长，用不可见盒子保证拖拽/选敌稳定（贴合缩放后身高约 0.75） */}
-      <mesh position={[0, 0.5, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-        <boxGeometry args={[0.5, 1, 0.5]} />
+      {/* 命中区：模型细长，用不可见盒子保证拖拽/选敌稳定（贴合缩放后身高约 0.6） */}
+      <mesh position={[0, 0.4, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+        <boxGeometry args={[0.4, 0.8, 0.4]} />
         <meshBasicMaterial visible={false} />
       </mesh>
     </group>
@@ -279,7 +270,6 @@ export function CorpseModel({
     const action = findAction(actions, CLIP_SUFFIX.die)
     if (!action) return
     played.current = true
-    action.reset().setLoop(THREE.LoopOnce, 1)
     action.reset().setLoop(THREE.LoopOnce, 1)
     action.clampWhenFinished = true
     action.play()
