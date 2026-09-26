@@ -187,7 +187,7 @@ export const spawnActions = createActions((world) => ({
   },
 
   /** 生成守军弓手：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
-  spawnDefenderArcher(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
+  spawnDefenderArcher(x: number, y: number = 2, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_ARCHER_HP, max: DEFENDER_ARCHER_HP }),
@@ -205,7 +205,7 @@ export const spawnActions = createActions((world) => ({
 
   /** 生成守军破矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击
    *  射程 3.3 比长枪兵 2.5 略大（先手由此而来），但仍够不到攻弓（纵深 3.55） */
-  spawnDefenderSpearBreaker(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
+  spawnDefenderSpearBreaker(x: number, y: number = 2, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_SPEAR_BREAKER_HP, max: DEFENDER_SPEAR_BREAKER_HP }),
@@ -236,7 +236,7 @@ export const spawnActions = createActions((world) => ({
   },
 
   /** 生成守军投石车：自动周期轰炸。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
-  spawnDefenderCatapult(x: number, y: number = 2.5, z: number = WALL_POSITION.z, hp?: number) {
+  spawnDefenderCatapult(x: number, y: number = 2, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
       Health({ current: hp ?? DEFENDER_CATAPULT_HP, max: DEFENDER_CATAPULT_HP }),

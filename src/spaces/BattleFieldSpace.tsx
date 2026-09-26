@@ -161,9 +161,9 @@ export default function BattleFieldSpace({
   /** 部署指定兵种到 slot（带保留血量） */
   const spawnDefender = (type: UnitType, slotX: number, hp: number) => {
     const spawn = spawnActions(world)
-    if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2.5, WALL_POSITION.z, hp)
-    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2.5, WALL_POSITION.z, hp)
-    else spawn.spawnDefenderCatapult(slotX, 2.5, WALL_POSITION.z, hp)
+    if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2, WALL_POSITION.z, hp)
+    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2, WALL_POSITION.z, hp)
+    else spawn.spawnDefenderCatapult(slotX, 2, WALL_POSITION.z, hp)
   }
 
   /** 商店雇佣：金币足够则扣金币 + 入兵营（满血） */

@@ -1,4 +1,5 @@
 import { useQuery, useQueryFirst } from 'koota/react'
+import { useCallback, useRef, useState } from 'react'
 import type { Entity } from 'koota'
 import { type ThreeEvent } from '@react-three/fiber'
 import {
@@ -17,6 +18,7 @@ import {
 } from '../core/traits'
 import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
 import CharacterProxy from './CharacterProxy'
+import CharacterModel, { CorpseModel, MODEL_YAW, type DeathInfo, type ModelKey } from './CharacterModel'
 import ArrowProxy from './ArrowProxy'
 import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
@@ -39,6 +41,14 @@ interface UnitRendererProps {
  * 用 ECS 查询批量渲染所有战场实体：敌人、守军、城墙、抛射物、WallSlot
  */
 export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp, onEnemyPointerUp }: UnitRendererProps) {
+  // 尸体列表：实体被逻辑层销毁后，由渲染层接着播 die，播完移除
+  const [corpses, setCorpses] = useState<(DeathInfo & { id: number })[]>([])
+  const corpseId = useRef(0)
+  const handleDeath = useCallback((info: DeathInfo) => {
+    setCorpses((prev) => [...prev, { ...info, id: corpseId.current++ }])
+  }, [])
+  const removeCorpse = (id: number) => setCorpses((prev) => prev.filter((c) => c.id !== id))
+
   // 敌人弓手
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
   // 敌人攻城兵（近战，只攻墙）
@@ -88,63 +98,73 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
       {/* 城墙插槽占位平面（仅未占用 slot 显示）；城墙被毁时随城墙一起消失 */}
       {wall && <WallSlots onSlotOver={onSlotOver ?? (() => {})} onSlotUp={onSlotUp ?? (() => {})} />}
 
-      {/* 敌人弓手（黄色） */}
+      {/* 敌人弓手 */}
       {enemyArchers.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy
+          <CharacterModel
             entity={entity}
-            color="#e6c200"
+            modelKey={'enemyArcher' as ModelKey}
+            yaw={MODEL_YAW.enemyArcher}
             onPointerUp={onEnemyPointerUp?.(entity)}
+            onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
         </group>
       ))}
 
-      {/* 敌人攻城兵（深灰） */}
+      {/* 敌人攻城兵 */}
       {enemySappers.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy
+          <CharacterModel
             entity={entity}
-            color="#3a3a3a"
+            modelKey={'enemySapper' as ModelKey}
+            yaw={MODEL_YAW.enemySapper}
             onPointerUp={onEnemyPointerUp?.(entity)}
+            onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
         </group>
       ))}
 
-      {/* 敌人长枪兵（深红） */}
+      {/* 敌人长枪兵 */}
       {enemyPikeman.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy
+          <CharacterModel
             entity={entity}
-            color="#b33939"
+            modelKey={'enemyPikeman' as ModelKey}
+            yaw={MODEL_YAW.enemyPikeman}
             onPointerUp={onEnemyPointerUp?.(entity)}
+            onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
         </group>
       ))}
 
-      {/* 守军弓手（蓝色） */}
+      {/* 守军弓手 */}
       {defenderArchers.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy
+          <CharacterModel
             entity={entity}
-            color="#4a90d9"
+            modelKey={'defenderArcher' as ModelKey}
+            yaw={MODEL_YAW.defenderArcher}
             onPointerDown={onDefenderPointerDown?.(entity)}
+            onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
         </group>
       ))}
 
-      {/* 守军破矛兵（青金） */}
+      {/* 守军破矛兵 */}
       {defenderSpearBreakers.map((entity) => (
         <group key={entity.id()}>
-          <CharacterProxy
+          <CharacterModel
             entity={entity}
-            color="#4a9d8f"
+            modelKey={'defenderSpearBreaker' as ModelKey}
+            yaw={MODEL_YAW.defenderSpearBreaker}
             onPointerDown={onDefenderPointerDown?.(entity)}
+            onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.6, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
         </group>
       ))}
 
@@ -157,8 +177,19 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             size={[0.6, 0.8, 0.6]}
             onPointerDown={onDefenderPointerDown?.(entity)}
           />
-          <HealthBarProxy entity={entity} offset={[0, 0.5, 0]} width={0.55} />
+          <HealthBarProxy entity={entity} offset={[0, 1.0, 0]} width={0.55} />
         </group>
+      ))}
+
+      {/* 尸体：播 die 后消失 */}
+      {corpses.map((c) => (
+        <CorpseModel
+          key={c.id}
+          modelKey={c.modelKey}
+          position={c.position}
+          yaw={c.yaw}
+          onDone={() => removeCorpse(c.id)}
+        />
       ))}
 
       {/* 箭矢抛射物 */}

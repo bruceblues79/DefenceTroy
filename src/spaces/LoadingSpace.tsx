@@ -1,12 +1,8 @@
-import { Billboard, Text } from '@react-three/drei'
-import { useEffect } from 'react'
+import { Billboard, Text, useGLTF } from '@react-three/drei'
+import { Suspense, useEffect } from 'react'
+import { MODEL_URLS } from '../components/CharacterModel'
 
-export default function LoadingSpace({ onLoaded }: { onLoaded: () => void }) {
-  useEffect(() => {
-    const timer = setTimeout(onLoaded, 100)
-    return () => clearTimeout(timer)
-  }, [onLoaded])
-
+function LoadingBillboard() {
   return (
     <Billboard position={[0, 0.1, 0]}>
       <mesh>
@@ -17,5 +13,26 @@ export default function LoadingSpace({ onLoaded }: { onLoaded: () => void }) {
         loading...
       </Text>
     </Billboard>
+  )
+}
+
+/** 真实预热：5 个角色 GLB 全部就绪后才进入战斗（Suspense 期间显示 loading） */
+function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
+  useGLTF(MODEL_URLS.enemyArcher)
+  useGLTF(MODEL_URLS.enemySapper)
+  useGLTF(MODEL_URLS.enemyPikeman)
+  useGLTF(MODEL_URLS.defenderArcher)
+  useGLTF(MODEL_URLS.defenderSpearBreaker)
+  useEffect(() => {
+    onLoaded()
+  }, [onLoaded])
+  return null
+}
+
+export default function LoadingSpace({ onLoaded }: { onLoaded: () => void }) {
+  return (
+    <Suspense fallback={<LoadingBillboard />}>
+      <CharacterPreloader onLoaded={onLoaded} />
+    </Suspense>
   )
 }
