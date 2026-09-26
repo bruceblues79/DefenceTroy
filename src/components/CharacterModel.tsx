@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import type { Entity } from 'koota'
 import { Attack, Health, Position, Velocity } from '../core/traits'
+import { deathQueue } from '../core/systems/death'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -46,8 +47,8 @@ const CLIP_SUFFIX: Record<ClipName, string> = {
   die: '_die',
 }
 
-/** attack 起手 0.4s 内受伤只掉血，不播 hurt */
-const ATTACK_PROTECT = 0.4
+/** attack 起手 0.6s 内受伤只掉血，不播 hurt */
+const ATTACK_PROTECT = 0.6
 const HURT_DURATION = 0.2
 const CROSSFADE = 0.12
 
@@ -129,10 +130,11 @@ export default function CharacterModel({
   const onDeathRef = useRef(onDeath)
   onDeathRef.current = onDeath
 
-  // 实体卸载（死亡或被回收）：只有血量归零才算死亡，才交给渲染层播 die
+  // 实体卸载（死亡或回收）：只有命中死亡队列才交给渲染层播 die
+  // 注意不能用 lastHp <= 0 判定——死亡与销毁同帧发生，渲染层永远读不到归零那一刻
   useEffect(
     () => () => {
-      if (st.current.lastHp <= 0) {
+      if (deathQueue.delete(entity.id())) {
         onDeathRef.current?.({ modelKey, position: st.current.lastPos, yaw })
       }
     },
@@ -159,7 +161,9 @@ export default function CharacterModel({
       action.reset()
       if (at !== undefined) action.time = at
       action.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, loop ? Infinity : 1)
-      action.clampWhenFinished = next === 'die'
+      // 一次性动作必须 clamp：否则播完那一帧 mixer 会立刻停用该动作、权重瞬间归零，
+      // 交叉淡出失效 → 角色闪回绑定姿势（attack/hurt 收尾不干净的根因）
+      action.clampWhenFinished = !loop
       if (prev && prev !== action) prev.fadeOut(CROSSFADE)
       action.fadeIn(next === 'hurt' ? CROSSFADE / 2 : CROSSFADE).play()
       s.playing = next
@@ -204,10 +208,14 @@ export default function CharacterModel({
 
     // 攻击指令：一条指令只播一次 atk。clip 长于 interval 时会被下一条指令截断重播
     if (rising && s.state !== 'die') {
-      playClip('atk')
-      s.state = 'atk'
-      s.endsAt = t + (clipOf('atk')?.getClip().duration ?? 0)
-      s.protectUntil = t + ATTACK_PROTECT
+      const dur = clipOf('atk')?.getClip().duration ?? 0
+      // 动作还没解析出来时不进状态：否则 endsAt=0 会在下一帧立刻弹回 guard，等于闪一帧 attack
+      if (dur > 0) {
+        playClip('atk')
+        s.state = 'atk'
+        s.endsAt = t + dur
+        s.protectUntil = t + ATTACK_PROTECT
+      }
     }
 
     // 受伤：attack 起手 0.4s 保护期内只掉血；过后打断当前动作播 hurt，

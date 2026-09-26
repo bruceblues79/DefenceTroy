@@ -25,6 +25,13 @@ import WallSlots from './WallSlots'
 import HealthBarProxy from './HealthBarProxy'
 import EffectProxy from './EffectProxy'
 
+/**
+ * React key 必须带上世代：koota 会回收实体 id（同 id 不同 generation 是两个不同实体）。
+ * 只用 id 做 key，会让「新实体复用刚死实体的组件实例」——动画状态机带着旧状态继续跑
+ * （莫名多播一次 attack、尸体也拿不到死亡信号）。
+ */
+const entityKey = (entity: Entity) => `${entity.id()}#${entity.generation()}`
+
 interface UnitRendererProps {
   /** 守军拖拽按下回调（BattleFieldSpace 提供，内部判定兵种） */
   onDefenderDragStart?: (entity: Entity) => void
@@ -100,7 +107,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 敌人弓手 */}
       {enemyArchers.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterModel
             entity={entity}
             modelKey={'enemyArcher' as ModelKey}
@@ -114,7 +121,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 敌人攻城兵 */}
       {enemySappers.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterModel
             entity={entity}
             modelKey={'enemySapper' as ModelKey}
@@ -128,7 +135,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 敌人长枪兵 */}
       {enemyPikeman.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterModel
             entity={entity}
             modelKey={'enemyPikeman' as ModelKey}
@@ -142,7 +149,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 守军弓手 */}
       {defenderArchers.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterModel
             entity={entity}
             modelKey={'defenderArcher' as ModelKey}
@@ -156,7 +163,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 守军破矛兵 */}
       {defenderSpearBreakers.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterModel
             entity={entity}
             modelKey={'defenderSpearBreaker' as ModelKey}
@@ -170,7 +177,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 守军投石车（深棕）盒子高 0.8，半高 0.4，血条 y = pos.y + 0.5 */}
       {defenderCatapults.map((entity) => (
-        <group key={entity.id()}>
+        <group key={entityKey(entity)}>
           <CharacterProxy
             entity={entity}
             color="#6b4226"
@@ -194,12 +201,12 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 箭矢抛射物 */}
       {projectiles.map((entity) => (
-        <ArrowProxy key={entity.id()} entity={entity} />
+        <ArrowProxy key={entityKey(entity)} entity={entity} />
       ))}
 
       {/* 石块抛射物 */}
       {boulders.map((entity) => (
-        <BoulderProxy key={entity.id()} entity={entity} />
+        <BoulderProxy key={entityKey(entity)} entity={entity} />
       ))}
 
       {/* 视觉效果（AOE 命中圆片等） */}
