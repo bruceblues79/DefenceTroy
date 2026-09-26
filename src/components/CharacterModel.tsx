@@ -20,17 +20,20 @@ export const MODEL_URLS = {
 export type ModelKey = keyof typeof MODEL_URLS
 
 /**
- * 模型朝向：资产正面朝 -z
- * - 守军站在墙上正对来敌（敌人在 -z 方向）→ 不旋转
- * - 敌人朝 +z 的城墙进军 → 旋转 180°
+ * 模型朝向：资产正面朝 +z（长枪/破矛兵的兵器向 -z 拖在身后）
+ * - 守军站墙上要正对来敌（敌人在 -z 方向）→ 旋转 180°
+ * - 敌人朝 +z 的城墙进军 → 不旋转
  */
 export const MODEL_YAW: Record<ModelKey, number> = {
-  enemyArcher: Math.PI,
-  enemySapper: Math.PI,
-  enemyPikeman: Math.PI,
-  defenderArcher: 0,
-  defenderSpearBreaker: 0,
+  enemyArcher: 0,
+  enemySapper: 0,
+  enemyPikeman: 0,
+  defenderArcher: Math.PI,
+  defenderSpearBreaker: Math.PI,
 }
+
+/** 单位统一缩放：资产标准身高约 1.5m，游戏内按 0.5 缩到约 0.75m */
+const MODEL_SCALE = 0.5
 
 type ClipName = 'guard' | 'move' | 'atk' | 'hurt' | 'die'
 
@@ -54,7 +57,7 @@ export interface DeathInfo {
   yaw: number
 }
 
-/** 克隆骨架模型 + 按后缀取出 5 个动作（蒙皮网格必须用 SkeletonUtils.clone） */
+/** 克隆骨架模型（蒙皮网格必须用 SkeletonUtils.clone）+ 绑定动作 */
 function useCharacterClips(modelKey: ModelKey, root: React.RefObject<THREE.Group>) {
   const { scene, animations } = useGLTF(MODEL_URLS[modelKey])
   const model = useMemo(() => {
@@ -68,16 +71,20 @@ function useCharacterClips(modelKey: ModelKey, root: React.RefObject<THREE.Group
     return m
   }, [scene])
   const { actions } = useAnimations(animations, root)
-  const clips = useMemo(() => {
-    const found: Partial<Record<ClipName, THREE.AnimationAction>> = {}
-    for (const name of Object.keys(actions)) {
-      for (const key of Object.keys(CLIP_SUFFIX) as ClipName[]) {
-        if (name.endsWith(CLIP_SUFFIX[key])) found[key] = actions[name]!
-      }
-    }
-    return found
-  }, [actions])
-  return { model, clips }
+  return { model, actions }
+}
+
+/**
+ * 按后缀取动作。
+ * ⚠️ 必须「用时再取」：useAnimations 的 actions 是懒解析 getter，render 阶段 ref 还是 null，
+ * 那时解析会得到 undefined 且不会重试——所以绝不能在 useMemo 里把 action 缓存下来。
+ */
+function findAction(actions: Record<string, THREE.AnimationAction | null>, suffix: string) {
+  for (const name of Object.keys(actions)) {
+    const action = actions[name]
+    if (action && name.endsWith(suffix)) return action
+  }
+  return undefined
 }
 
 /**
@@ -105,7 +112,8 @@ export default function CharacterModel({
   onDeath?: (info: DeathInfo) => void
 }) {
   const group = useRef<THREE.Group>(null!)
-  const { model, clips } = useCharacterClips(modelKey, group)
+  const { model, actions } = useCharacterClips(modelKey, group)
+  const clipOf = (name: ClipName) => findAction(actions, CLIP_SUFFIX[name])
 
   const st = useRef({
     state: 'guard' as ClipName,
@@ -144,9 +152,9 @@ export default function CharacterModel({
     const s = st.current
 
     const playClip = (next: ClipName, at?: number) => {
-      const action = clips[next]
+      const action = clipOf(next)
       if (!action) return
-      const prev = s.playing ? clips[s.playing] : null
+      const prev = s.playing ? clipOf(s.playing) : null
       const loop = next === 'guard' || next === 'move'
       action.reset()
       if (at !== undefined) action.time = at
@@ -175,6 +183,12 @@ export default function CharacterModel({
     const moving = vel ? Math.hypot(vel.x, vel.z) > 0.01 : false
     const base: ClipName = moving ? 'move' : 'guard'
 
+    // 首次进入：立刻起播当前基础动作（否则会停在绑定姿势不动）
+    if (!s.playing) {
+      playClip(base)
+      s.state = base
+    }
+
     const attack = entity.get(Attack)
     const attacking = attack?.isAttacking ?? false
     const rising = attacking && !s.wasAttacking
@@ -184,7 +198,7 @@ export default function CharacterModel({
     if (s.state === 'hurt' && t >= s.endsAt) {
       if (s.attackRemaining > 0) {
         // 受伤插在 attack 中途：从被打断的进度继续播完
-        const dur = clips.atk?.getClip().duration ?? 0
+        const dur = clipOf('atk')?.getClip().duration ?? 0
         playClip('atk', Math.max(0, dur - s.attackRemaining))
         s.state = 'atk'
         s.endsAt = t + s.attackRemaining
@@ -212,7 +226,7 @@ export default function CharacterModel({
     if (rising && s.state !== 'die' && s.state !== 'hurt') {
       playClip('atk')
       s.state = 'atk'
-      s.endsAt = t + (clips.atk?.getClip().duration ?? 0)
+      s.endsAt = t + (clipOf('atk')?.getClip().duration ?? 0)
       s.protectUntil = t + ATTACK_PROTECT
       s.attackRemaining = 0
     }
@@ -228,10 +242,12 @@ export default function CharacterModel({
 
   return (
     <group ref={group} rotation={[0, yaw, 0]}>
-      <primitive object={model} />
-      {/* 命中区：模型细长，用不可见盒子保证拖拽/选敌稳定 */}
-      <mesh position={[0, 0.75, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-        <boxGeometry args={[0.5, 1.5, 0.5]} />
+      <group scale={MODEL_SCALE}>
+        <primitive object={model} />
+      </group>
+      {/* 命中区：模型细长，用不可见盒子保证拖拽/选敌稳定（贴合缩放后身高约 0.75） */}
+      <mesh position={[0, 0.5, 0]} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+        <boxGeometry args={[0.5, 1, 0.5]} />
         <meshBasicMaterial visible={false} />
       </mesh>
     </group>
@@ -251,7 +267,7 @@ export function CorpseModel({
   onDone: () => void
 }) {
   const group = useRef<THREE.Group>(null!)
-  const { model, clips } = useCharacterClips(modelKey, group)
+  const { model, actions } = useCharacterClips(modelKey, group)
 
   // onDone 是父层内联函数，用 ref 持有并只播一次，避免父层重渲染导致 die 反复重播
   const onDoneRef = useRef(onDone)
@@ -260,22 +276,22 @@ export function CorpseModel({
 
   useEffect(() => {
     if (played.current) return
+    const action = findAction(actions, CLIP_SUFFIX.die)
+    if (!action) return
     played.current = true
-    const action = clips.die
-    if (!action) {
-      onDoneRef.current()
-      return
-    }
+    action.reset().setLoop(THREE.LoopOnce, 1)
     action.reset().setLoop(THREE.LoopOnce, 1)
     action.clampWhenFinished = true
     action.play()
     const timer = setTimeout(() => onDoneRef.current(), action.getClip().duration * 1000)
     return () => clearTimeout(timer)
-  }, [clips])
+  }, [actions])
 
   return (
     <group ref={group} position={position} rotation={[0, yaw, 0]}>
-      <primitive object={model} />
+      <group scale={MODEL_SCALE}>
+        <primitive object={model} />
+      </group>
     </group>
   )
 }

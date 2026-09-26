@@ -108,7 +108,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 0.95, 0]} width={0.4} />
         </group>
       ))}
 
@@ -122,7 +122,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 0.95, 0]} width={0.4} />
         </group>
       ))}
 
@@ -136,7 +136,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerUp={onEnemyPointerUp?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 0.95, 0]} width={0.4} />
         </group>
       ))}
 
@@ -150,7 +150,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 0.95, 0]} width={0.4} />
         </group>
       ))}
 
@@ -164,7 +164,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             onPointerDown={onDefenderPointerDown?.(entity)}
             onDeath={handleDeath}
           />
-          <HealthBarProxy entity={entity} offset={[0, 1.7, 0]} width={0.4} />
+          <HealthBarProxy entity={entity} offset={[0, 0.95, 0]} width={0.4} />
         </group>
       ))}
 
