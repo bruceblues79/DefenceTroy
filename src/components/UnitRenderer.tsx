@@ -6,7 +6,8 @@ import {
   IsDefender,
   IsArcher,
   IsMelee,
-  IsSpearman,
+  IsSpearBreaker,
+  IsPikeman,
   IsCatapult,
   IsWall,
   IsProjectile,
@@ -40,14 +41,14 @@ interface UnitRendererProps {
 export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp, onEnemyPointerUp }: UnitRendererProps) {
   // 敌人弓手
   const enemyArchers = useQuery(IsEnemy, IsArcher, Position)
-  // 敌人步兵（近战）
-  const enemyInfantry = useQuery(IsEnemy, IsMelee, Position)
-  // 敌人矛兵
-  const enemySpearmen = useQuery(IsEnemy, IsSpearman, Position)
+  // 敌人攻城兵（近战，只攻墙）
+  const enemySappers = useQuery(IsEnemy, IsMelee, Position)
+  // 敌人长枪兵
+  const enemyPikeman = useQuery(IsEnemy, IsPikeman, Position)
   // 守军弓手
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
-  // 守军矛兵
-  const defenderSpearmen = useQuery(IsDefender, IsSpearman, Position)
+  // 守军破矛兵
+  const defenderSpearBreakers = useQuery(IsDefender, IsSpearBreaker, Position)
   // 守军投石车
   const defenderCatapults = useQuery(IsDefender, IsCatapult, Position)
   // 箭矢抛射物（排除石块）
@@ -99,8 +100,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </group>
       ))}
 
-      {/* 敌人步兵（深灰） */}
-      {enemyInfantry.map((entity) => (
+      {/* 敌人攻城兵（深灰） */}
+      {enemySappers.map((entity) => (
         <group key={entity.id()}>
           <CharacterProxy
             entity={entity}
@@ -111,8 +112,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </group>
       ))}
 
-      {/* 敌人矛兵（深红） */}
-      {enemySpearmen.map((entity) => (
+      {/* 敌人长枪兵（深红） */}
+      {enemyPikeman.map((entity) => (
         <group key={entity.id()}>
           <CharacterProxy
             entity={entity}
@@ -135,8 +136,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </group>
       ))}
 
-      {/* 守军矛兵（青金） */}
-      {defenderSpearmen.map((entity) => (
+      {/* 守军破矛兵（青金） */}
+      {defenderSpearBreakers.map((entity) => (
         <group key={entity.id()}>
           <CharacterProxy
             entity={entity}

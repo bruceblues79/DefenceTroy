@@ -1,0 +1,10 @@
+/* 全局样式。
+   注意：不要搬回 index.html 的内联 <style> ——
+   vite 5.4.21 与 rollup 4.63.2 的 html-inline-proxy 不兼容，内联样式会导致构建失败。 */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

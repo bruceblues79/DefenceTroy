@@ -2,7 +2,8 @@
 // 所有发兵相关参数集中于此，不得散落在发兵逻辑中。
 // 追加轮次只需向 ROUNDS 数组末尾追加，胜利结算自动移动到最后一个已配置轮次之后。
 
-export type EnemyType = 'infantry' | 'archer' | 'spearman'
+// sapper 攻城兵（干扰/送钱） / archer 弓兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭）
+export type EnemyType = 'sapper' | 'archer' | 'pikeman'
 
 export interface WaveEnemy {
   type: EnemyType
@@ -32,8 +33,8 @@ export interface RoundConfig {
   gold: number
 }
 
-const SPAWN_INTERVAL = 0.5
-const WAVE_GAP = 3
+const SPAWN_INTERVAL = 1
+const WAVE_GAP = 5
 
 export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
@@ -44,9 +45,9 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Open the shop to view available defenders. Preparation gold can be used to recruit them after this round.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 4 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 6 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 6 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -64,17 +65,18 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Drag a deployed defender back to the barracks to recover health over time.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'NO PLACE IS SAFE',
       body: 'The wall is no longer the only thing under threat. Troy\'s defenders can also be worn down.',
     },
-    gold: 300,
+    gold: 200,
   },
 
   // ── 第三轮 ──
@@ -85,23 +87,23 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'Drag deployed defenders between wall positions to rearrange the defense.',
     },
     waves: [
-      { enemies: [{ type: 'infantry', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'spearman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       {
         enemies: [
-          { type: 'infantry', count: 2 },
-          { type: 'spearman', count: 2 },
+          { type: 'sapper', count: 2 },
           { type: 'archer', count: 2 },
         ],
         spawnInterval: SPAWN_INTERVAL,
       },
+      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'DIVIDED PRESSURE',
       body: 'The attack is no longer simple. Protecting one part of the defense may leave another exposed.',
     },
-    gold: 400,
+    gold: 300,
   },
 ]

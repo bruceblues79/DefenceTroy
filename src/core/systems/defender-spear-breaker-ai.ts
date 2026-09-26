@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Position, CanAttackUnits, Health, IsDefender, IsSpearman, IsEnemy, Targeting } from '../traits'
+import { Position, CanAttackUnits, Health, IsDefender, IsSpearBreaker, IsEnemy, Targeting } from '../traits'
 
 /**
  * 计算 XZ 平面距离
@@ -11,12 +11,13 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
 }
 
 /**
- * 守军矛兵 AI 系统
+ * 守军破矛兵 AI 系统
  * 行为：静止在城墙上，攻击射程内距离自己最近的敌人
  * 与守军弓兵结构一致，区别在于射程/伤害参数（由 CanAttackUnits 提供）
+ * 射程 3.3 比长枪兵 2.5 略大（先手由此而来）；够不到攻弓（纵深 3.55）是它「专而不强」的代价
  */
-export function updateDefenderSpearmanAI(world: World, _dt: number) {
-  const defenders = world.query(IsDefender, IsSpearman, Position, CanAttackUnits)
+export function updateDefenderSpearBreakerAI(world: World, _dt: number) {
+  const defenders = world.query(IsDefender, IsSpearBreaker, Position, CanAttackUnits)
 
   defenders.readEach(([pos, unitsAtk], defender) => {
     // 1. 检查当前目标是否有效

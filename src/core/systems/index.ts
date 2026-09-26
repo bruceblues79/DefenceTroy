@@ -4,10 +4,10 @@
 
 export { updateMovement } from './movement'
 export { updateEnemyArcherAI } from './enemy-archer-ai'
-export { updateEnemyInfantryAI } from './enemy-infantry-ai'
-export { updateEnemySpearmanAI } from './enemy-spearman-ai'
+export { updateEnemySapperAI } from './enemy-sapper-ai'
+export { updateEnemyPikemanAI } from './enemy-pikeman-ai'
 export { updateDefenderArcherAI } from './defender-archer-ai'
-export { updateDefenderSpearmanAI } from './defender-spearman-ai'
+export { updateDefenderSpearBreakerAI } from './defender-spear-breaker-ai'
 export { updateCatapultBombard } from './catapult-bombard'
 export { updateAttack } from './attack'
 export { updateProjectiles } from './projectile'

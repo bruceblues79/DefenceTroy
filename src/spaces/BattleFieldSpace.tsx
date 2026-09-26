@@ -11,8 +11,8 @@ import UnitRenderer from '../components/UnitRenderer'
 import DragUnitProxy from '../components/DragUnitProxy'
 import RoundedShapeButton from '../components/RoundedShapeButton'
 import RoundPromptPanel from '../components/RoundPromptPanel'
-import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEARMAN_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
-import { IsDefender, IsArcher, IsSpearman, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
+import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
+import { IsDefender, IsArcher, IsSpearBreaker, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 
@@ -34,7 +34,7 @@ type StockUnit = { hp: number }
 type Barracks = Record<UnitType, StockUnit[]>
 
 // 雇佣满血常量
-const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEARMAN_HP, catapult: DEFENDER_CATAPULT_HP }
+const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEAR_BREAKER_HP, catapult: DEFENDER_CATAPULT_HP }
 
 /** 从 stock 中取出血量最大的单位，返回其 hp 与剔除后的数组（并列取首个） */
 const takeMaxHpStock = (stock: StockUnit[]): { hp: number; rest: StockUnit[] } => {
@@ -105,13 +105,13 @@ export default function BattleFieldSpace({
   const barracksCount = barracks.bow.length + barracks.spear.length + barracks.catapult.length
   const promptOpen = prompt.kind !== 'none'
 
-  // 兵营单位线性回血：每秒1点，上限为该兵种 max HP；暂停/结算时停止
+  // 兵营单位回血：每5秒回10点，上限为该兵种 max HP；暂停/结算时停止
   useFrame((_, delta) => {
     if (paused || gameOver) return
     regenAccumRef.current += delta
-    if (regenAccumRef.current < 1) return
-    const ticks = Math.floor(regenAccumRef.current)
-    regenAccumRef.current -= ticks
+    if (regenAccumRef.current < 5) return
+    const ticks = Math.floor(regenAccumRef.current / 5)
+    regenAccumRef.current -= ticks * 5
     setBarracks((prev) => {
       let changed = false
       const next: Barracks = { bow: [], spear: [], catapult: [] }
@@ -120,7 +120,7 @@ export default function BattleFieldSpace({
         next[t] = prev[t].map((u) => {
           if (u.hp >= max) return u
           changed = true
-          return { hp: Math.min(max, u.hp + ticks) }
+          return { hp: Math.min(max, u.hp + ticks * 10) }
         })
       }
       return changed ? next : prev
@@ -145,7 +145,7 @@ export default function BattleFieldSpace({
   /** 判定实体兵种 */
   const unitTypeOf = (e: Entity): UnitType => {
     if (e.has(IsArcher)) return 'bow'
-    if (e.has(IsSpearman)) return 'spear'
+    if (e.has(IsSpearBreaker)) return 'spear'
     if (e.has(IsCatapult)) return 'catapult'
     // 退定值（守军必然属于三类之一，理论上不会到这里）
     return 'catapult'
@@ -162,7 +162,7 @@ export default function BattleFieldSpace({
   const spawnDefender = (type: UnitType, slotX: number, hp: number) => {
     const spawn = spawnActions(world)
     if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2.5, WALL_POSITION.z, hp)
-    else if (type === 'spear') spawn.spawnDefenderSpearman(slotX, 2.5, WALL_POSITION.z, hp)
+    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2.5, WALL_POSITION.z, hp)
     else spawn.spawnDefenderCatapult(slotX, 2.5, WALL_POSITION.z, hp)
   }
 
@@ -367,15 +367,26 @@ export default function BattleFieldSpace({
                 </Text>
               )}
               {name === 'btn_shop' && (
-                <Text
-                  position={[0, 0, 0.01]}
-                  fontSize={0.4}
-                  color="#ffffff"
-                  anchorX="center"
-                  anchorY="middle"
-                >
-                  S
-                </Text>
+                <>
+                  <Text
+                    position={[0, 0, 0.01]}
+                    fontSize={0.4}
+                    color="#ffffff"
+                    anchorX="center"
+                    anchorY="middle"
+                  >
+                    S
+                  </Text>
+                  <Text
+                    position={[0, 0.3, 0.01]}
+                    fontSize={0.2}
+                    color="#ffd700"
+                    anchorX="center"
+                    anchorY="middle"
+                  >
+                    {Math.min(gold, 9999)}
+                  </Text>
+                </>
               )}
             </Billboard>
           )
