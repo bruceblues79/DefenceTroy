@@ -27,6 +27,8 @@ interface RoundedShapeButtonProps {
   imageScale?: number
   /** 图片是否透明,默认 true */
   imageTransparent?: boolean
+  /** 图片染色(与 meshBasicMaterial.color 相乘),默认白色不染色 */
+  imageColor?: string
   // ── 可选文字标签 ──
   /** 按钮文字;提供时在按钮表面 localZ +0.01 渲染 */
   label?: string
@@ -42,11 +44,13 @@ interface RoundedShapeButtonProps {
 function ButtonImage({
   url,
   transparent,
+  color,
   width,
   height,
 }: {
   url: string
   transparent?: boolean
+  color?: string
   width: number
   height: number
 }) {
@@ -54,7 +58,7 @@ function ButtonImage({
   return (
     <mesh position={[0, 0, 0.005]}>
       <planeGeometry args={[width, height]} />
-      <meshBasicMaterial map={tex} transparent={transparent ?? true} depthWrite={false} toneMapped={false} />
+      <meshBasicMaterial map={tex} color={color ?? '#ffffff'} transparent={transparent ?? true} depthWrite={false} toneMapped={false} />
     </mesh>
   )
 }
@@ -74,6 +78,7 @@ export default function RoundedShapeButton({
   image,
   imageScale = 1,
   imageTransparent,
+  imageColor,
   label,
   labelColor = '#ffffff',
   labelFontSize = 0.3,
@@ -92,6 +97,7 @@ export default function RoundedShapeButton({
         <ButtonImage
           url={image}
           transparent={imageTransparent}
+          color={imageColor}
           width={width * imageScale}
           height={height * imageScale}
         />

@@ -20,8 +20,11 @@ import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
 const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
-// 3 个兵种按钮用对应守军染色（与 CharacterProxy 一致），Shop 灰，Menu 红
-const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
+// 按钮底色统一中灰半透明，通过 SVG 图标颜色区分兵种
+const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
+const BUTTON_OPACITY = 0.75
+// SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
+const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#ffd700', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
@@ -337,8 +340,10 @@ export default function BattleFieldSpace({
                 height={0.8}
                 cornerRadius={0.1}
                 color={BUTTON_COLORS[i]}
+                opacity={BUTTON_OPACITY}
                 image={BUTTON_IMAGES[i]}
                 imageScale={BUTTON_IMAGE_SCALES[i]}
+                imageColor={BUTTON_IMAGE_COLORS[i]}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
@@ -359,7 +364,7 @@ export default function BattleFieldSpace({
               {type && count > 0 && (
                 <Text
                   position={[0.3, 0.3, 0.01]}
-                  fontSize={0.2}
+                  fontSize={0.28}
                   color="#ffffff"
                   anchorX="center"
                   anchorY="middle"
