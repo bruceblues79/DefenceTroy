@@ -24,6 +24,17 @@ const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
+// 与 BUTTON_NAMES 对齐：3 个兵种用单位插画，Shop/Menu 用 UI 图标。
+// 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
+export const BUTTON_IMAGES = [
+  `${import.meta.env.BASE_URL}assets/textures/unit-archer-defence.webp`,
+  `${import.meta.env.BASE_URL}assets/textures/unit-spear_breaker.webp`,
+  `${import.meta.env.BASE_URL}assets/textures/ui_icon_focus.webp`,
+  `${import.meta.env.BASE_URL}assets/textures/ui-icon-shop.webp`,
+  `${import.meta.env.BASE_URL}assets/textures/ui-icon-menu.webp`,
+]
+// 单位插画留边(露出按钮染色底)，UI 图标整幅构图铺满为主
+const BUTTON_IMAGE_SCALES = [0.65, 0.65, 0.75, 0.75, 0.75]
 
 // 拖拽示意物染色：与各兵种守军 CharacterProxy 颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {
@@ -321,6 +332,8 @@ export default function BattleFieldSpace({
                 height={0.8}
                 cornerRadius={0.1}
                 color={BUTTON_COLORS[i]}
+                image={BUTTON_IMAGES[i]}
+                imageScale={BUTTON_IMAGE_SCALES[i]}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
@@ -349,38 +362,17 @@ export default function BattleFieldSpace({
                   {count}
                 </Text>
               )}
-              {name === 'btn_menu' && (
+              {/* btn_menu / btn_shop 的文字已由 BUTTON_IMAGES 的图标取代 */}
+              {name === 'btn_shop' && (
                 <Text
-                  position={[0, 0, 0.01]}
-                  fontSize={0.4}
-                  color="#ffffff"
+                  position={[0, 0.3, 0.01]}
+                  fontSize={0.2}
+                  color="#ffd700"
                   anchorX="center"
                   anchorY="middle"
                 >
-                  M
+                  {Math.min(gold, 9999)}
                 </Text>
-              )}
-              {name === 'btn_shop' && (
-                <>
-                  <Text
-                    position={[0, 0, 0.01]}
-                    fontSize={0.4}
-                    color="#ffffff"
-                    anchorX="center"
-                    anchorY="middle"
-                  >
-                    S
-                  </Text>
-                  <Text
-                    position={[0, 0.3, 0.01]}
-                    fontSize={0.2}
-                    color="#ffd700"
-                    anchorX="center"
-                    anchorY="middle"
-                  >
-                    {Math.min(gold, 9999)}
-                  </Text>
-                </>
               )}
             </Billboard>
           )

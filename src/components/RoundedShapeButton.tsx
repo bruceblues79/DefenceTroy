@@ -23,6 +23,8 @@ interface RoundedShapeButtonProps {
   // ── 可选图片槽位 ──
   /** 图片 URL;提供时在 localZ +0.005 渲染一个透明图片平面 */
   image?: string
+  /** 图片相对按钮尺寸的缩放,默认 1(铺满 width/height) */
+  imageScale?: number
   /** 图片是否透明,默认 true */
   imageTransparent?: boolean
   // ── 可选文字标签 ──
@@ -35,14 +37,23 @@ interface RoundedShapeButtonProps {
 /**
  * 图片槽位子组件
  * 独立组件以避免 useTexture 的条件 hook 调用。
- * 当前用最小实现(planeGeometry args=[1,1] 不缩放),
- * 将来启用图片时再决定缩放策略。
+ * 尺寸 = 按钮 width/height × imageScale。
  */
-function ButtonImage({ url, transparent }: { url: string; transparent?: boolean }) {
+function ButtonImage({
+  url,
+  transparent,
+  width,
+  height,
+}: {
+  url: string
+  transparent?: boolean
+  width: number
+  height: number
+}) {
   const tex = useTexture(url)
   return (
     <mesh position={[0, 0, 0.005]}>
-      <planeGeometry args={[1, 1]} />
+      <planeGeometry args={[width, height]} />
       <meshBasicMaterial map={tex} transparent={transparent ?? true} depthWrite={false} toneMapped={false} />
     </mesh>
   )
@@ -55,10 +66,13 @@ function ButtonImage({ url, transparent }: { url: string; transparent?: boolean 
  * 不带 Text —— Text 由调用方作为兄弟节点添加(遵循项目既有约定)。
  */
 export default function RoundedShapeButton({
+  width = 0.5,
+  height = 0.5,
   onClick,
   onPointerDown,
   onPointerUp,
   image,
+  imageScale = 1,
   imageTransparent,
   label,
   labelColor = '#ffffff',
@@ -66,8 +80,22 @@ export default function RoundedShapeButton({
   ...planeProps
 }: RoundedShapeButtonProps) {
   return (
-    <RoundShapePlane {...planeProps} onClick={onClick} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
-      {image && <ButtonImage url={image} transparent={imageTransparent} />}
+    <RoundShapePlane
+      width={width}
+      height={height}
+      {...planeProps}
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+    >
+      {image && (
+        <ButtonImage
+          url={image}
+          transparent={imageTransparent}
+          width={width * imageScale}
+          height={height * imageScale}
+        />
+      )}
       {label && (
         <Text
           position={[0, 0, 0.01]}
