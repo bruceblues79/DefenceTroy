@@ -450,7 +450,7 @@ export default function BattleFieldSpace({
         <RoundPromptPanel
           title={prompt.kind === 'intro' ? prompt.round.intro.title : prompt.round.ending.title}
           body={prompt.kind === 'intro' ? prompt.round.intro.body : prompt.round.ending.body}
-          tip={prompt.kind === 'intro' ? prompt.round.intro.tip : undefined}
+          tip={prompt.kind === 'intro' ? prompt.round.intro.tip : prompt.round.ending.tip}
           onOk={() => {
             if (prompt.kind === 'intro') {
               engine.confirmIntro()

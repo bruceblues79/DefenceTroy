@@ -42,7 +42,7 @@ export const ROUNDS: RoundConfig[] = [
     intro: {
       title: '希腊联军登陆',
       body: '希腊联军登陆了海岸，开始了试探性攻击。来，保卫我们的城墙！',
-      tip: '点击并拖动瞄准按钮到进攻单位，符合攻击距离的守军单位会集火攻击。也可以点击并拖动城墙上的防守单位到目标，符合攻击距离的话，会切换目标。',
+      tip: '点击并拖动瞄准按钮到进攻单位，符合守军单位攻击距离会集火攻击。也可以点击并拖动城墙上的守军单位到目标，符合攻击距离的话，也会切换目标。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
