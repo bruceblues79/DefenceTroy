@@ -219,12 +219,14 @@ export default function BattleFieldSpace({
 
     // 先从兵营取血量最大的单位，再回收原兵，避免刚回营的原兵被立刻选中
     const { hp: deployHp, rest } = takeMaxHpStock(stock)
+    // 必须在 setBarracks 回调外同步读取：recycleDefenderUnit 会销毁实体，
+    // React 18 batching 下回调延迟执行，届时 occupant trait 已失效，unitTypeOf 会 fallback 到 'catapult'
+    const occupantType = occupant ? unitTypeOf(occupant) : null
+    const occupantHp = occupant?.get(Health)?.current ?? 0
     setBarracks((prev) => {
       const next = { ...prev, [drag.type]: rest }
-      if (occupant) {
-        const occupantType = unitTypeOf(occupant)
-        const hp = occupant.get(Health)?.current ?? 0
-        next[occupantType] = [...next[occupantType], { hp }]
+      if (occupant && occupantType) {
+        next[occupantType] = [...next[occupantType], { hp: occupantHp }]
       }
       return next
     })
