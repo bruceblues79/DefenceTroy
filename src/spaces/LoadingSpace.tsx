@@ -1,8 +1,10 @@
-import { Billboard, Text, useGLTF } from '@react-three/drei'
+import { Billboard, Text, useGLTF, useTexture } from '@react-three/drei'
 import { Suspense, useEffect } from 'react'
 import { MODEL_URLS } from '../components/CharacterModel'
 import { WALL_MODEL_URL } from '../components/WallModel'
 import { GROUND_MODEL_URL } from '../components/GroundModel'
+import { BUTTON_IMAGES } from './BattleFieldSpace'
+import { SHOP_TAB_IMAGES } from './ShopScreen'
 
 function LoadingBillboard() {
   return (
@@ -18,8 +20,13 @@ function LoadingBillboard() {
   )
 }
 
-/** 真实预热：5 个角色 GLB + 城墙 GLB 全部就绪后才进入战斗（Suspense 期间显示 loading） */
-function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
+/**
+ * 真实预热：5 个角色 GLB + 城墙/地面 GLB + 按钮图标纹理全部就绪后才进入战斗
+ * （Suspense 期间显示 loading）。
+ * 按钮纹理必须在这里预热 —— BattleFieldSpace 外层没有 Suspense 边界，
+ * 未缓存的 useTexture 会在战斗首帧挂起。
+ */
+function AssetPreloader({ onLoaded }: { onLoaded: () => void }) {
   useGLTF(MODEL_URLS.enemyArcher)
   useGLTF(MODEL_URLS.enemySapper)
   useGLTF(MODEL_URLS.enemyPikeman)
@@ -27,6 +34,8 @@ function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
   useGLTF(MODEL_URLS.defenderSpearBreaker)
   useGLTF(WALL_MODEL_URL)
   useGLTF(GROUND_MODEL_URL)
+  useTexture(BUTTON_IMAGES)
+  useTexture(SHOP_TAB_IMAGES)
   useEffect(() => {
     onLoaded()
   }, [onLoaded])
@@ -36,7 +45,7 @@ function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
 export default function LoadingSpace({ onLoaded }: { onLoaded: () => void }) {
   return (
     <Suspense fallback={<LoadingBillboard />}>
-      <CharacterPreloader onLoaded={onLoaded} />
+      <AssetPreloader onLoaded={onLoaded} />
     </Suspense>
   )
 }

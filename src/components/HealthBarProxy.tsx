@@ -1,7 +1,11 @@
 import { Billboard } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
+import * as THREE from 'three'
 import { useTrait } from 'koota/react'
 import type { Entity } from 'koota'
 import { Health, Position } from '../core/traits'
+import { computeUnitYaw } from './CharacterModel'
 
 interface HealthBarProxyProps {
   entity: Entity
@@ -26,9 +30,9 @@ const RED = '#cc3333'
  * - 背景红色 + 前景固定绿色（左对齐收缩）
  * - Billboard 正对相机：相机锁死在 20° 俯角，血条因此带一个固定倾角，
  *   既不像平躺那样被压扁，也不会和角色身体叠在一起
- * - backOffset 沿角色 **local -z（背后）** 挪：按 yaw 旋转到世界。
- *   敌人 yaw=0 → 世界 -z（屏幕上方）；守军 yaw=π → 世界 +z（屏幕下方），
- *   两边各自往自己背后挪，这是要的效果，不是 bug
+ * - backOffset 沿角色 **local -z（背后）** 挪：按动态 yaw 旋转到世界。
+ *   yaw 由 computeUnitYaw 每帧重算（有目标朝目标、否则朝移动方向、否则保持上次），
+ *   与 CharacterModel 的 lastYaw 同步——血条始终在单位背后
  * - 正交相机没有透视收缩，要在屏幕上拉开距离只能靠世界坐标的真实位移；
  *   其中 z 的投影系数 0.94 远大于 y 的 0.342，所以主要靠 z 拉开、y 只要不贴头就够
  * - 不参与 raycaster，避免干扰拖拽命中
@@ -41,17 +45,40 @@ export default function HealthBarProxy({
   yaw = 0,
   backOffset = 0,
 }: HealthBarProxyProps) {
-  const pos = useTrait(entity, Position)
+  const groupRef = useRef<THREE.Group>(null!)
+  const yawRef = useRef(yaw)
   const health = useTrait(entity, Health)
-  if (!pos || !health) return null
+
+  useFrame(() => {
+    const g = groupRef.current
+    if (!g) return
+    const pos = entity.get(Position)
+    if (!pos) return
+    // 与 CharacterModel 同样的 lastYaw 策略：有新 yaw 就更新，否则保持
+    const computed = computeUnitYaw(entity)
+    if (computed !== null) {
+      yawRef.current = computed
+    }
+    const y = yawRef.current
+    // local -z 偏移 (0,0,-f) 绕 y 轴转 yaw → 世界 (-f·sin(yaw), 0, -f·cos(yaw))
+    const ox = -backOffset * Math.sin(y)
+    const oz = -backOffset * Math.cos(y)
+    g.position.set(pos.x + offset[0] + ox, pos.y + offset[1], pos.z + offset[2] + oz)
+  })
+
+  // 初始位置一次性读取，避免首帧 [0,0,0] 闪烁；之后由 useFrame 接管
+  const initialPos = entity.get(Position)
+  if (!initialPos || !health) return null
 
   const ratio = Math.max(0, Math.min(1, health.current / health.max))
-  // local -z 偏移 (0,0,-f) 绕 y 轴转 yaw → 世界 (-f·sin(yaw), 0, -f·cos(yaw))
-  const ox = -backOffset * Math.sin(yaw)
-  const oz = -backOffset * Math.cos(yaw)
+  const ox0 = -backOffset * Math.sin(yaw)
+  const oz0 = -backOffset * Math.cos(yaw)
 
   return (
-    <group position={[pos.x + offset[0] + ox, pos.y + offset[1], pos.z + offset[2] + oz]}>
+    <group
+      ref={groupRef}
+      position={[initialPos.x + offset[0] + ox0, initialPos.y + offset[1], initialPos.z + offset[2] + oz0]}
+    >
       <Billboard>
         {/* 背景条 */}
         <mesh raycast={() => null}>

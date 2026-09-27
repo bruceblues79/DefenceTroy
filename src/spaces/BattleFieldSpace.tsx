@@ -20,10 +20,27 @@ import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
 const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
-// 3 个兵种按钮用对应守军染色（与 CharacterProxy 一致），Shop 灰，Menu 红
-const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
+// 按钮底色统一中灰半透明，通过 SVG 图标颜色区分兵种
+const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
+const BUTTON_OPACITY = 0.75
+// SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
+const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#ffd700', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
+// 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
+const ASSET_VERSION = 3
+const BASE = import.meta.env.BASE_URL
+// 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
+// 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
+export const BUTTON_IMAGES = [
+  `${BASE}assets/svg/icon-bow.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-spear.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-focus.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-shop.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-menu.svg?v=${ASSET_VERSION}`,
+]
+// SVG 透明背景无白底，可放大到 0.85
+const BUTTON_IMAGE_SCALES = [0.85, 0.85, 0.85, 0.85, 0.85]
 
 // 拖拽示意物染色：与各兵种守军 CharacterProxy 颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {
@@ -205,12 +222,14 @@ export default function BattleFieldSpace({
 
     // 先从兵营取血量最大的单位，再回收原兵，避免刚回营的原兵被立刻选中
     const { hp: deployHp, rest } = takeMaxHpStock(stock)
+    // 必须在 setBarracks 回调外同步读取：recycleDefenderUnit 会销毁实体，
+    // React 18 batching 下回调延迟执行，届时 occupant trait 已失效，unitTypeOf 会 fallback 到 'catapult'
+    const occupantType = occupant ? unitTypeOf(occupant) : null
+    const occupantHp = occupant?.get(Health)?.current ?? 0
     setBarracks((prev) => {
       const next = { ...prev, [drag.type]: rest }
-      if (occupant) {
-        const occupantType = unitTypeOf(occupant)
-        const hp = occupant.get(Health)?.current ?? 0
-        next[occupantType] = [...next[occupantType], { hp }]
+      if (occupant && occupantType) {
+        next[occupantType] = [...next[occupantType], { hp: occupantHp }]
       }
       return next
     })
@@ -321,6 +340,10 @@ export default function BattleFieldSpace({
                 height={0.8}
                 cornerRadius={0.1}
                 color={BUTTON_COLORS[i]}
+                opacity={BUTTON_OPACITY}
+                image={BUTTON_IMAGES[i]}
+                imageScale={BUTTON_IMAGE_SCALES[i]}
+                imageColor={BUTTON_IMAGE_COLORS[i]}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
@@ -341,7 +364,7 @@ export default function BattleFieldSpace({
               {type && count > 0 && (
                 <Text
                   position={[0.3, 0.3, 0.01]}
-                  fontSize={0.2}
+                  fontSize={0.28}
                   color="#ffffff"
                   anchorX="center"
                   anchorY="middle"
@@ -349,38 +372,17 @@ export default function BattleFieldSpace({
                   {count}
                 </Text>
               )}
-              {name === 'btn_menu' && (
+              {/* btn_menu / btn_shop 的文字已由 BUTTON_IMAGES 的图标取代 */}
+              {name === 'btn_shop' && (
                 <Text
-                  position={[0, 0, 0.01]}
-                  fontSize={0.4}
-                  color="#ffffff"
+                  position={[0, 0.3, 0.01]}
+                  fontSize={0.2}
+                  color="#ffd700"
                   anchorX="center"
                   anchorY="middle"
                 >
-                  M
+                  {Math.min(gold, 9999)}
                 </Text>
-              )}
-              {name === 'btn_shop' && (
-                <>
-                  <Text
-                    position={[0, 0, 0.01]}
-                    fontSize={0.4}
-                    color="#ffffff"
-                    anchorX="center"
-                    anchorY="middle"
-                  >
-                    S
-                  </Text>
-                  <Text
-                    position={[0, 0.3, 0.01]}
-                    fontSize={0.2}
-                    color="#ffd700"
-                    anchorX="center"
-                    anchorY="middle"
-                  >
-                    {Math.min(gold, 9999)}
-                  </Text>
-                </>
               )}
             </Billboard>
           )
