@@ -143,28 +143,31 @@ export default function ShopScreen({
           )
         })}
 
-      {/* 操作区：雇佣页 / 神迹页 / 关闭（图标化，无文字，白染图标） */}
-      {OP_BUTTONS.map((btn, i) => (
-        <RoundedShapeButton
-          key={btn.id}
-          width={0.8}
-          height={0.8}
-          cornerRadius={0.1}
-          color="#444444"
-          depthTest={false}
-          renderOrder={2}
-          position={[OP_BUTTON_X[i], -1.975, 0.01]}
-          image={btn.image}
-          imageScale={0.55}
-          imageColor="#ffffff"
-          onClick={(e) => {
-            e.stopPropagation()
-            if (btn.id === 'hire') setPage('hire')
-            else if (btn.id === 'miracle') setPage('miracle')
-            else onClose()
-          }}
-        />
-      ))}
+      {/* 操作区：雇佣页 / 神迹页 / 关闭（图标化，无文字，白染图标；当前页按钮高亮） */}
+      {OP_BUTTONS.map((btn, i) => {
+        const isActive = btn.id === page
+        return (
+          <RoundedShapeButton
+            key={btn.id}
+            width={0.8}
+            height={0.8}
+            cornerRadius={0.1}
+            color={isActive ? '#888888' : '#444444'}
+            depthTest={false}
+            renderOrder={2}
+            position={[OP_BUTTON_X[i], -1.975, 0.01]}
+            image={btn.image}
+            imageScale={0.55}
+            imageColor="#ffffff"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (btn.id === 'hire') setPage('hire')
+              else if (btn.id === 'miracle') setPage('miracle')
+              else onClose()
+            }}
+          />
+        )
+      })}
     </Billboard>
   )
 }
