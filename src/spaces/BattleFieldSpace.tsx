@@ -8,6 +8,7 @@ import SettlementMenu from './SettlementMenu'
 import ShopScreen, { type UnitType } from './ShopScreen'
 import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
+import GroundModel from '../components/GroundModel'
 import DragUnitProxy from '../components/DragUnitProxy'
 import RoundedShapeButton from '../components/RoundedShapeButton'
 import RoundPromptPanel from '../components/RoundPromptPanel'
@@ -269,11 +270,8 @@ export default function BattleFieldSpace({
         onGameOver={onGameOver}
       />
 
-      {/* ground: plane 5×10, beach sand（中心 +0.25 跟随城墙下移，底部不穿帮、出生区仍覆盖） */}
-      <mesh name="ground" position={[0, 0, 0.25]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[5, 10]} />
-        <meshStandardMaterial color="#d4c4a0" />
-      </mesh>
+      {/* ground: GLB 模型 15×15 手绘沙地平面，中心 (0,0,0)，远大于可视区 */}
+      <GroundModel />
 
       {/* 拖拽兜底区：覆盖战场下方大范围，松开在空地/单位/ground 时清空 dragState
           WallSlot 与按钮行 onPointerUp 都 stopPropagation，不会冒泡到这里；
