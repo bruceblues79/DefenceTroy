@@ -100,7 +100,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
             <boxGeometry args={[WALL_WIDTH, 4, 0.84]} />
             <meshStandardMaterial color="#a68b5b" />
           </mesh>
-          {/* 城墙血条：z=3.5（按钮 z=4 与城墙 z=2.95 中点），y=2.5 浮空，细窄 */}
+          {/* 城墙血条：z=4.0（按钮 z=4.5 与城墙 z=3.45 中点），y=2.5 浮空，细窄 */}
           <HealthBarProxy
             entity={wall}
             offset={[0, 2.5, 0.55]}

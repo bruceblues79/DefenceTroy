@@ -24,7 +24,10 @@ import {
 } from '../traits'
 
 // 战场常量
-export const WALL_POSITION = { x: 0, y: 0, z: 2.95 }
+// 城墙 z：2026-09-27 从 2.95 下移到 3.45，利用竖屏底部留白。
+// 注意：ENEMY_*_WALL_Z / DEFENDER_CATAPULT_TARGET_Z 是绝对 z 值，未随墙移动（有意保留，
+// 攻城兵停战线后续可能单独微调）；移动城墙只增大停战点到城墙正面的视觉空隙，逻辑无距离校验。
+export const WALL_POSITION = { x: 0, y: 0, z: 3.45 }
 export const WALL_WIDTH = 4.5
 // 城墙血量：有意设为近乎不可破，因此失败判定实际只走「守军全灭 + 兵营为空」这条路径。
 // 这是暂时性数值，等城墙攻防玩法定稿后再回填真实值 —— 不是 bug，不要顺手改小。

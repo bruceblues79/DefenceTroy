@@ -268,9 +268,9 @@ export default function BattleFieldSpace({
         onGameOver={onGameOver}
       />
 
-      {/* ground: plane 5×9, beach sand */}
-      <mesh name="ground" position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[5, 9]} />
+      {/* ground: plane 5×10, beach sand（中心 +0.25 跟随城墙下移，底部不穿帮、出生区仍覆盖） */}
+      <mesh name="ground" position={[0, 0, 0.25]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[5, 10]} />
         <meshStandardMaterial color="#d4c4a0" />
       </mesh>
 
@@ -297,7 +297,7 @@ export default function BattleFieldSpace({
       {/* 按钮行整体回收检测条带（invisible，仅作 raycaster 命中） */}
       {!gameOver && !paused && !promptOpen && (
         <mesh
-          position={[0, 1.99, 4.0]}
+          position={[0, 1.99, 4.5]}
           rotation={[-Math.PI / 2, 0, 0]}
           onPointerUp={(e: ThreeEvent<PointerEvent>) => {
             e.stopPropagation()
@@ -315,7 +315,7 @@ export default function BattleFieldSpace({
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
           return (
-            <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
+            <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.5]}>
               <RoundedShapeButton
                 name={name}
                 width={0.8}
