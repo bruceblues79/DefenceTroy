@@ -4,6 +4,7 @@ import { MODEL_URLS } from '../components/CharacterModel'
 import { WALL_MODEL_URL } from '../components/WallModel'
 import { GROUND_MODEL_URL } from '../components/GroundModel'
 import { BUTTON_IMAGES } from './BattleFieldSpace'
+import { SHOP_TAB_IMAGES } from './ShopScreen'
 
 function LoadingBillboard() {
   return (
@@ -34,6 +35,7 @@ function AssetPreloader({ onLoaded }: { onLoaded: () => void }) {
   useGLTF(WALL_MODEL_URL)
   useGLTF(GROUND_MODEL_URL)
   useTexture(BUTTON_IMAGES)
+  useTexture(SHOP_TAB_IMAGES)
   useEffect(() => {
     onLoaded()
   }, [onLoaded])

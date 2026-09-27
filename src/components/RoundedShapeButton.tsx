@@ -47,16 +47,18 @@ function ButtonImage({
   color,
   width,
   height,
+  renderOrder,
 }: {
   url: string
   transparent?: boolean
   color?: string
   width: number
   height: number
+  renderOrder?: number
 }) {
   const tex = useTexture(url)
   return (
-    <mesh position={[0, 0, 0.005]}>
+    <mesh position={[0, 0, 0.005]} renderOrder={renderOrder}>
       <planeGeometry args={[width, height]} />
       <meshBasicMaterial map={tex} color={color ?? '#ffffff'} transparent={transparent ?? true} depthWrite={false} toneMapped={false} />
     </mesh>
@@ -84,6 +86,7 @@ export default function RoundedShapeButton({
   labelFontSize = 0.3,
   ...planeProps
 }: RoundedShapeButtonProps) {
+  const bgRenderOrder = planeProps.renderOrder ?? 0
   return (
     <RoundShapePlane
       width={width}
@@ -100,6 +103,7 @@ export default function RoundedShapeButton({
           color={imageColor}
           width={width * imageScale}
           height={height * imageScale}
+          renderOrder={bgRenderOrder + 1}
         />
       )}
       {label && (
@@ -109,6 +113,7 @@ export default function RoundedShapeButton({
           color={labelColor}
           anchorX="center"
           anchorY="middle"
+          renderOrder={bgRenderOrder + 2}
         >
           {label}
         </Text>
