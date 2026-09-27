@@ -15,6 +15,7 @@ dist
 .[a-z]*/
 !.agents/
 !.git/
+!.github/
 /agent/
 /data/
 /skills/
