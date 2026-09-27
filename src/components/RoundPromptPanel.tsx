@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Billboard, Text } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 import RoundedShapeButton from './RoundedShapeButton'
@@ -40,13 +40,17 @@ interface RoundPromptPanelProps {
  * 复用 RoundShapePlane 作背景，上部显示标题/正文/操作提示/页码，下部 P/N/OK 三按钮。
  */
 export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPromptPanelProps) {
-  const pages = useMemo(() => paginate(body), [body])
+  // 翻页对象改为 tip 内容（正文简短，直接完整显示）
+  const tipPages = useMemo(() => (tip ? paginate(tip) : ['']), [tip])
   const [page, setPage] = useState(0)
   const isFirst = page === 0
-  const isLast = page === pages.length - 1
+  const isLast = page === tipPages.length - 1
+
+  // tip 切换时回到第一页
+  useEffect(() => setPage(0), [tip])
 
   const handlePrev = () => setPage((p) => Math.max(0, p - 1))
-  const handleNext = () => setPage((p) => Math.min(pages.length - 1, p + 1))
+  const handleNext = () => setPage((p) => Math.min(tipPages.length - 1, p + 1))
 
   return (
     <Billboard position={[0, 4, 0.5]}>
@@ -68,14 +72,14 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
 
       <Text
         position={[0, 1.1, 0.01]}
-        fontSize={0.2}
+        fontSize={0.18}
         color="#e5e5e5"
         anchorX="center"
         anchorY="middle"
         maxWidth={3.25}
         textAlign="center"
       >
-        {pages[page]}
+        {body}
       </Text>
 
       <Text
@@ -87,7 +91,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
         maxWidth={3.25}
         textAlign="center"
       >
-        {tip ? `tips\n${tip}` : 'tips'}
+        {tip ? `tips\n${tipPages[page]}` : 'tips'}
       </Text>
 
       <Text
@@ -97,7 +101,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
         anchorX="center"
         anchorY="middle"
       >
-        {`${page + 1} / ${pages.length}`}
+        {`${page + 1} / ${tipPages.length}`}
       </Text>
 
       {/* 底部 20% 按钮区（y ∈ [-2.5, -1.5]）：三个方形按钮均分 */}
