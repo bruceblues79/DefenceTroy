@@ -4,8 +4,38 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import type { Entity } from 'koota'
-import { Attack, Health, Position, Velocity } from '../core/traits'
+import { Attack, Health, Position, Velocity, Targeting, IsWall } from '../core/traits'
 import { deathQueue } from '../core/systems/death'
+
+/**
+ * 计算单位当前应朝向的 yaw（绕 Y 轴）：
+ * - 有 Targeting 目标：
+ *   - 目标是城墙 → 0（城墙是宽面，朝 +z 即朝墙平面，不偏向中心点）
+ *   - 否则朝目标方位 atan2(dx, dz)
+ * - 否则 Velocity 的 XZ 模长 > 0.01 → 朝移动方向 atan2(vel.x, vel.z)
+ *   （攻方行军 vel.z>0 → 0 = 朝 +z）
+ * - 否则返回 null（调用方保持上一次 yaw；满足守方目标死亡后不转回 -z）
+ */
+export function computeUnitYaw(entity: Entity): number | null {
+  const pos = entity.get(Position)
+  if (!pos) return null
+
+  const target = entity.targetFor(Targeting)
+  if (target) {
+    if (target.has(IsWall)) return 0
+    const targetPos = target.get(Position)
+    if (targetPos) {
+      return Math.atan2(targetPos.x - pos.x, targetPos.z - pos.z)
+    }
+  }
+
+  const vel = entity.get(Velocity)
+  if (vel && Math.hypot(vel.x, vel.z) > 0.01) {
+    return Math.atan2(vel.x, vel.z)
+  }
+
+  return null
+}
 
 const BASE = import.meta.env.BASE_URL
 
@@ -124,6 +154,7 @@ export default function CharacterModel({
     wasAttacking: false,
     lastHp: Infinity,
     lastPos: [0, 0, 0] as [number, number, number],
+    lastYaw: yaw,
     playing: null as ClipName | null,
   })
 
@@ -135,7 +166,7 @@ export default function CharacterModel({
   useEffect(
     () => () => {
       if (deathQueue.delete(entity.id())) {
-        onDeathRef.current?.({ modelKey, position: st.current.lastPos, yaw })
+        onDeathRef.current?.({ modelKey, position: st.current.lastPos, yaw: st.current.lastYaw })
       }
     },
     [modelKey, yaw],
@@ -148,6 +179,13 @@ export default function CharacterModel({
     if (pos) {
       g.position.set(pos.x, pos.y, pos.z)
       st.current.lastPos = [pos.x, pos.y, pos.z]
+    }
+
+    // 动态朝向：有目标朝目标、否则朝移动方向、否则保持上一次（不转回 -z）
+    const newYaw = computeUnitYaw(entity)
+    if (newYaw !== null) {
+      g.rotation.y = newYaw
+      st.current.lastYaw = newYaw
     }
 
     const t = clock.elapsedTime
