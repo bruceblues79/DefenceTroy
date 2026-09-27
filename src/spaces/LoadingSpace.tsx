@@ -1,6 +1,7 @@
 import { Billboard, Text, useGLTF } from '@react-three/drei'
 import { Suspense, useEffect } from 'react'
 import { MODEL_URLS } from '../components/CharacterModel'
+import { WALL_MODEL_URL } from '../components/WallModel'
 
 function LoadingBillboard() {
   return (
@@ -16,13 +17,14 @@ function LoadingBillboard() {
   )
 }
 
-/** 真实预热：5 个角色 GLB 全部就绪后才进入战斗（Suspense 期间显示 loading） */
+/** 真实预热：5 个角色 GLB + 城墙 GLB 全部就绪后才进入战斗（Suspense 期间显示 loading） */
 function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
   useGLTF(MODEL_URLS.enemyArcher)
   useGLTF(MODEL_URLS.enemySapper)
   useGLTF(MODEL_URLS.enemyPikeman)
   useGLTF(MODEL_URLS.defenderArcher)
   useGLTF(MODEL_URLS.defenderSpearBreaker)
+  useGLTF(WALL_MODEL_URL)
   useEffect(() => {
     onLoaded()
   }, [onLoaded])

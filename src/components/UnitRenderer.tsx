@@ -17,9 +17,9 @@ import {
   Projectile,
   Health,
 } from '../core/traits'
-import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
 import CharacterProxy from './CharacterProxy'
 import CharacterModel, { CorpseModel, MODEL_YAW, type DeathInfo, type ModelKey } from './CharacterModel'
+import WallModel from './WallModel'
 import { ArrowProxy, SpearProxy } from './ProjectileProxy'
 import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
@@ -93,13 +93,10 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
   return (
     <group>
-      {/* 城墙 */}
+      {/* 城墙（GLB 模型，见 WallModel 内的缩放/沉底说明） */}
       {wall && (
         <>
-          <mesh position={[WALL_POSITION.x, WALL_POSITION.y, WALL_POSITION.z]} castShadow receiveShadow>
-            <boxGeometry args={[WALL_WIDTH, 4, 0.84]} />
-            <meshStandardMaterial color="#a68b5b" />
-          </mesh>
+          <WallModel />
           {/* 城墙血条：z=4.0（按钮 z=4.5 与城墙 z=3.45 中点），y=2.5 浮空，细窄 */}
           <HealthBarProxy
             entity={wall}
