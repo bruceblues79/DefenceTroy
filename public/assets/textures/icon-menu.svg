@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <!-- 汉堡菜单：三横线 -->
+  <rect x="96" y="152" width="320" height="48" rx="24" fill="#222222"/>
+  <rect x="112" y="164" width="288" height="24" rx="12" fill="#f8f8f8"/>
+  <rect x="96" y="232" width="320" height="48" rx="24" fill="#222222"/>
+  <rect x="112" y="244" width="288" height="24" rx="12" fill="#f8f8f8"/>
+  <rect x="96" y="312" width="320" height="48" rx="24" fill="#222222"/>
+  <rect x="112" y="324" width="288" height="24" rx="12" fill="#f8f8f8"/>
+</svg>

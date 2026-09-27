@@ -24,17 +24,17 @@ const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
-// 与 BUTTON_NAMES 对齐：3 个兵种用单位插画，Shop/Menu 用 UI 图标。
+// 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
 export const BUTTON_IMAGES = [
-  `${import.meta.env.BASE_URL}assets/textures/unit-archer-defence.webp`,
-  `${import.meta.env.BASE_URL}assets/textures/unit-spear_breaker.webp`,
-  `${import.meta.env.BASE_URL}assets/textures/ui_icon_focus.webp`,
-  `${import.meta.env.BASE_URL}assets/textures/ui-icon-shop.webp`,
-  `${import.meta.env.BASE_URL}assets/textures/ui-icon-menu.webp`,
+  `${import.meta.env.BASE_URL}assets/textures/icon-archer.svg`,
+  `${import.meta.env.BASE_URL}assets/textures/icon-spear.svg`,
+  `${import.meta.env.BASE_URL}assets/textures/icon-catapult.svg`,
+  `${import.meta.env.BASE_URL}assets/textures/icon-shop.svg`,
+  `${import.meta.env.BASE_URL}assets/textures/icon-menu.svg`,
 ]
-// 单位插画留边(露出按钮染色底)，UI 图标整幅构图铺满为主
-const BUTTON_IMAGE_SCALES = [0.65, 0.65, 0.75, 0.75, 0.75]
+// SVG 透明背景无白底，可放大到 0.85
+const BUTTON_IMAGE_SCALES = [0.85, 0.85, 0.85, 0.85, 0.85]
 
 // 拖拽示意物染色：与各兵种守军 CharacterProxy 颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <!-- 投石车 -->
+  <!-- 底座三角支架 -->
+  <path d="M120 380 L392 380 L300 200 Z" fill="#222222"/>
+  <path d="M140 376 L372 376 L298 214 Z" fill="#f8f8f8"/>
+  <!-- 投掷臂 -->
+  <line x1="298" y1="214" x2="420" y2="96" stroke="#222222" stroke-width="26" stroke-linecap="round"/>
+  <line x1="298" y1="214" x2="420" y2="96" stroke="#f8f8f8" stroke-width="16" stroke-linecap="round"/>
+  <!-- 投掷物（石块） -->
+  <circle cx="420" cy="96" r="30" fill="#222222"/>
+  <circle cx="420" cy="96" r="22" fill="#f8f8f8"/>
+  <!-- 轮子 -->
+  <circle cx="160" cy="392" r="28" fill="#222222"/>
+  <circle cx="160" cy="392" r="18" fill="#f8f8f8"/>
+  <circle cx="356" cy="392" r="28" fill="#222222"/>
+  <circle cx="356" cy="392" r="18" fill="#f8f8f8"/>
+</svg>

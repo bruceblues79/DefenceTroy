@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <!-- 长矛 + 盾 -->
+  <!-- 矛杆 -->
+  <line x1="372" y1="92" x2="140" y2="420" stroke="#222222" stroke-width="22" stroke-linecap="round"/>
+  <line x1="372" y1="92" x2="140" y2="420" stroke="#f8f8f8" stroke-width="14" stroke-linecap="round"/>
+  <!-- 矛头 -->
+  <path d="M372 92 L330 140 L414 110 L384 56 Z" fill="#222222"/>
+  <path d="M372 96 L338 136 L408 110 L386 66 Z" fill="#f8f8f8"/>
+  <!-- 盾（圆形） -->
+  <circle cx="180" cy="332" r="86" fill="#222222"/>
+  <circle cx="180" cy="332" r="74" fill="#f8f8f8"/>
+  <!-- 盾面纹样：倒 V -->
+  <path d="M180 286 L142 348 L180 378 L218 348 Z" fill="#222222"/>
+</svg>
