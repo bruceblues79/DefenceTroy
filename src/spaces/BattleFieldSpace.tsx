@@ -12,21 +12,22 @@ import GroundModel from '../components/GroundModel'
 import DragUnitProxy from '../components/DragUnitProxy'
 import RoundedShapeButton from '../components/RoundedShapeButton'
 import RoundPromptPanel from '../components/RoundPromptPanel'
-import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP, DEFENDER_CATAPULT_HP } from '../core/actions'
-import { IsDefender, IsArcher, IsSpearBreaker, IsCatapult, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
+import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP } from '../core/actions'
+import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 
-const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
+const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
 const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
-// 按钮底色统一中灰半透明，通过 SVG 图标颜色区分兵种
+// 按钮底色：全部统一中灰半透明
 const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
 // SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
-const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#ffd700', '#cc2222']
-// 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
-const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
+// 集火按钮图标红染以在中灰底上突出
+const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#cc2222', '#ffd700', '#cc2222']
+// 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
+const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
 const ASSET_VERSION = 3
 const BASE = import.meta.env.BASE_URL
@@ -42,18 +43,21 @@ export const BUTTON_IMAGES = [
 // SVG 透明背景无白底，可放大到 0.85
 const BUTTON_IMAGE_SCALES = [0.85, 0.85, 0.85, 0.85, 0.85]
 
-// 拖拽示意物染色：与各兵种守军 CharacterProxy 颜色一致
+// 拖拽示意物染色：与各兵种守军模型颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {
   bow: '#4a90d9',
   spear: '#4a9d8f',
-  catapult: '#6b4226',
 }
+// 集火拖拽示意物颜色（红色）
+const FOCUS_DRAG_COLOR = '#ff3333'
+// 集火落点检测半径（米）：以落点 XZ 为中心扫描存活敌人，取最近
+const FOCUS_DROP_RADIUS = 1.0
 
 type StockUnit = { hp: number }
 type Barracks = Record<UnitType, StockUnit[]>
 
 // 雇佣满血常量
-const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEAR_BREAKER_HP, catapult: DEFENDER_CATAPULT_HP }
+const UNIT_MAX_HP: Record<UnitType, number> = { bow: DEFENDER_ARCHER_HP, spear: DEFENDER_SPEAR_BREAKER_HP }
 
 /** 从 stock 中取出血量最大的单位，返回其 hp 与剔除后的数组（并列取首个） */
 const takeMaxHpStock = (stock: StockUnit[]): { hp: number; rest: StockUnit[] } => {
@@ -71,6 +75,7 @@ const takeMaxHpStock = (stock: StockUnit[]): { hp: number; rest: StockUnit[] } =
 type DragState =
   | { source: 'unit'; entity: Entity; type: UnitType }
   | { source: 'button'; type: UnitType }
+  | { source: 'focus' }
   | null
 
 type PromptState =
@@ -98,7 +103,7 @@ export default function BattleFieldSpace({
   onGameOver: (result: 'victory' | 'defeat') => void
 }) {
   const world = useWorld()
-  const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [], catapult: [] })
+  const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [] })
   const [dragState, setDragState] = useState<DragState>(null)
   const [gold, setGold] = useState(0)
   const [shopOpen, setShopOpen] = useState(false)
@@ -119,7 +124,7 @@ export default function BattleFieldSpace({
   }
   const engine = engineRef.current
 
-  const barracksCount = barracks.bow.length + barracks.spear.length + barracks.catapult.length
+  const barracksCount = barracks.bow.length + barracks.spear.length
   const promptOpen = prompt.kind !== 'none'
 
   // 兵营单位回血：每5秒回10点，上限为该兵种 max HP；暂停/结算时停止
@@ -131,8 +136,8 @@ export default function BattleFieldSpace({
     regenAccumRef.current -= ticks * 5
     setBarracks((prev) => {
       let changed = false
-      const next: Barracks = { bow: [], spear: [], catapult: [] }
-      for (const t of ['bow', 'spear', 'catapult'] as UnitType[]) {
+      const next: Barracks = { bow: [], spear: [] }
+      for (const t of ['bow', 'spear'] as UnitType[]) {
         const max = UNIT_MAX_HP[t]
         next[t] = prev[t].map((u) => {
           if (u.hp >= max) return u
@@ -158,9 +163,8 @@ export default function BattleFieldSpace({
   const unitTypeOf = (e: Entity): UnitType => {
     if (e.has(IsArcher)) return 'bow'
     if (e.has(IsSpearBreaker)) return 'spear'
-    if (e.has(IsCatapult)) return 'catapult'
-    // 退定值（守军必然属于三类之一，理论上不会到这里）
-    return 'catapult'
+    // 退定值（守军必然属于两类之一，理论上不会到这里）
+    return 'spear'
   }
 
   /** 查询某 slot 上是否已有守军 */
@@ -174,8 +178,7 @@ export default function BattleFieldSpace({
   const spawnDefender = (type: UnitType, slotX: number, hp: number) => {
     const spawn = spawnActions(world)
     if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2, WALL_POSITION.z, hp)
-    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2, WALL_POSITION.z, hp)
-    else spawn.spawnDefenderCatapult(slotX, 2, WALL_POSITION.z, hp)
+    else spawn.spawnDefenderSpearBreaker(slotX, 2, WALL_POSITION.z, hp)
   }
 
   /** 商店雇佣：金币足够则扣金币 + 入兵营（满血） */
@@ -197,10 +200,40 @@ export default function BattleFieldSpace({
     setDragState({ source: 'button', type })
   }
 
+  // ── 集火拖拽起点 ──
+  const startFocusDrag = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation()
+    if (paused || gameOver || promptOpen) return
+    setDragState({ source: 'focus' })
+  }
+
+  // ── 集火落点：以落点 XZ 为中心扫描最近存活敌人，让射程内守军集火 ──
+  const handleFocusDrop = (dropX: number, dropZ: number) => {
+    setDragState(null)
+    let nearest: Entity | null = null
+    let nearestDist = Infinity
+    world.query(IsEnemy, Position, Health).readEach(([pos, hp], enemy) => {
+      if (hp.current <= 0) return
+      const dx = pos.x - dropX
+      const dz = pos.z - dropZ
+      const dist = Math.sqrt(dx * dx + dz * dz)
+      if (dist <= FOCUS_DROP_RADIUS && dist < nearestDist) {
+        nearestDist = dist
+        nearest = enemy
+      }
+    })
+    if (nearest) combatActions(world).focusFire(nearest)
+  }
+
   // ── 拖拽落点：WallSlot ──
   const handleDropToSlot = (slotIndex: number) => {
     const drag = dragState
     if (!drag) return
+    // 集火拖拽落在 slot 上 = 取消
+    if (drag.source === 'focus') {
+      setDragState(null)
+      return
+    }
     setDragState(null)
 
     const occupant = findDefenderAtSlot(slotIndex)
@@ -223,7 +256,7 @@ export default function BattleFieldSpace({
     // 先从兵营取血量最大的单位，再回收原兵，避免刚回营的原兵被立刻选中
     const { hp: deployHp, rest } = takeMaxHpStock(stock)
     // 必须在 setBarracks 回调外同步读取：recycleDefenderUnit 会销毁实体，
-    // React 18 batching 下回调延迟执行，届时 occupant trait 已失效，unitTypeOf 会 fallback 到 'catapult'
+    // React 18 batching 下回调延迟执行，届时 occupant trait 已失效，unitTypeOf 会 fallback 到 'spear'
     const occupantType = occupant ? unitTypeOf(occupant) : null
     const occupantHp = occupant?.get(Health)?.current ?? 0
     setBarracks((prev) => {
@@ -238,16 +271,21 @@ export default function BattleFieldSpace({
     spawnDefender(drag.type, WALL_SLOTS[slotIndex], deployHp)
   }
 
-  // ── 拖拽落点：敌人单位（手动更换攻击目标） ──
+  // ── 拖拽落点：敌人单位（手动更换攻击目标 / 集火） ──
   const handleDropToEnemy = (enemy: Entity) => (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation()
     const drag = dragState
     if (!drag) return
     setDragState(null)
 
-    // 仅守军单位拖拽，且非投石车（投石车用 CanBombard 自动周期轰炸，不走 Targeting）
+    // 集火拖拽：以落点 XZ 为中心扫描最近存活敌人并集火
+    if (drag.source === 'focus') {
+      handleFocusDrop(e.point.x, e.point.z)
+      return
+    }
+
+    // 仅守军单位拖拽
     if (drag.source !== 'unit') return
-    if (drag.entity.has(IsCatapult)) return
 
     const defenderPos = drag.entity.get(Position)
     const enemyPos = enemy.get(Position)
@@ -294,11 +332,17 @@ export default function BattleFieldSpace({
 
       {/* 拖拽兜底区：覆盖战场下方大范围，松开在空地/单位/ground 时清空 dragState
           WallSlot 与按钮行 onPointerUp 都 stopPropagation，不会冒泡到这里；
-          只在没有上层命中的情况下触发，作为“拖拽取消”兜底 */}
+          只在没有上层命中的情况下触发，作为"拖拽取消"兜底；集火拖拽在此判定落点 */}
       <mesh
         position={[0, -0.5, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
-        onPointerUp={() => setDragState((prev) => (prev ? null : prev))}
+        onPointerUp={(e: ThreeEvent<PointerEvent>) => {
+          if (dragState?.source === 'focus') {
+            handleFocusDrop(e.point.x, e.point.z)
+          } else {
+            setDragState((prev) => (prev ? null : prev))
+          }
+        }}
       >
         <planeGeometry args={[20, 30]} />
         <meshBasicMaterial visible={false} />
@@ -347,6 +391,8 @@ export default function BattleFieldSpace({
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
+                    : name === 'btn_focus'
+                    ? (e: ThreeEvent<PointerEvent>) => startFocusDrag(e)
                     : name === 'btn_shop'
                     ? (e: ThreeEvent<PointerEvent>) => {
                         e.stopPropagation()
@@ -388,8 +434,13 @@ export default function BattleFieldSpace({
           )
         })}
 
-      {/* 拖拽示意物：拖拽期间显示，跟随 pointer 在 y=6 平面 */}
-      {dragState && <DragUnitProxy color={DRAG_COLORS[dragState.type]} />}
+      {/* 拖拽示意物：拖拽期间显示，跟随 pointer 在 y=6 平面。集火拖拽显示红色 focus 图标 */}
+      {dragState &&
+        (dragState.source === 'focus' ? (
+          <DragUnitProxy color={FOCUS_DRAG_COLOR} image={BUTTON_IMAGES[2]} />
+        ) : (
+          <DragUnitProxy color={DRAG_COLORS[dragState.type]} />
+        ))}
 
       {/* 轮次开场/结束提示面板 */}
       {promptOpen && (

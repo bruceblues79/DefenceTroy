@@ -17,19 +17,18 @@ import { IsDefender, IsEnemy, IsWall, UnitType, type UnitKind } from '../traits'
  *   长枪兵 ──(守弓打他只有 0.25 + 速度 2×)──▶ 守弓
  */
 
-// 守军攻击敌军（行 key：archer 守弓 / spearbreaker 破矛兵 / catapult 投石车；
+// 守军攻击敌军（行 key：archer 守弓 / spearbreaker 破矛兵；
 //               列 key：sapper 攻城兵 / archer 攻弓 / pikeman 长枪兵）
 const DEFENDER_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
   archer:       { sapper: 1.0,  archer: 1.0,  pikeman: 0.25 },
   spearbreaker: { sapper: 1.0,  archer: 0.5,  pikeman: 2.0  },
-  catapult:     { sapper: 0.75, archer: 1.5,  pikeman: 1.0  },
 }
 
 // 敌军攻击守军（行 key：archer 攻弓 / pikeman 长枪兵；
-//               列 key：archer 守弓 / spearbreaker 破矛兵 / catapult 投石车）
+//               列 key：archer 守弓 / spearbreaker 破矛兵）
 const ENEMY_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:  { archer: 1.0, spearbreaker: 1.0,  catapult: 0.85 },
-  pikeman: { archer: 1.5, spearbreaker: 0.25, catapult: 1.25 },
+  archer:  { archer: 1.0, spearbreaker: 1.0 },
+  pikeman: { archer: 1.5, spearbreaker: 0.25 },
 }
 
 /**

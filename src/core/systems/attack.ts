@@ -1,5 +1,5 @@
 import type { World } from 'koota'
-import { Attack, CanAttackUnits, CanAttackWall, CanBombard, Targeting, Health, IsWall, IsMelee, UnitType } from '../traits'
+import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, UnitType } from '../traits'
 import { spawnActions } from '../actions'
 import { calculateDamage } from '../combat/damage'
 
@@ -15,9 +15,6 @@ export function updateAttack(world: World, dt: number) {
   const actions = spawnActions(world)
 
   attackers.updateEach(([attack], attacker) => {
-    // 投石车由 catapult-bombard 系统独立管理，不走本系统的 Targeting 状态机
-    if (attacker.has(CanBombard)) return
-
     // 纯状态机：仅检查 Targeting 是否存在。目标有效性由 AI 系统与 death 系统维护
     const target = attacker.targetFor(Targeting)
 

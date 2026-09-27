@@ -9,19 +9,15 @@ import {
   IsMelee,
   IsSpearBreaker,
   IsPikeman,
-  IsCatapult,
   IsWall,
   IsProjectile,
-  IsBoulder,
   Position,
   Projectile,
   Health,
 } from '../core/traits'
-import CharacterProxy from './CharacterProxy'
 import CharacterModel, { CorpseModel, MODEL_YAW, type DeathInfo, type ModelKey } from './CharacterModel'
 import WallModel from './WallModel'
 import { ArrowProxy, SpearProxy } from './ProjectileProxy'
-import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
 import HealthBarProxy from './HealthBarProxy'
 import EffectProxy from './EffectProxy'
@@ -37,8 +33,6 @@ const entityKey = (entity: Entity) => `${entity.id()}#${entity.generation()}`
 const BAR_Y = 0.7
 // 沿角色 local -z（各自背后）挪的量，是拉开血条与角色的主力
 const BAR_BACK = 0.24
-// 投石车仍是 box 占位，高 0.8，条在顶上方 0.1；无朝向，按 yaw=0 往世界 -z 挪
-const BAR_Y_CATAPULT = 0.9
 
 interface UnitRendererProps {
   /** 守军拖拽按下回调（BattleFieldSpace 提供，内部判定兵种） */
@@ -74,12 +68,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
   // 守军破矛兵
   const defenderSpearBreakers = useQuery(IsDefender, IsSpearBreaker, Position)
-  // 守军投石车
-  const defenderCatapults = useQuery(IsDefender, IsCatapult, Position)
-  // 箭矢抛射物（排除石块）
+  // 箭矢抛射物
   const projectiles = useQuery(IsProjectile, Position)
-  // 石块抛射物
-  const boulders = useQuery(IsBoulder, Position)
   // 城墙（单个实体）
   const wall = useQueryFirst(IsWall, Health)
 
@@ -180,19 +170,6 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </group>
       ))}
 
-      {/* 守军投石车（深棕）盒子高 0.8，半高 0.4 */}
-      {defenderCatapults.map((entity) => (
-        <group key={entityKey(entity)}>
-          <CharacterProxy
-            entity={entity}
-            color="#6b4226"
-            size={[0.6, 0.8, 0.6]}
-            onPointerDown={onDefenderPointerDown?.(entity)}
-          />
-          <HealthBarProxy entity={entity} offset={[0, BAR_Y_CATAPULT, 0]} width={0.55} backOffset={BAR_BACK} />
-        </group>
-      ))}
-
       {/* 尸体：播 die 后消失 */}
       {corpses.map((c) => (
         <CorpseModel
@@ -209,11 +186,6 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         entity.get(Projectile)?.sourceKind === 'archer'
           ? <ArrowProxy key={entityKey(entity)} entity={entity} />
           : <SpearProxy key={entityKey(entity)} entity={entity} />
-      ))}
-
-      {/* 石块抛射物 */}
-      {boulders.map((entity) => (
-        <BoulderProxy key={entityKey(entity)} entity={entity} />
       ))}
 
       {/* 视觉效果（AOE 命中圆片等） */}

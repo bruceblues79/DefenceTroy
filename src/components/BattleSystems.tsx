@@ -8,15 +8,13 @@ import {
   updateEnemyPikemanAI,
   updateDefenderArcherAI,
   updateDefenderSpearBreakerAI,
-  updateCatapultBombard,
   updateAttack,
   updateProjectiles,
-  updateBoulders,
   updateEffects,
   updateDeath,
 } from '../core/systems'
 import { spawnActions, WALL_SLOTS } from '../core/actions'
-import { IsWall, IsEnemy, IsDefender, IsProjectile, IsBoulder, IsEffect, Health, Reward } from '../core/traits'
+import { IsWall, IsEnemy, IsDefender, IsProjectile, IsEffect, Health, Reward } from '../core/traits'
 import type { RoundEngine } from '../core/rounds/rounds-engine'
 
 interface BattleSystemsProps {
@@ -73,7 +71,6 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
       world.query(IsEnemy).forEach((e) => e.destroy())
       world.query(IsDefender).forEach((e) => e.destroy())
       world.query(IsProjectile).forEach((e) => e.destroy())
-      world.query(IsBoulder).forEach((e) => e.destroy())
       world.query(IsEffect).forEach((e) => e.destroy())
     }
   }, [world, engine])
@@ -90,11 +87,9 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     updateEnemyPikemanAI(world, dt)
     updateDefenderArcherAI(world, dt)
     updateDefenderSpearBreakerAI(world, dt)
-    updateCatapultBombard(world, dt)
     updateAttack(world, dt)
     updateMovement(world, dt)
     updateProjectiles(world, dt)
-    updateBoulders(world, dt)
     updateEffects(world, dt)
     const goldBefore = world.query(IsEnemy, Reward).reduce((s, e) => s + e.get(Reward)!.value, 0)
     updateDeath(world, dt)

@@ -6,7 +6,6 @@ import {
   Attack,
   CanAttackUnits,
   CanAttackWall,
-  CanBombard,
   Reward,
   Projectile,
   IsEnemy,
@@ -16,16 +15,14 @@ import {
   IsMelee,
   IsSpearBreaker,
   IsPikeman,
-  IsCatapult,
   IsProjectile,
-  IsBoulder,
   Targeting,
   UnitType,
 } from '../traits'
 
 // 战场常量
 // 城墙 z：2026-09-27 从 2.95 下移到 3.45，利用竖屏底部留白。
-// 注意：ENEMY_*_WALL_Z / DEFENDER_CATAPULT_TARGET_Z 是绝对 z 值，未随墙移动（有意保留，
+// 注意：ENEMY_*_WALL_Z 是绝对 z 值，未随墙移动（有意保留，
 // 攻城兵停战线后续可能单独微调）；移动城墙只增大停战点到城墙正面的视觉空隙，逻辑无距离校验。
 export const WALL_POSITION = { x: 0, y: 0, z: 3.45 }
 export const WALL_WIDTH = 4.5
@@ -88,19 +85,10 @@ export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
 // 先手不受影响：0.8m 射程差 / 长枪兵速度 1.2 = 0.667s < 1.4，仍是恰好先手一枪
 export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.4
 
-// 守军投石车：自动周期轰炸 z=-1 线，AOE 1.25m 半径
-export const DEFENDER_CATAPULT_HP = 200
-export const DEFENDER_CATAPULT_TARGET_Z = -1
-export const DEFENDER_CATAPULT_RADIUS = 1.5
-export const DEFENDER_CATAPULT_DAMAGE = 40
-export const DEFENDER_CATAPULT_INTERVAL = 2
-
 export const PROJECTILE_SPEED = 15
-export const BOULDER_SPEED = 8
 
 // 抛射物发射/命中高度：角色身高约 1.5m，取 2/3 ≈ 1.0m（胸口）。
 // Position.y 语义是脚底，所以发射点 = 发射者 y + 本值，命中点 = 目标 y + 本值。
-// 石块（boulder）是落地 AOE，不走这个高度，仍从脚底飞向地面。
 export const UNIT_SHOOT_HEIGHT = 1.0
 
 // 城墙 9 个部署点位（x 坐标）
@@ -240,37 +228,6 @@ export const spawnActions = createActions((world) => ({
       Projectile({ damage, speed, sourceKind }),
       IsProjectile,
       Targeting(targetEntity),
-    )
-  },
-
-  /** 生成守军投石车：自动周期轰炸。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击 */
-  spawnDefenderCatapult(x: number, y: number = 2, z: number = WALL_POSITION.z, hp?: number) {
-    return world.spawn(
-      Position({ x, y, z }),
-      Health({ current: hp ?? DEFENDER_CATAPULT_HP, max: DEFENDER_CATAPULT_HP }),
-      Attack(),
-      CanBombard({
-        targetZ: DEFENDER_CATAPULT_TARGET_Z,
-        radius: DEFENDER_CATAPULT_RADIUS,
-        damage: DEFENDER_CATAPULT_DAMAGE,
-        interval: DEFENDER_CATAPULT_INTERVAL,
-      }),
-      UnitType({ kind: 'catapult' }),
-      IsDefender,
-      IsCatapult,
-    )
-  },
-
-  /** 生成石块抛射物（AOE，非追踪） */
-  spawnBoulder(fromEntity: Entity, targetZ: number, radius: number, damage: number, speed: number = BOULDER_SPEED) {
-    const fromPos = fromEntity.get(Position)
-    if (!fromPos) return null
-    const sourceKind = fromEntity.get(UnitType)?.kind ?? 'unknown'
-    return world.spawn(
-      Position({ x: fromPos.x, y: fromPos.y, z: fromPos.z }),
-      Velocity({ x: 0, y: 0, z: 0 }),
-      Projectile({ damage, speed, targetZ, aoeRadius: radius, sourceKind }),
-      IsBoulder,
     )
   },
 }))
