@@ -1,6 +1,7 @@
 import { Billboard, Text } from '@react-three/drei'
 import RoundShapePlane from '../components/RoundShapePlane'
 import RoundedShapeButton from '../components/RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 type GameResult = 'victory' | 'defeat'
 
@@ -33,7 +34,7 @@ export default function SettlementMenu({
               onExitToMenu()
             }}
           />
-          <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">win</Text>
+          <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">win</Text>
         </group>
       </Billboard>
     )
@@ -54,7 +55,7 @@ export default function SettlementMenu({
             onRestart()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">retry</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">retry</Text>
       </group>
       <group position={[0, -0.625, 0.02]}>
         <RoundedShapeButton
@@ -67,7 +68,7 @@ export default function SettlementMenu({
             onExitToMenu()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
       </group>
     </Billboard>
   )

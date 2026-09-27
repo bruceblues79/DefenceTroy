@@ -1,6 +1,7 @@
 import { type ThreeEvent } from '@react-three/fiber'
 import { Text, useTexture } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
+import { UI_FONT } from '../core/font'
 
 interface RoundedShapeButtonProps {
   // ── 几何/外观(透传给 RoundShapePlane) ──
@@ -108,6 +109,7 @@ export default function RoundedShapeButton({
       )}
       {label && (
         <Text
+          font={UI_FONT}
           position={[0, 0, 0.01]}
           fontSize={labelFontSize}
           color={labelColor}

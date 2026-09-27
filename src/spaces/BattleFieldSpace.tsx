@@ -16,6 +16,7 @@ import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER
 import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
+import { UI_FONT } from '../core/font'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
@@ -409,6 +410,7 @@ export default function BattleFieldSpace({
               />
               {type && count > 0 && (
                 <Text
+                  font={UI_FONT}
                   position={[0.3, 0.3, 0.01]}
                   fontSize={0.28}
                   color="#ffffff"
@@ -421,6 +423,7 @@ export default function BattleFieldSpace({
               {/* btn_menu / btn_shop 的文字已由 BUTTON_IMAGES 的图标取代 */}
               {name === 'btn_shop' && (
                 <Text
+                  font={UI_FONT}
                   position={[0, 0.3, 0.01]}
                   fontSize={0.2}
                   color="#ffd700"

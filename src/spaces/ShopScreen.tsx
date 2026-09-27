@@ -2,6 +2,7 @@ import { Billboard, Text, useTexture } from '@react-three/drei'
 import { useState } from 'react'
 import RoundShapePlane from '../components/RoundShapePlane'
 import RoundedShapeButton from '../components/RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 export type UnitType = 'bow' | 'spear'
 
@@ -117,6 +118,7 @@ export default function ShopScreen({
               </mesh>
               {/* 兵种名称（左对齐，首字母对齐） */}
               <Text
+                font={UI_FONT}
                 position={[NAME_LOCAL_X, 0, 0.01]}
                 fontSize={0.2}
                 color="#ffffff"
@@ -129,6 +131,7 @@ export default function ShopScreen({
               </Text>
               {/* 费用/金币（右段，小字号，够金币绿色，不够红色） */}
               <Text
+                font={UI_FONT}
                 position={[COST_LOCAL_X, 0, 0.01]}
                 fontSize={0.18}
                 color={canAfford ? '#4caf50' : '#f44336'}

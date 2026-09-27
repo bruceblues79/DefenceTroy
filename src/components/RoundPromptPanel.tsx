@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Billboard, Text } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 import RoundedShapeButton from './RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 const BASE = import.meta.env.BASE_URL
 const ASSET_VERSION = 1
@@ -59,6 +60,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
 
       {/* 上部内容区：标题 2/10 + 正文 3/10 + tip 5/10（内容区 y∈[-1.5,2.5]，高 4.0） */}
       <Text
+        font={UI_FONT}
         position={[0, 2.1, 0.01]}
         fontSize={0.26}
         color="#ffffff"
@@ -71,6 +73,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       </Text>
 
       <Text
+        font={UI_FONT}
         position={[0, 1.1, 0.01]}
         fontSize={0.18}
         color="#e5e5e5"
@@ -83,6 +86,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       </Text>
 
       <Text
+        font={UI_FONT}
         position={[0, -0.5, 0.01]}
         fontSize={0.1625}
         color="#ffd700"
@@ -95,6 +99,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       </Text>
 
       <Text
+        font={UI_FONT}
         position={[0, -1.4, 0.01]}
         fontSize={0.15}
         color="#a0a0a0"
