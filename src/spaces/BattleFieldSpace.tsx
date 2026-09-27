@@ -17,7 +17,8 @@ import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engin
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
-const BUTTON_X = [-1.95, -0.975, 0, 0.975, 1.95]
+// 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
+const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 // 3 个兵种按钮用对应守军染色（与 CharacterProxy 一致），Shop 灰，Menu 红
 const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
