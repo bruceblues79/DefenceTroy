@@ -81,22 +81,38 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
         anchorY="middle"
         maxWidth={3.25}
         textAlign="center"
+        overflowWrap="break-word"
       >
         {body}
       </Text>
 
+      {/* tip 区：column 布局 —— "tips" 固定在顶端居中，内容在下方 */}
       <Text
         font={UI_FONT}
-        position={[0, -0.5, 0.01]}
+        position={[0, 0.35, 0.01]}
         fontSize={0.1625}
         color="#ffd700"
         anchorX="center"
         anchorY="middle"
-        maxWidth={3.25}
-        textAlign="center"
       >
-        {tip ? `tips\n${tipPages[page]}` : 'tips'}
+        tips
       </Text>
+
+      {tip && (
+        <Text
+          font={UI_FONT}
+          position={[0, 0.12, 0.01]}
+          fontSize={0.1625}
+          color="#ffd700"
+          anchorX="center"
+          anchorY="top"
+          maxWidth={3.25}
+          textAlign="center"
+          overflowWrap="break-word"
+        >
+          {tipPages[page]}
+        </Text>
+      )}
 
       <Text
         font={UI_FONT}
