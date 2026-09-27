@@ -54,7 +54,7 @@ export const ROUNDS: RoundConfig[] = [
     ending: {
       title: '击退了第一轮',
       body: '城墙并没有什么实质性危险，但看起来这将是持久战！',
-      tip: '获胜奖金100g',
+      tip: '获胜奖金100g，可以拖动单位改变他们在城墙的站位，也可以拖动到彼此位置互相换位。',
     },
     gold: 100,
   },
@@ -91,10 +91,10 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
