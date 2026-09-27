@@ -1,14 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
-  <!-- 长矛 + 盾 -->
-  <!-- 矛杆 -->
-  <line x1="372" y1="92" x2="140" y2="420" stroke="#222222" stroke-width="22" stroke-linecap="round"/>
-  <line x1="372" y1="92" x2="140" y2="420" stroke="#f8f8f8" stroke-width="14" stroke-linecap="round"/>
-  <!-- 矛头 -->
-  <path d="M372 92 L330 140 L414 110 L384 56 Z" fill="#222222"/>
-  <path d="M372 96 L338 136 L408 110 L386 66 Z" fill="#f8f8f8"/>
-  <!-- 盾（圆形） -->
-  <circle cx="180" cy="332" r="86" fill="#222222"/>
-  <circle cx="180" cy="332" r="74" fill="#f8f8f8"/>
-  <!-- 盾面纹样：倒 V -->
-  <path d="M180 286 L142 348 L180 378 L218 348 Z" fill="#222222"/>
+  <defs>
+    <linearGradient id="spearShaft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a6a35"/>
+      <stop offset="0.5" stop-color="#d4a05a"/>
+      <stop offset="1" stop-color="#7a4f24"/>
+    </linearGradient>
+    <linearGradient id="spearMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8edf2"/>
+      <stop offset="0.4" stop-color="#a8b4c2"/>
+      <stop offset="1" stop-color="#6a7686"/>
+    </linearGradient>
+    <radialGradient id="shieldFace" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#4a90d9"/>
+      <stop offset="0.7" stop-color="#2c5f8a"/>
+      <stop offset="1" stop-color="#1a3d5c"/>
+    </radialGradient>
+    <radialGradient id="shieldRim" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.7" stop-color="#b8860b"/>
+      <stop offset="1" stop-color="#6b4e0a"/>
+    </radialGradient>
+  </defs>
+  <!-- 矛杆（立体木色，对角线） -->
+  <line x1="404" y1="60" x2="120" y2="452" stroke="#3a1d0a" stroke-width="28" stroke-linecap="round"/>
+  <line x1="404" y1="60" x2="120" y2="452" stroke="url(#spearShaft)" stroke-width="18" stroke-linecap="round"/>
+  <!-- 矛头（金属，立体） -->
+  <path d="M404 60 L348 132 L456 96 L424 32 Z" fill="#3a1d0a"/>
+  <path d="M404 66 L358 126 L448 100 L422 42 Z" fill="url(#spearMetal)"/>
+  <!-- 盾（金边蓝面） -->
+  <circle cx="176" cy="348" r="112" fill="#3a1d0a"/>
+  <circle cx="176" cy="348" r="100" fill="url(#shieldRim)"/>
+  <circle cx="176" cy="348" r="82" fill="url(#shieldFace)"/>
+  <!-- 盾面纹样：希腊倒 V -->
+  <path d="M176 292 L128 364 L176 396 L224 364 Z" fill="#f8f8f8" opacity="0.9"/>
 </svg>
