@@ -158,7 +158,7 @@ export default function ShopScreen({
             position={[OP_BUTTON_X[i], -1.975, 0.01]}
             image={btn.image}
             imageScale={0.55}
-            imageColor="#ffffff"
+            imageColor={isActive ? '#666666' : '#ffffff'}
             onClick={(e) => {
               e.stopPropagation()
               if (btn.id === 'hire') setPage('hire')
