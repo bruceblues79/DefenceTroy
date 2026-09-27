@@ -1,13 +1,12 @@
 import { createActions, type Entity } from 'koota'
-import { Health, Targeting, Position, Attack, CanAttackUnits, CanBombard } from '../traits'
+import { Health, Targeting, Position, Attack, CanAttackUnits, IsDefender } from '../traits'
 
 /** 重置单位战斗状态：清除目标，攻击计时归零，冷却设为满值（换位/重部署后先走冷却再攻击） */
 function resetUnitCombatState(entity: Entity) {
   const attack = entity.get(Attack)
   if (attack) {
     const unitsAtk = entity.get(CanAttackUnits)
-    const bombard = entity.get(CanBombard)
-    const interval = unitsAtk?.interval ?? bombard?.interval ?? 0
+    const interval = unitsAtk?.interval ?? 0
     entity.set(Attack, { cooldown: interval, attackTimer: 0, isAttacking: false })
   }
   if (entity.targetFor(Targeting)) entity.remove(Targeting('*'))
@@ -32,6 +31,24 @@ export const combatActions = createActions((world) => ({
   /** 设置目标 */
   setTarget(entity: Entity, target: Entity) {
     entity.add(Targeting(target))
+  },
+
+  /**
+   * 集火：让射程内含目标的所有守军切换攻击目标为 target。
+   * 射程外守军保持原目标（或由 AI 自动清空目标进入发呆），不强制改目标。
+   */
+  focusFire(target: Entity) {
+    const targetPos = target.get(Position)
+    const targetHealth = target.get(Health)
+    if (!targetPos || !targetHealth || targetHealth.current <= 0) return
+
+    world.query(IsDefender, CanAttackUnits, Position).readEach(([unitsAtk, pos], defender) => {
+      const dx = pos.x - targetPos.x
+      const dz = pos.z - targetPos.z
+      if (Math.sqrt(dx * dx + dz * dz) <= unitsAtk.range) {
+        defender.add(Targeting(target))
+      }
+    })
   },
 
   /** 销毁实体 */

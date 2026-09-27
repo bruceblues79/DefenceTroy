@@ -3,7 +3,7 @@ import { useState } from 'react'
 import RoundShapePlane from '../components/RoundShapePlane'
 import RoundedShapeButton from '../components/RoundedShapeButton'
 
-export type UnitType = 'bow' | 'spear' | 'catapult'
+export type UnitType = 'bow' | 'spear'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -22,7 +22,7 @@ const HIRE_ICON_BOW = `${BASE}assets/svg/icon-bow.svg?v=3`
 const HIRE_ICON_SPEAR = `${BASE}assets/svg/icon-spear.svg?v=3`
 
 // 雇佣商品：兵种 / 名称 / 花费 / 染色（与战斗 UI SVG 染色一致） / 图标
-// 注：仅含可雇佣的 bow/spear（catapult 已被集火攻击机制取代，不再雇佣）
+// 注：仅含可雇佣的 bow/spear（集火机制取代了原投石车兵种）
 type HireType = 'bow' | 'spear'
 const HIRE_ITEMS: { type: HireType; name: string; cost: number; color: string; icon: string }[] = [
   { type: 'bow', name: 'archer', cost: 200, color: '#4a90d9', icon: HIRE_ICON_BOW },
