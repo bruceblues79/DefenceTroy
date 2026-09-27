@@ -53,10 +53,10 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       {/* 背景面板 3.75×5（原 3×4 放大 25%），中灰半透 */}
       <RoundShapePlane width={3.75} height={5} cornerRadius={0.19} color="#888888" opacity={0.8} />
 
-      {/* 上部内容区（整体缩放 1.25） */}
+      {/* 上部内容区：标题 2/10 + 正文 3/10 + tip 5/10（内容区 y∈[-1.5,2.5]，高 4.0） */}
       <Text
-        position={[0, 1.875, 0.01]}
-        fontSize={0.325}
+        position={[0, 2.1, 0.01]}
+        fontSize={0.26}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
@@ -67,7 +67,7 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       </Text>
 
       <Text
-        position={[0, 0.6875, 0.01]}
+        position={[0, 1.1, 0.01]}
         fontSize={0.2}
         color="#e5e5e5"
         anchorX="center"
@@ -78,22 +78,20 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
         {pages[page]}
       </Text>
 
-      {tip && (
-        <Text
-          position={[0, -0.5625, 0.01]}
-          fontSize={0.1625}
-          color="#c8c8c8"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={3.25}
-          textAlign="center"
-        >
-          {tip}
-        </Text>
-      )}
+      <Text
+        position={[0, -0.5, 0.01]}
+        fontSize={0.1625}
+        color="#ffd700"
+        anchorX="center"
+        anchorY="middle"
+        maxWidth={3.25}
+        textAlign="center"
+      >
+        {tip ? `tips\n${tip}` : 'tips'}
+      </Text>
 
       <Text
-        position={[0, -1.35, 0.01]}
+        position={[0, -1.4, 0.01]}
         fontSize={0.15}
         color="#a0a0a0"
         anchorX="center"
