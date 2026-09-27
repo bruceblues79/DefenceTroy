@@ -2,6 +2,7 @@ import { Billboard, Text, useGLTF } from '@react-three/drei'
 import { Suspense, useEffect } from 'react'
 import { MODEL_URLS } from '../components/CharacterModel'
 import { WALL_MODEL_URL } from '../components/WallModel'
+import { GROUND_MODEL_URL } from '../components/GroundModel'
 
 function LoadingBillboard() {
   return (
@@ -25,6 +26,7 @@ function CharacterPreloader({ onLoaded }: { onLoaded: () => void }) {
   useGLTF(MODEL_URLS.defenderArcher)
   useGLTF(MODEL_URLS.defenderSpearBreaker)
   useGLTF(WALL_MODEL_URL)
+  useGLTF(GROUND_MODEL_URL)
   useEffect(() => {
     onLoaded()
   }, [onLoaded])
