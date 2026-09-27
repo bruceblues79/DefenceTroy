@@ -20,12 +20,12 @@ import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
 const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
-// 按钮底色：兵种/商店/菜单统一中灰半透明；集火按钮染红
-const BUTTON_COLORS = ['#888888', '#888888', '#cc2222', '#888888', '#888888']
+// 按钮底色：全部统一中灰半透明
+const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
 // SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
-// 集火按钮图标用白色以保证在红底上的可见性
-const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#ffffff', '#ffd700', '#cc2222']
+// 集火按钮图标红染以在中灰底上突出
+const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#cc2222', '#ffd700', '#cc2222']
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
