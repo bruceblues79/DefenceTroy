@@ -24,14 +24,17 @@ const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', 'catapult', null, null]
+// 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
+const ASSET_VERSION = 3
+const BASE = import.meta.env.BASE_URL
 // 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
 export const BUTTON_IMAGES = [
-  `${import.meta.env.BASE_URL}assets/textures/icon-archer.svg`,
-  `${import.meta.env.BASE_URL}assets/textures/icon-spear.svg`,
-  `${import.meta.env.BASE_URL}assets/textures/icon-catapult.svg`,
-  `${import.meta.env.BASE_URL}assets/textures/icon-shop.svg`,
-  `${import.meta.env.BASE_URL}assets/textures/icon-menu.svg`,
+  `${BASE}assets/svg/icon-bow.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-spear.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-focus.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-shop.svg?v=${ASSET_VERSION}`,
+  `${BASE}assets/svg/icon-menu.svg?v=${ASSET_VERSION}`,
 ]
 // SVG 透明背景无白底，可放大到 0.85
 const BUTTON_IMAGE_SCALES = [0.85, 0.85, 0.85, 0.85, 0.85]
