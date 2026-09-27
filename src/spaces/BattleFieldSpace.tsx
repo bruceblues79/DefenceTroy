@@ -17,7 +17,8 @@ import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engin
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_catapult', 'btn_shop', 'btn_menu'] as const
-const BUTTON_X = [-1.95, -0.975, 0, 0.975, 1.95]
+// 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
+const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 // 3 个兵种按钮用对应守军染色（与 CharacterProxy 一致），Shop 灰，Menu 红
 const BUTTON_COLORS = ['#4a90d9', '#4a9d8f', '#6b4226', '#888888', '#cc2222']
 // 与 BUTTON_NAMES 对齐：3 个兵种按钮有库存，Shop/Menu 无
@@ -68,7 +69,6 @@ export default function BattleFieldSpace({
   onRestart,
   onExitToMenu,
   onGameOver,
-  onDragStateChange,
 }: {
   paused: boolean
   gameOver: boolean
@@ -78,7 +78,6 @@ export default function BattleFieldSpace({
   onRestart: () => void
   onExitToMenu: () => void
   onGameOver: (result: 'victory' | 'defeat') => void
-  onDragStateChange?: (dragging: boolean) => void
 }) {
   const world = useWorld()
   const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [], catapult: [] })
@@ -127,11 +126,6 @@ export default function BattleFieldSpace({
     })
   })
 
-  // 通知 App 屏蔽 OrbitControls（拖拽或提示面板显示期间）
-  useEffect(() => {
-    onDragStateChange?.(dragState !== null || promptOpen)
-  }, [dragState, promptOpen, onDragStateChange])
-
   // 胜负结算或提示面板出现时自动关闭商店
   useEffect(() => {
     if (gameOver) {
@@ -161,9 +155,9 @@ export default function BattleFieldSpace({
   /** 部署指定兵种到 slot（带保留血量） */
   const spawnDefender = (type: UnitType, slotX: number, hp: number) => {
     const spawn = spawnActions(world)
-    if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2.5, WALL_POSITION.z, hp)
-    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2.5, WALL_POSITION.z, hp)
-    else spawn.spawnDefenderCatapult(slotX, 2.5, WALL_POSITION.z, hp)
+    if (type === 'bow') spawn.spawnDefenderArcher(slotX, 2, WALL_POSITION.z, hp)
+    else if (type === 'spear') spawn.spawnDefenderSpearBreaker(slotX, 2, WALL_POSITION.z, hp)
+    else spawn.spawnDefenderCatapult(slotX, 2, WALL_POSITION.z, hp)
   }
 
   /** 商店雇佣：金币足够则扣金币 + 入兵营（满血） */
@@ -252,8 +246,10 @@ export default function BattleFieldSpace({
   // ── 拖拽落点：按钮行（回收） ──
   const handleDropToBarracks = () => {
     const drag = dragState
-    if (!drag || drag.source !== 'unit') return
+    // 先无条件清空：兵营按钮起的拖拽落回按钮行 = 取消。
+    // 本函数带 stopPropagation，不在这里清空的话，点一下有库存的按钮会留下一个跟着指针的拖拽示意物
     setDragState(null)
+    if (!drag || drag.source !== 'unit') return
     const hp = drag.entity.get(Health)?.current ?? 0
     setBarracks((prev) => ({
       ...prev,
@@ -273,9 +269,9 @@ export default function BattleFieldSpace({
         onGameOver={onGameOver}
       />
 
-      {/* ground: plane 5×9, beach sand */}
-      <mesh name="ground" position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[5, 9]} />
+      {/* ground: plane 5×10, beach sand（中心 +0.25 跟随城墙下移，底部不穿帮、出生区仍覆盖） */}
+      <mesh name="ground" position={[0, 0, 0.25]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[5, 10]} />
         <meshStandardMaterial color="#d4c4a0" />
       </mesh>
 
@@ -302,7 +298,7 @@ export default function BattleFieldSpace({
       {/* 按钮行整体回收检测条带（invisible，仅作 raycaster 命中） */}
       {!gameOver && !paused && !promptOpen && (
         <mesh
-          position={[0, 1.99, 4.0]}
+          position={[0, 1.99, 4.5]}
           rotation={[-Math.PI / 2, 0, 0]}
           onPointerUp={(e: ThreeEvent<PointerEvent>) => {
             e.stopPropagation()
@@ -320,7 +316,7 @@ export default function BattleFieldSpace({
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
           return (
-            <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.0]}>
+            <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.5]}>
               <RoundedShapeButton
                 name={name}
                 width={0.8}

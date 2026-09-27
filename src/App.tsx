@@ -10,6 +10,12 @@ import * as THREE from 'three'
 
 type GameState = 'menu' | 'loading' | 'play'
 
+// 战斗镜头俯角（自 +Y 轴量起的 polar angle）：正交相机下越倾斜越能露出单位侧面与城墙体积
+// 锁定值 —— 进战斗后镜头完全不动（不旋转、不缩放）
+const BATTLE_TILT = THREE.MathUtils.degToRad(20)
+// 入场推进时长：从正俯视转到 BATTLE_TILT
+const TILT_INTRO_MS = 350
+
 function requestFullscreen() {
   const el = document.documentElement
   if (el.requestFullscreen) el.requestFullscreen()
@@ -106,8 +112,6 @@ export default function App() {
   const [paused, setPaused] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [gameResult, setGameResult] = useState<'victory' | 'defeat' | null>(null)
-  const [cameraReady, setCameraReady] = useState(false)
-  const [dragging, setDragging] = useState(false)
   const orbitRef = useRef<any>(null)
   const handleStart = useCallback(() => setGameState('loading'), [])
   const handleLoaded = useCallback(() => setGameState('play'), [])
@@ -130,21 +134,18 @@ export default function App() {
     setGameState('menu')
   }, [])
 
+  // 入场：从正俯视推进到 BATTLE_TILT。之后镜头锁死，任何手势都动不了它
   useEffect(() => {
     if (gameState !== 'play') return
-    setCameraReady(false)
     const fromAngle = 0.001
-    const toAngle = THREE.MathUtils.degToRad(7.5)
-    const duration = 100
     const startTime = performance.now()
+    let rafId = 0
     const tick = (now: number) => {
-      const t = Math.min((now - startTime) / duration, 1)
-      const angle = fromAngle + (toAngle - fromAngle) * t
-      orbitRef.current?.setPolarAngle(angle)
-      if (t < 1) requestAnimationFrame(tick)
-      else setCameraReady(true)
+      const t = Math.min((now - startTime) / TILT_INTRO_MS, 1)
+      orbitRef.current?.setPolarAngle(fromAngle + (BATTLE_TILT - fromAngle) * t)
+      if (t < 1) rafId = requestAnimationFrame(tick)
     }
-    const rafId = requestAnimationFrame(tick)
+    rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
   }, [gameState])
 
@@ -155,19 +156,20 @@ export default function App() {
       <Canvas dpr={[1, 2]} shadows>
         <color attach="background" args={['#888888']} />
         <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
+        {/* 镜头锁死：不旋转、不缩放、不平移。
+            minPolarAngle 必须留 0 —— setPolarAngle 会把值 clamp 到 [min,max]，
+            设成 min=max=20° 会把入场推进动画直接吃掉。用户输入已被 enableRotate 禁掉，不会突破上限 */}
         <OrbitControls
           ref={orbitRef}
           target={[0, 0, 0]}
           enablePan={false}
-          enableRotate={gameState === 'play' && cameraReady && !paused && !gameOver && !dragging}
-          enableZoom={!dragging}
+          enableRotate={false}
+          enableZoom={false}
           enableDamping={false}
-          minZoom={60}
-          maxZoom={100}
           minAzimuthAngle={0}
           maxAzimuthAngle={0}
           minPolarAngle={0}
-          maxPolarAngle={THREE.MathUtils.degToRad(10)}
+          maxPolarAngle={BATTLE_TILT}
         />
         <directionalLight
           position={[2, 9, -3]}
@@ -193,7 +195,6 @@ export default function App() {
             onRestart={handleRestart}
             onExitToMenu={handleExitToMenu}
             onGameOver={handleGameOver}
-            onDragStateChange={setDragging}
           />
         )}
       </Canvas>
