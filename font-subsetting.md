@@ -1,6 +1,8 @@
 # 中文字体子集化指南
 
-本项目使用 Noto Sans SC 作为 UI 字体。由于完整字体约 11MB，会拖慢首次加载，因此用 `pyftsubset` 提取项目实际用到的字符，生成约 115KB 的子集字体（`public/assets/fonts/NotoSansSC-Subset.woff2`）。
+本项目使用 Noto Sans SC 作为 UI 字体。由于完整字体约 11MB，会拖慢首次加载，因此用 `pyftsubset` 提取项目实际用到的字符，生成约 224KB 的子集字体（`public/assets/fonts/NotoSansSC-Subset.ttf`）。
+
+> **为什么用 TTF 不用 WOFF2？** drei 的 `<Text>`（troika-three-text）对 TTF 支持最稳定；WOFF2 在部分 troika 版本会加载失败，导致整屏白屏。TTF 子集仅 224KB，体积可接受。
 
 > **什么时候需要重新生成？** 当你在源码中新增了中文字符（轮次文案、按钮文字等），子集字体中没有这些字形，会显示为空白。此时按下方步骤重新生成。
 
@@ -29,11 +31,10 @@ curl -sL -H "User-Agent: Mozilla/5.0" \
 find src -name "*.ts" -o -name "*.tsx" | xargs cat \
   | grep -oP '.' | sort -u | tr -d '\n' > /tmp/chars.txt
 
-# 生成 WOFF2 子集（troika-three-text 支持 WOFF2）
+# 生成 TTF 子集（troika-three-text 对 TTF 支持最稳定）
 pyftsubset public/assets/fonts/NotoSansSC-Regular.ttf \
   --text-file=/tmp/chars.txt \
-  --output-file=public/assets/fonts/NotoSansSC-Subset.woff2 \
-  --flavor=woff2 \
+  --output-file=public/assets/fonts/NotoSansSC-Subset.ttf \
   --no-hinting \
   --desubroutinize \
   --drop-tables+=DSIG
@@ -54,7 +55,7 @@ rm public/assets/fonts/NotoSansSC-Regular.ttf
 - 如需校验字符覆盖：
   ```python
   from fontTools.ttLib import TTFont
-  f = TTFont('public/assets/fonts/NotoSansSC-Subset.woff2')
+  f = TTFont('public/assets/fonts/NotoSansSC-Subset.ttf')
   cmap = f.getBestCmap()
   # 检查某字符是否在内
   print(ord('希') in cmap)
