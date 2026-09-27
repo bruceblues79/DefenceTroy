@@ -1,5 +1,6 @@
 import { Text } from '@react-three/drei'
 import RoundedShapeButton from '../components/RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 /**
  * 主菜单
@@ -23,7 +24,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             window.location.href = 'https://svalbardpost.xyz/'
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
       </group>
 
       {/* play 按钮（蓝）,下方 */}
@@ -39,7 +40,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             onStart()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">play</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.15} color="#ffffff" anchorX="center" anchorY="middle">play</Text>
       </group>
     </group>
   )

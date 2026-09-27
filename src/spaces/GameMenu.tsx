@@ -1,6 +1,7 @@
 import { Billboard, Text } from '@react-three/drei'
 import RoundShapePlane from '../components/RoundShapePlane'
 import RoundedShapeButton from '../components/RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 export default function GameMenu({
   onResume,
@@ -25,7 +26,7 @@ export default function GameMenu({
             onResume()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">resume</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">resume</Text>
       </group>
       <group position={[0, 0, 0.02]}>
         <RoundedShapeButton
@@ -38,7 +39,7 @@ export default function GameMenu({
             onRestart()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">restart</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">restart</Text>
       </group>
       <group position={[0, -1.25, 0.02]}>
         <RoundedShapeButton
@@ -51,7 +52,7 @@ export default function GameMenu({
             onExitToMenu()
           }}
         />
-        <Text position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
       </group>
     </Billboard>
   )

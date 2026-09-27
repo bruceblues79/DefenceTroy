@@ -5,6 +5,7 @@ import { WALL_MODEL_URL } from '../components/WallModel'
 import { GROUND_MODEL_URL } from '../components/GroundModel'
 import { BUTTON_IMAGES } from './BattleFieldSpace'
 import { SHOP_TAB_IMAGES } from './ShopScreen'
+import { UI_FONT } from '../core/font'
 
 function LoadingBillboard() {
   return (
@@ -13,7 +14,7 @@ function LoadingBillboard() {
         <planeGeometry args={[2, 2]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      <Text position={[0, 0, 0.01]} fontSize={0.25} color="black" anchorX="center" anchorY="middle">
+      <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.25} color="black" anchorX="center" anchorY="middle">
         loading...
       </Text>
     </Billboard>

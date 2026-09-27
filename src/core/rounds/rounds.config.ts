@@ -40,19 +40,21 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
   {
     intro: {
-      title: 'THE GREEKS ARRIVE',
-      body: 'The Greek army has reached Troy and begun its first advance toward the wall.',
-      tip: 'Open the shop to view available defenders. Preparation gold can be used to recruit them after this round.',
+      title: '希腊联军登陆',
+      body: '希腊联军登陆了海岸，开始了试探性攻击。来，保卫我们的城墙！',
+      tip: '点击并拖动瞄准按钮到进攻单位，符合守军单位攻击距离会集火攻击。也可以点击并拖动城墙上的守军单位到目标，符合攻击距离的话，也会切换目标。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 6 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 5 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: 'THE LINE HOLDS',
-      body: 'The war has only begun. The wall still stands, but the size of the enemy force proves this will not be a short conflict.',
+      title: '击退了第一轮',
+      body: '城墙并没有什么实质性危险，但看起来这将是持久战！',
+      tip: '获胜奖金100g',
     },
     gold: 100,
   },
@@ -60,21 +62,22 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第二轮 ──
   {
     intro: {
-      title: 'ARROWS FROM AFAR',
-      body: 'The enemy has begun attacking Troy\'s defenders from a distance.',
-      tip: 'Drag a deployed defender back to the barracks to recover health over time.',
+      title: '弓兵的侵扰',
+      body: '希腊联军开始用步兵与弓兵的混合了，优先考虑击杀弓兵！',
+      tip: '你现在有一定收入，点击购物车图标，可以点击兵种按钮雇佣更多单位，他们将出现在兵种按钮里，点击并拖动到城墙部署。',
     },
     waves: [
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: 'NO PLACE IS SAFE',
-      body: 'The wall is no longer the only thing under threat. Troy\'s defenders can also be worn down.',
+      title: '击退了第2轮',
+      body: '城墙没有太大压力，但我方部队开始损失了！',
+      tip: '获胜奖金200g，把城墙单位拖下来，可收入兵营，缓缓回血。',
     },
     gold: 200,
   },
@@ -82,27 +85,22 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第三轮 ──
   {
     intro: {
-      title: 'A MIXED ASSAULT',
-      body: 'A mixed enemy force is advancing against both the defenders and the wall.',
-      tip: 'Drag deployed defenders between wall positions to rearrange the defense.',
+      title: '长矛兵的强袭',
+      body: '希腊联军集结了快速长矛兵，他们对我方弓兵是巨大的威胁！',
+      tip: '我方的长矛盾骑士是克制他们的好单位，雇佣他们，从兵营按钮拖上城墙，替换或者站到防守单位上，被替换的目标会自动返回兵营，等待再次部署。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      {
-        enemies: [
-          { type: 'sapper', count: 2 },
-          { type: 'archer', count: 2 },
-        ],
-        spawnInterval: SPAWN_INTERVAL,
-      },
-      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: 'DIVIDED PRESSURE',
-      body: 'The attack is no longer simple. Protecting one part of the defense may leave another exposed.',
+      title: '击退了第3轮',
+      body: '城墙尚可，但我方部队已经开始遭受不同战术的挑战！',
+      tip: '获胜奖金300g，灵活的拖动单位，集火，将减轻你的压力。',
     },
     gold: 300,
   },

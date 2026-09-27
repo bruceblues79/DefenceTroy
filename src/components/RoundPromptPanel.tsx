@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Billboard, Text } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 import RoundedShapeButton from './RoundedShapeButton'
+import { UI_FONT } from '../core/font'
 
 const BASE = import.meta.env.BASE_URL
 const ASSET_VERSION = 1
@@ -40,23 +41,28 @@ interface RoundPromptPanelProps {
  * 复用 RoundShapePlane 作背景，上部显示标题/正文/操作提示/页码，下部 P/N/OK 三按钮。
  */
 export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPromptPanelProps) {
-  const pages = useMemo(() => paginate(body), [body])
+  // 翻页对象改为 tip 内容（正文简短，直接完整显示）
+  const tipPages = useMemo(() => (tip ? paginate(tip) : ['']), [tip])
   const [page, setPage] = useState(0)
   const isFirst = page === 0
-  const isLast = page === pages.length - 1
+  const isLast = page === tipPages.length - 1
+
+  // tip 切换时回到第一页
+  useEffect(() => setPage(0), [tip])
 
   const handlePrev = () => setPage((p) => Math.max(0, p - 1))
-  const handleNext = () => setPage((p) => Math.min(pages.length - 1, p + 1))
+  const handleNext = () => setPage((p) => Math.min(tipPages.length - 1, p + 1))
 
   return (
     <Billboard position={[0, 4, 0.5]}>
       {/* 背景面板 3.75×5（原 3×4 放大 25%），中灰半透 */}
       <RoundShapePlane width={3.75} height={5} cornerRadius={0.19} color="#888888" opacity={0.8} />
 
-      {/* 上部内容区（整体缩放 1.25） */}
+      {/* 上部内容区：标题 2/10 + 正文 3/10 + tip 5/10（内容区 y∈[-1.5,2.5]，高 4.0） */}
       <Text
-        position={[0, 1.875, 0.01]}
-        fontSize={0.325}
+        font={UI_FONT}
+        position={[0, 2.1, 0.01]}
+        fontSize={0.26}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
@@ -67,39 +73,56 @@ export default function RoundPromptPanel({ title, body, tip, onOk }: RoundPrompt
       </Text>
 
       <Text
-        position={[0, 0.6875, 0.01]}
-        fontSize={0.2}
+        font={UI_FONT}
+        position={[0, 1.1, 0.01]}
+        fontSize={0.18}
         color="#e5e5e5"
         anchorX="center"
         anchorY="middle"
         maxWidth={3.25}
         textAlign="center"
+        overflowWrap="break-word"
       >
-        {pages[page]}
+        {body}
+      </Text>
+
+      {/* tip 区：column 布局 —— "tips" 固定在顶端居中，内容在下方 */}
+      <Text
+        font={UI_FONT}
+        position={[0, 0.35, 0.01]}
+        fontSize={0.1625}
+        color="#ffd700"
+        anchorX="center"
+        anchorY="middle"
+      >
+        tips
       </Text>
 
       {tip && (
         <Text
-          position={[0, -0.5625, 0.01]}
+          font={UI_FONT}
+          position={[0, 0.12, 0.01]}
           fontSize={0.1625}
-          color="#c8c8c8"
+          color="#ffd700"
           anchorX="center"
-          anchorY="middle"
+          anchorY="top"
           maxWidth={3.25}
           textAlign="center"
+          overflowWrap="break-word"
         >
-          {tip}
+          {tipPages[page]}
         </Text>
       )}
 
       <Text
-        position={[0, -1.35, 0.01]}
+        font={UI_FONT}
+        position={[0, -1.4, 0.01]}
         fontSize={0.15}
         color="#a0a0a0"
         anchorX="center"
         anchorY="middle"
       >
-        {`${page + 1} / ${pages.length}`}
+        {`${page + 1} / ${tipPages.length}`}
       </Text>
 
       {/* 底部 20% 按钮区（y ∈ [-2.5, -1.5]）：三个方形按钮均分 */}
