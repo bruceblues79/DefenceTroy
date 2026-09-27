@@ -95,6 +95,11 @@ export const DEFENDER_CATAPULT_INTERVAL = 2
 export const PROJECTILE_SPEED = 15
 export const BOULDER_SPEED = 8
 
+// 抛射物发射/命中高度：角色身高约 1.5m，取 2/3 ≈ 1.0m（胸口）。
+// Position.y 语义是脚底，所以发射点 = 发射者 y + 本值，命中点 = 目标 y + 本值。
+// 石块（boulder）是落地 AOE，不走这个高度，仍从脚底飞向地面。
+export const UNIT_SHOOT_HEIGHT = 1.0
+
 // 城墙 9 个部署点位（x 坐标）
 // 城墙宽 WALL_WIDTH，9 等分，单位站每格中心
 // 每格宽 = WALL_WIDTH / 9，中心偏移半格
@@ -227,7 +232,7 @@ export const spawnActions = createActions((world) => ({
     if (!fromPos) return null
     const sourceKind = fromEntity.get(UnitType)?.kind ?? 'unknown'
     return world.spawn(
-      Position({ x: fromPos.x, y: fromPos.y, z: fromPos.z }),
+      Position({ x: fromPos.x, y: fromPos.y + UNIT_SHOOT_HEIGHT, z: fromPos.z }),
       Velocity({ x: 0, y: 0, z: 0 }),
       Projectile({ damage, speed, sourceKind }),
       IsProjectile,

@@ -14,12 +14,13 @@ import {
   IsProjectile,
   IsBoulder,
   Position,
+  Projectile,
   Health,
 } from '../core/traits'
 import { WALL_POSITION, WALL_WIDTH } from '../core/actions'
 import CharacterProxy from './CharacterProxy'
 import CharacterModel, { CorpseModel, MODEL_YAW, type DeathInfo, type ModelKey } from './CharacterModel'
-import ArrowProxy from './ArrowProxy'
+import { ArrowProxy, SpearProxy } from './ProjectileProxy'
 import BoulderProxy from './BoulderProxy'
 import WallSlots from './WallSlots'
 import HealthBarProxy from './HealthBarProxy'
@@ -206,9 +207,11 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         />
       ))}
 
-      {/* 箭矢抛射物 */}
+      {/* 抛射物：弓兵射箭，长枪兵/破矛兵投矛 */}
       {projectiles.map((entity) => (
-        <ArrowProxy key={entityKey(entity)} entity={entity} />
+        entity.get(Projectile)?.sourceKind === 'archer'
+          ? <ArrowProxy key={entityKey(entity)} entity={entity} />
+          : <SpearProxy key={entityKey(entity)} entity={entity} />
       ))}
 
       {/* 石块抛射物 */}

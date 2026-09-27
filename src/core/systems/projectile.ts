@@ -1,6 +1,7 @@
 import type { World, Entity } from 'koota'
 import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health } from '../traits'
 import { calculateDamage } from '../combat/damage'
+import { UNIT_SHOOT_HEIGHT } from '../actions'
 
 const HIT_THRESHOLD = 0.15 // 命中判定距离（米）
 
@@ -48,9 +49,9 @@ export function updateProjectiles(world: World, _dt: number) {
       return
     }
 
-    // 单位目标：追踪飞行
+    // 单位目标：追踪飞行，命中点抬到目标胸口（Position.y 是脚底）
     const dx = targetPos.x - pos.x
-    const dy = targetPos.y - pos.y
+    const dy = targetPos.y + UNIT_SHOOT_HEIGHT - pos.y
     const dz = targetPos.z - pos.z
     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
