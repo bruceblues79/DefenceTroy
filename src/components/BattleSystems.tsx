@@ -50,8 +50,9 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     // 生成城墙
     actions.spawnWall()
 
-    // 初始守军：2 弓兵
+    // 初始守军：2 弓兵 + 1 长矛兵
     actions.spawnDefenderArcher(WALL_SLOTS[3])
+    actions.spawnDefenderSpearBreaker(WALL_SLOTS[4])
     actions.spawnDefenderArcher(WALL_SLOTS[5])
 
     // 启动轮次引擎（触发第一轮开场提示）
