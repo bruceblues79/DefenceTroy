@@ -128,9 +128,9 @@ export default function BattleFieldSpace({
   const barracksCount = barracks.bow.length + barracks.spear.length
   const promptOpen = prompt.kind !== 'none'
 
-  // 兵营单位回血：每5秒回10点，上限为该兵种 max HP；暂停/结算时停止
+  // 兵营单位回血：每5秒回10点，上限为该兵种 max HP；暂停/结算/提示阶段停止
   useFrame((_, delta) => {
-    if (paused || gameOver) return
+    if (paused || gameOver || promptOpen) return
     regenAccumRef.current += delta
     if (regenAccumRef.current < 5) return
     const ticks = Math.floor(regenAccumRef.current / 5)
