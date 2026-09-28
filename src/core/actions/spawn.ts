@@ -30,13 +30,14 @@ export const WALL_WIDTH = 4.5
 // 这是暂时性数值，等城墙攻防玩法定稿后再回填真实值 —— 不是 bug，不要顺手改小。
 export const WALL_HP = 99999
 
-// 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.6）
+// 敌方弓兵：攻击单位（range=5）+ 攻击城门（wallZ=-0.8）
+// wallZ 从 -0.6 拉远到 -0.8：给守矛兵射程腾空间，避免守矛 range 增大后够得到攻弓
 export const ENEMY_ARCHER_HP = 200
 export const ENEMY_ARCHER_SPEED = 0.6
 export const ENEMY_ARCHER_UNITS_RANGE = 5
 export const ENEMY_ARCHER_UNITS_DAMAGE = 24
 export const ENEMY_ARCHER_UNITS_INTERVAL = 1.2
-export const ENEMY_ARCHER_WALL_Z = -0.6
+export const ENEMY_ARCHER_WALL_Z = -0.8
 export const ENEMY_ARCHER_WALL_DAMAGE = 1.2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
 export const ENEMY_ARCHER_REWARD = 60
@@ -51,16 +52,18 @@ export const ENEMY_SAPPER_WALL_DAMAGE = 1
 export const ENEMY_SAPPER_WALL_INTERVAL = 1.0
 export const ENEMY_SAPPER_REWARD = 60
 
-// 敌方长枪兵：攻击单位（range=2.5）+ 攻击城门（wallZ=0.825）
+// 敌方长枪兵：攻击单位（range=3.2）+ 攻击城门（wallZ=0.5）
 // 速度 = 弓兵 2×（0.6 → 1.2）；抗弓箭（守弓打他 ×0.25，见 combat/damage.ts）
 // UNITS_INTERVAL 与守方破矛兵对齐为 1.4：对位双方攻速相同，胜负只由克制倍率决定，
 // 不被攻速差干扰。砸墙间隔（WALL_INTERVAL）不参与此对齐，保持 1.6
+// wallZ 与 range 同步拉远/增大（2026-09-28）：城墙前方原本拥挤（攻矛 z=1.325 与攻城兵 z=1.95 仅差 0.625m），
+// 拉远到 0.5 后距守军 2.95m，range 同步增到 3.2（余量 0.25m）保证能切守军目标
 export const ENEMY_PIKEMAN_HP = 200
 export const ENEMY_PIKEMAN_SPEED = 1.2
-export const ENEMY_PIKEMAN_UNITS_RANGE = 2.5
+export const ENEMY_PIKEMAN_UNITS_RANGE = 3.2
 export const ENEMY_PIKEMAN_UNITS_DAMAGE = 32
 export const ENEMY_PIKEMAN_UNITS_INTERVAL = 1.4
-export const ENEMY_PIKEMAN_WALL_Z = 0.825
+export const ENEMY_PIKEMAN_WALL_Z = 0.5
 export const ENEMY_PIKEMAN_WALL_DAMAGE = 1.6
 export const ENEMY_PIKEMAN_WALL_INTERVAL = 1.6
 export const ENEMY_PIKEMAN_REWARD = 60
@@ -75,11 +78,11 @@ export const DEFENDER_ARCHER_UNITS_DAMAGE = 24
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.2
 
 // 守军破矛兵：只攻击单位
-// 射程 3.3 = 长枪兵 2.5 + 0.8，同样只是「比对手远一点」，先手由此自然产生。
-// ⚠️ 上限被「不能碰到攻弓」卡死：攻弓纵深 3.55，所以 3.3 已经贴着上限（余量 0.25）。
-//    任何调大此值的改动都要先验算 < 3.55，否则破矛兵够得到攻弓，「专而不强」失效。
+// 射程 4.0 = 长枪兵 3.2 + 0.8，同样只是「比对手远一点」，先手由此自然产生。
+// ⚠️ 上限被「不能碰到攻弓」卡死：攻弓 wallZ=-0.8 距守矛 4.25，所以 4.0 余量 0.25。
+//    任何调大此值的改动都要先验算 < (WALL_POSITION.z - ENEMY_ARCHER_WALL_Z) = 4.25，否则破矛兵够得到攻弓，「专而不强」失效。
 export const DEFENDER_SPEAR_BREAKER_HP = 200
-export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 3.3
+export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 4.0
 export const DEFENDER_SPEAR_BREAKER_UNITS_DAMAGE = 32
 // 与长枪兵对齐为 1.4（原 1.2）：双方 DPS 基数相同，克制由倍率（受 0.25 / 出 2.0）说话。
 // 先手不受影响：0.8m 射程差 / 长枪兵速度 1.2 = 0.667s < 1.4，仍是恰好先手一枪
