@@ -173,6 +173,7 @@ export default function App() {
         />
         <directionalLight
           position={[2, 9, -3]}
+          intensity={4.5}
           castShadow
           shadow-intensity={2}
           shadow-mapSize={[1024, 1024]}
@@ -183,7 +184,7 @@ export default function App() {
           shadow-camera-near={1}
           shadow-camera-far={30}
         />
-        <Environment files={`${import.meta.env.BASE_URL}assets/hdr/battle_field.hdr`} />
+        <Environment files={`${import.meta.env.BASE_URL}assets/hdr/battle_field.hdr`} environmentIntensity={0.4} />
         {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
         {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
         {gameState === 'play' && (
