@@ -174,7 +174,7 @@ export default function App() {
         <directionalLight
           position={[2, 9, -3]}
           castShadow
-          shadow-intensity={3}
+          shadow-intensity={2}
           shadow-mapSize={[1024, 1024]}
           shadow-camera-left={-5}
           shadow-camera-right={5}
