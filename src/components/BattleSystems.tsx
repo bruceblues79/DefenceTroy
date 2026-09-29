@@ -38,7 +38,7 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
   const gameOverFiredRef = useRef(false)
   const battleReadyRef = useRef(false)
 
-  // 初始化战场：生成城墙 + 2 弓兵 + 启动轮次引擎
+  // 初始化战场：生成城墙 + 3 弓兵 + 启动轮次引擎
   useEffect(() => {
     if (initializedRef.current) return
     initializedRef.current = true
@@ -50,8 +50,9 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     // 生成城墙
     actions.spawnWall()
 
-    // 初始守军：2 弓兵
+    // 初始守军：3 弓兵（slot3-4-5 三连弓）
     actions.spawnDefenderArcher(WALL_SLOTS[3])
+    actions.spawnDefenderArcher(WALL_SLOTS[4])
     actions.spawnDefenderArcher(WALL_SLOTS[5])
 
     // 启动轮次引擎（触发第一轮开场提示）
