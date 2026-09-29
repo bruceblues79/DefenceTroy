@@ -41,20 +41,20 @@ export const ROUNDS: RoundConfig[] = [
   {
     intro: {
       title: '希腊联军登陆',
-      body: '希腊联军登陆了海岸，开始了试探性攻击。来，保卫我们的城墙！',
-      tip: '点击并拖动瞄准按钮到进攻单位，符合守军单位攻击距离会集火攻击。也可以点击并拖动城墙上的守军单位到目标，符合攻击距离的话，也会切换目标。',
+      body: '希腊联军登陆海岸，发起试探性进攻。保卫城墙！',
+      tip: '点击拖动瞄准按钮至敌方单位，在守军攻击范围内即可集火；也可拖动城墙上守军至目标，满足距离则切换攻击目标。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 5 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退了第一轮',
-      body: '城墙并没有什么实质性危险，但看起来这将是持久战！',
-      tip: '获胜奖金100g，可以拖动单位改变他们在城墙的站位，也可以拖动到彼此位置互相换位。',
+      title: '击退第一轮',
+      body: '城墙暂无重大威胁，但这场战争注定漫长！',
+      tip: '获胜奖金100g。拖动单位可调整城墙站位，也可互相交换位置。',
     },
     gold: 100,
   },
@@ -62,9 +62,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第二轮 ──
   {
     intro: {
-      title: '弓兵的侵扰',
-      body: '希腊联军开始用步兵与弓兵的混合了，优先考虑击杀弓兵！',
-      tip: '你现在有一定收入，点击购物车图标，可以点击兵种按钮雇佣更多单位，他们将出现在兵种按钮里，点击并拖动到城墙部署。',
+      title: '弓兵侵扰',
+      body: '希腊联军派出步兵与弓兵混合部队，优先击杀敌方弓兵！',
+      tip: '你已获得收入，点击购物车图标，选择兵种雇佣。雇佣单位存入兵种栏，点击拖动至城墙完成部署。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
@@ -75,9 +75,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退了第2轮',
-      body: '城墙没有太大压力，但我方部队开始损失了！',
-      tip: '获胜奖金200g，把城墙单位拖下来，可收入兵营，缓缓回血。',
+      title: '击退第2轮',
+      body: '城墙压力不大，但我方守军开始出现伤亡！',
+      tip: '获胜奖金200g。将城墙单位拖下城墙，可返回兵营缓慢恢复生命。',
     },
     gold: 200,
   },
@@ -85,9 +85,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第三轮 ──
   {
     intro: {
-      title: '长矛兵的强袭',
-      body: '希腊联军集结了快速长矛兵，他们对我方弓兵是巨大的威胁！',
-      tip: '我方的长矛盾骑士是克制他们的好单位，雇佣他们，从兵营按钮拖上城墙，替换或者站到防守单位上，被替换的目标会自动返回兵营，等待再次部署。',
+      title: '长矛兵强袭',
+      body: '希腊联军集结高速长矛兵，对我方弓兵威胁极大！',
+      tip: '破矛兵可有效克制长矛兵。雇佣后从兵营拖至城墙，可部署在原有单位位置；被替换单位自动返回兵营待命。',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
@@ -98,10 +98,34 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退了第3轮',
-      body: '城墙尚可，但我方部队已经开始遭受不同战术的挑战！',
-      tip: '获胜奖金300g，灵活的拖动单位，集火，将减轻你的压力。',
+      title: '击退第3轮',
+      body: '城墙尚且稳固，敌军已开始使用多样战术向我方施压！',
+      tip: '获胜奖金200g。灵活掌握守军轮换与位置调整，稳住防守节奏。',
     },
-    gold: 300,
+    gold: 200,
+  },
+
+  // ── 第四轮 ──
+  {
+    intro: {
+      title: '联军混合方阵进攻',
+      body: '敌军混合方阵逼近，对方已经熟悉我方防守配置。',
+      tip: '破矛兵防御出众，可短暂承受攻势。灵活轮换、移动守军，能够改变敌方攻击目标。',
+    },
+    waves: [
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+    ],
+    waveGap: WAVE_GAP,
+    ending: {
+      title: '击退第4轮',
+      body: '敌军现阶段不以破城为目标，意图持续消耗我方兵力。',
+      tip: '获胜奖金200g。熟练掌握守军轮换与位置调整，稳住防守节奏。',
+    },
+    gold: 200,
   },
 ]

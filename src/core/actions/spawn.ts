@@ -40,7 +40,7 @@ export const ENEMY_ARCHER_UNITS_INTERVAL = 1.2
 export const ENEMY_ARCHER_WALL_Z = -0.8
 export const ENEMY_ARCHER_WALL_DAMAGE = 1.2
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.2
-export const ENEMY_ARCHER_REWARD = 60
+export const ENEMY_ARCHER_REWARD = 50
 
 // 敌方攻城兵：只攻击城门（wallZ=1.95），近战
 // 定位：干扰 + 分散守军火力 + 送钱。不主动攻击守军，但会吸引守军自动索敌，
@@ -50,7 +50,7 @@ export const ENEMY_SAPPER_SPEED = 0.4
 export const ENEMY_SAPPER_WALL_Z = 1.95
 export const ENEMY_SAPPER_WALL_DAMAGE = 1
 export const ENEMY_SAPPER_WALL_INTERVAL = 1.0
-export const ENEMY_SAPPER_REWARD = 60
+export const ENEMY_SAPPER_REWARD = 50
 
 // 敌方长枪兵：攻击单位（range=3.2）+ 攻击城门（wallZ=0.5）
 // 速度 = 弓兵 2×（0.6 → 1.2）；抗弓箭（守弓打他 ×0.25，见 combat/damage.ts）
@@ -66,7 +66,7 @@ export const ENEMY_PIKEMAN_UNITS_INTERVAL = 1.4
 export const ENEMY_PIKEMAN_WALL_Z = 0.5
 export const ENEMY_PIKEMAN_WALL_DAMAGE = 1.6
 export const ENEMY_PIKEMAN_WALL_INTERVAL = 1.6
-export const ENEMY_PIKEMAN_REWARD = 60
+export const ENEMY_PIKEMAN_REWARD = 50
 
 // 守军弓兵：只攻击单位
 // 射程 5.7 = 攻弓 5.0 + 0.7。这 0.7 米是对手走到自己射程前守弓多打一箭的距离，
