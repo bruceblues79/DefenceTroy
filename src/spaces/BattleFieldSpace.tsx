@@ -26,11 +26,11 @@ const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
 // SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
 // 集火按钮图标红染以在中灰底上突出
-const BUTTON_IMAGE_COLORS = ['#4a90d9', '#4a9d8f', '#cc2222', '#ffd700', '#cc2222']
+const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#E23636']
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
-const ASSET_VERSION = 3
+const ASSET_VERSION = 4
 const BASE = import.meta.env.BASE_URL
 // 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
@@ -41,8 +41,8 @@ export const BUTTON_IMAGES = [
   `${BASE}assets/svg/icon-shop.svg?v=${ASSET_VERSION}`,
   `${BASE}assets/svg/icon-menu.svg?v=${ASSET_VERSION}`,
 ]
-// SVG 透明背景无白底，可放大到 0.85
-const BUTTON_IMAGE_SCALES = [0.85, 0.85, 0.85, 0.85, 0.85]
+// SVG 透明背景无白底；缩到 0.75 留出 padding，使按钮底色边框可见
+const BUTTON_IMAGE_SCALES = [0.75, 0.75, 0.75, 0.75, 0.75]
 
 // 拖拽示意物染色：与各兵种守军模型颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {
