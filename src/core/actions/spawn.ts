@@ -15,6 +15,7 @@ import {
   IsMelee,
   IsSpearBreaker,
   IsPikeman,
+  IsRam,
   IsProjectile,
   Targeting,
   UnitType,
@@ -67,6 +68,16 @@ export const ENEMY_PIKEMAN_WALL_Z = 0.5
 export const ENEMY_PIKEMAN_WALL_DAMAGE = 1.6
 export const ENEMY_PIKEMAN_WALL_INTERVAL = 1.6
 export const ENEMY_PIKEMAN_REWARD = 50
+
+// 敌方攻城车：厚血 + 极慢 + 百分比砸墙。3× 标准血，2× 奖励，速度仅 sapper 一半
+// wallZ 1.75 < sapper 1.95：略远离城墙正面，给玩家反应时间
+// wallDamage 5% × 间隔 3s = 20 击 / 60 秒破墙（墙 HP 99999 时每击 ~5000）
+export const ENEMY_RAM_HP = 1200
+export const ENEMY_RAM_SPEED = 0.2
+export const ENEMY_RAM_WALL_Z = 1.75
+export const ENEMY_RAM_WALL_DAMAGE = 5
+export const ENEMY_RAM_WALL_INTERVAL = 3
+export const ENEMY_RAM_REWARD = 100
 
 // 守军弓兵：只攻击单位
 // 射程 5.7 = 攻弓 5.0 + 0.7。这 0.7 米是对手走到自己射程前守弓多打一箭的距离，
@@ -182,6 +193,26 @@ export const spawnActions = createActions((world) => ({
       UnitType({ kind: 'pikeman' }),
       IsEnemy,
       IsPikeman,
+    )
+  },
+
+  /** 生成敌方攻城车：只攻击城门（近战百分比）。厚血慢速，需集火 */
+  spawnEnemyRam(x: number, z: number = ENEMY_SPAWN_Z) {
+    return world.spawn(
+      Position({ x, y: 0, z }),
+      Velocity({ x: 0, y: 0, z: 0 }),
+      Health({ current: ENEMY_RAM_HP, max: ENEMY_RAM_HP }),
+      Attack(),
+      CanAttackWall({
+        wallZ: ENEMY_RAM_WALL_Z,
+        damage: ENEMY_RAM_WALL_DAMAGE,
+        interval: ENEMY_RAM_WALL_INTERVAL,
+        isPercent: true,
+      }),
+      Reward({ value: ENEMY_RAM_REWARD }),
+      UnitType({ kind: 'ram' }),
+      IsEnemy,
+      IsRam,
     )
   },
 

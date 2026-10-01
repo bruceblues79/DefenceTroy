@@ -5,6 +5,7 @@
 export { updateMovement } from './movement'
 export { updateEnemyArcherAI } from './enemy-archer-ai'
 export { updateEnemySapperAI } from './enemy-sapper-ai'
+export { updateEnemyRamAI } from './enemy-ram-ai'
 export { updateEnemyPikemanAI } from './enemy-pikeman-ai'
 export { updateDefenderArcherAI } from './defender-archer-ai'
 export { updateDefenderSpearBreakerAI } from './defender-spear-breaker-ai'

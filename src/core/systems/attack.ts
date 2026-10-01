@@ -1,5 +1,5 @@
 import type { World } from 'koota'
-import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, UnitType } from '../traits'
+import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, IsRam, UnitType } from '../traits'
 import { spawnActions } from '../actions'
 import { calculateDamage } from '../combat/damage'
 
@@ -43,7 +43,9 @@ export function updateAttack(world: World, dt: number) {
           abortAttack(attack)
           return
         }
-        damage = wallAtk.damage
+        damage = wallAtk.isPercent
+          ? target.get(Health)!.max * (wallAtk.damage / 100)
+          : wallAtk.damage
       } else {
         const unitsAtk = attacker.get(CanAttackUnits)
         if (!unitsAtk) {
@@ -53,7 +55,7 @@ export function updateAttack(world: World, dt: number) {
         damage = unitsAtk.damage
       }
 
-      if (attacker.has(IsMelee)) {
+      if (attacker.has(IsMelee) || attacker.has(IsRam)) {
         // 近战：直接扣血（无抛射物飞行）
         const targetHealth = target.get(Health)
         if (targetHealth) {

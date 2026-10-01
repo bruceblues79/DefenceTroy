@@ -2,8 +2,8 @@
 // 所有发兵相关参数集中于此，不得散落在发兵逻辑中。
 // 追加轮次只需向 ROUNDS 数组末尾追加，胜利结算自动移动到最后一个已配置轮次之后。
 
-// sapper 攻城兵（干扰/送钱） / archer 弓兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭）
-export type EnemyType = 'sapper' | 'archer' | 'pikeman'
+// sapper 攻城兵（干扰/送钱） / archer 弩兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭） / ram 攻城车（厚血百分比砸墙）
+export type EnemyType = 'sapper' | 'archer' | 'pikeman' | 'ram'
 
 export interface WaveEnemy {
   type: EnemyType
@@ -125,6 +125,30 @@ export const ROUNDS: RoundConfig[] = [
       title: '击退第4轮',
       body: '敌军现阶段不以破城为目标，意图持续消耗我方兵力。',
       tip: '获胜奖金200g。熟练掌握守军轮换与位置调整，稳住防守节奏。',
+    },
+    gold: 200,
+  },
+
+  // ── 第五轮 ──
+  {
+    intro: {
+      title: '攻城车阴影',
+      body: '在混合方阵中，攻城车非常结实，会对城墙造成极大威胁。',
+      tip: '用矛兵集火攻城车，造成最大伤害。弓兵对攻城车伤害减半。灵活地更换守军位置，优先击破攻城车。',
+    },
+    waves: [
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+    ],
+    waveGap: WAVE_GAP,
+    ending: {
+      title: '击退第5轮',
+      body: '敌军对我方展开了立体攻势。',
+      tip: '获胜奖金200g。灵活地切换目标与我方单位。',
     },
     gold: 200,
   },
