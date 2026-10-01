@@ -8,6 +8,7 @@
 - 场景工具：@react-three/drei。优先复用 Text、Billboard、OrthographicCamera 等封装，不重复造轮子。
 - ECS：koota。实体/特征/系统模式，目录遵循 `core/`(traits/systems/actions) + `spaces/`。
 - 构建：Vite + TypeScript，单端口静态站点。
+- 音效：Node.js 纯 JS 生成 WAV（scripts/），Web Audio API 播放，不引 Python/Howler。
 
 ## 编码前先思考
 **不要假设,不要掩盖困惑,要明确权衡。**
