@@ -1,7 +1,8 @@
 import { useQuery, useQueryFirst } from 'koota/react'
 import { useCallback, useRef, useState } from 'react'
+import { useFrame, type ThreeEvent } from '@react-three/fiber'
+import * as THREE from 'three'
 import type { Entity } from 'koota'
-import { type ThreeEvent } from '@react-three/fiber'
 import {
   IsEnemy,
   IsDefender,
@@ -9,6 +10,7 @@ import {
   IsMelee,
   IsSpearBreaker,
   IsPikeman,
+  IsRam,
   IsWall,
   IsProjectile,
   Position,
@@ -21,6 +23,7 @@ import { ArrowProxy, SpearProxy } from './ProjectileProxy'
 import WallSlots from './WallSlots'
 import HealthBarProxy from './HealthBarProxy'
 import EffectProxy from './EffectProxy'
+import RamProxy from './RamProxy'
 
 /**
  * React key 必须带上世代：koota 会回收实体 id（同 id 不同 generation 是两个不同实体）。
@@ -64,6 +67,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
   const enemySappers = useQuery(IsEnemy, IsMelee, Position)
   // 敌人长枪兵
   const enemyPikeman = useQuery(IsEnemy, IsPikeman, Position)
+  // 敌人攻城车
+  const enemyRams = useQuery(IsEnemy, IsRam, Position)
   // 守军弓手
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
   // 守军破矛兵
@@ -142,6 +147,15 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
         </group>
       ))}
 
+      {/* 敌人攻城车 */}
+      {enemyRams.map((entity) => (
+        <RamUnitView
+          key={entityKey(entity)}
+          entity={entity}
+          onPointerUp={onEnemyPointerUp?.(entity)}
+        />
+      ))}
+
       {/* 守军弓手 */}
       {defenderArchers.map((entity) => (
         <group key={entityKey(entity)}>
@@ -190,6 +204,28 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 视觉效果（AOE 命中圆片等） */}
       <EffectProxy />
+    </group>
+  )
+}
+
+/** 攻城车视图：跟随 Position，渲染 RamProxy + 血条 + 隐形命中盒 */
+function RamUnitView({ entity, onPointerUp }: { entity: Entity; onPointerUp?: (e: ThreeEvent<PointerEvent>) => void }) {
+  const groupRef = useRef<THREE.Group>(null!)
+  useFrame(() => {
+    const g = groupRef.current
+    if (!g) return
+    const pos = entity.get(Position)
+    if (pos) g.position.set(pos.x, pos.y, pos.z)
+  })
+  const initialPos = entity.get(Position)
+  return (
+    <group ref={groupRef} position={initialPos ? [initialPos.x, initialPos.y, initialPos.z] : [0, 0, 0]}>
+      <RamProxy position={[0, 0, 0]} />
+      <HealthBarProxy entity={entity} offset={[0, 1.0, 0]} width={0.5} />
+      <mesh position={[0, 0.35, 0]} onPointerUp={onPointerUp}>
+        <boxGeometry args={[0.6, 0.7, 1.0]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
     </group>
   )
 }

@@ -10,7 +10,6 @@ import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import GroundModel from '../components/GroundModel'
 import DragUnitProxy from '../components/DragUnitProxy'
-import RamProxy from '../components/RamProxy'
 import RoundedShapeButton from '../components/RoundedShapeButton'
 import RoundPromptPanel from '../components/RoundPromptPanel'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP } from '../core/actions'
@@ -331,9 +330,6 @@ export default function BattleFieldSpace({
 
       {/* ground: GLB 模型 15×15 手绘沙地平面，中心 (0,0,0)，远大于可视区 */}
       <GroundModel />
-
-      {/* 攻城车形象占位：纯几何体，位于战场中央 [0,0,0]，仅做视觉验收 */}
-      <RamProxy position={[0, 0, 0]} />
 
       {/* 拖拽兜底区：覆盖战场下方大范围，松开在空地/单位/ground 时清空 dragState
           WallSlot 与按钮行 onPointerUp 都 stopPropagation，不会冒泡到这里；

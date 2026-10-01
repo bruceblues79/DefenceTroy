@@ -30,13 +30,15 @@ export const CanAttackUnits = trait({
 /**
  * 攻击城门的能力参数
  * wallZ: 攻城 z 位置，pos.z >= wallZ 时停止并攻击城墙
- * damage: 每次伤害
+ * damage: 每次伤害（isPercent 为 true 时为百分比 0-100，按 target.max 计算）
  * interval: 完整攻击周期（秒）
+ * isPercent: true 时 damage 按目标 maxHP 百分比结算（用于攻城车）
  */
 export const CanAttackWall = trait({
   wallZ: 1.95,
   damage: 8,
   interval: 1.2,
+  isPercent: false,
 })
 
 /**

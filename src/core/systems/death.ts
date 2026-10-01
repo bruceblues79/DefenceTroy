@@ -1,5 +1,5 @@
 import type { World, Entity } from 'koota'
-import { Health, Targeting, IsWall, IsDefender } from '../traits'
+import { Health, Targeting, IsWall, IsDefender, IsRam } from '../traits'
 
 /**
  * 死亡事件队列（渲染层消费）
@@ -51,8 +51,8 @@ export function updateDeath(world: World, _dt: number) {
   }
 
   for (const entity of dying) {
-    // 城墙没有角色模型，不进死亡队列
-    if (!entity.has(IsWall)) deathQueue.add(entity.id())
+    // 城墙与攻城车没有角色模型，不进死亡队列
+    if (!entity.has(IsWall) && !entity.has(IsRam)) deathQueue.add(entity.id())
     entity.destroy()
   }
 }

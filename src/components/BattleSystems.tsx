@@ -5,6 +5,7 @@ import {
   updateMovement,
   updateEnemyArcherAI,
   updateEnemySapperAI,
+  updateEnemyRamAI,
   updateEnemyPikemanAI,
   updateDefenderArcherAI,
   updateDefenderSpearBreakerAI,
@@ -84,6 +85,7 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     // 系统执行顺序：AI → 攻击 → 移动 → 抛射物 → 死亡
     updateEnemyArcherAI(world, dt)
     updateEnemySapperAI(world, dt)
+    updateEnemyRamAI(world, dt)
     updateEnemyPikemanAI(world, dt)
     updateDefenderArcherAI(world, dt)
     updateDefenderSpearBreakerAI(world, dt)
