@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && node scripts/deploy.mjs"
+    "deploy": "npm run build && node scripts/deploy.mjs",
+    "gen-audio": "node scripts/gen-bow-sound.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",

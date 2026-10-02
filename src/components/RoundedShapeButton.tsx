@@ -2,6 +2,7 @@ import { type ThreeEvent } from '@react-three/fiber'
 import { Text, useTexture } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 import { UI_FONT } from '../core/font'
+import { playClick, unlockAudio } from '../core/audio'
 
 interface RoundedShapeButtonProps {
   // ── 几何/外观(透传给 RoundShapePlane) ──
@@ -88,13 +89,22 @@ export default function RoundedShapeButton({
   ...planeProps
 }: RoundedShapeButtonProps) {
   const bgRenderOrder = planeProps.renderOrder ?? 0
+  // pointerdown 时提前解锁 AudioContext，给 resume 留足时间，避免 click 播放延迟
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    unlockAudio()
+    onPointerDown?.(e)
+  }
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    playClick()
+    onClick?.(e)
+  }
   return (
     <RoundShapePlane
       width={width}
       height={height}
       {...planeProps}
-      onClick={onClick}
-      onPointerDown={onPointerDown}
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
       onPointerUp={onPointerUp}
     >
       {image && (
