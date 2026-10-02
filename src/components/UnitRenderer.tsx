@@ -210,22 +210,25 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
 /** 攻城车视图：跟随 Position，渲染 RamProxy + 血条 + 隐形命中盒 */
 function RamUnitView({ entity, onPointerUp }: { entity: Entity; onPointerUp?: (e: ThreeEvent<PointerEvent>) => void }) {
-  const groupRef = useRef<THREE.Group>(null!)
+  const innerRef = useRef<THREE.Group>(null!)
   useFrame(() => {
-    const g = groupRef.current
+    const g = innerRef.current
     if (!g) return
     const pos = entity.get(Position)
     if (pos) g.position.set(pos.x, pos.y, pos.z)
   })
   const initialPos = entity.get(Position)
   return (
-    <group ref={groupRef} position={initialPos ? [initialPos.x, initialPos.y, initialPos.z] : [0, 0, 0]}>
-      <RamProxy position={[0, 0, 0]} />
+    <group>
+      {/* 内层跟随 entity.Position；外层不移动，使 HealthBarProxy 自身的 Position 定位不被叠加 */}
+      <group ref={innerRef} position={initialPos ? [initialPos.x, initialPos.y, initialPos.z] : [0, 0, 0]}>
+        <RamProxy position={[0, 0, 0]} />
+        <mesh position={[0, 0.35, 0]} onPointerUp={onPointerUp}>
+          <boxGeometry args={[0.6, 0.7, 1.0]} />
+          <meshBasicMaterial visible={false} />
+        </mesh>
+      </group>
       <HealthBarProxy entity={entity} offset={[0, 1.0, 0]} width={0.5} />
-      <mesh position={[0, 0.35, 0]} onPointerUp={onPointerUp}>
-        <boxGeometry args={[0.6, 0.7, 1.0]} />
-        <meshBasicMaterial visible={false} />
-      </mesh>
     </group>
   )
 }
