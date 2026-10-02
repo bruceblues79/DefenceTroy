@@ -377,6 +377,8 @@ export default function BattleFieldSpace({
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
+          // 兵营按钮(bow/spear)和集火按钮(focus)是拖拽操作,不需要点击音效
+          const btnSoundEnabled = name !== 'btn_bow' && name !== 'btn_spear' && name !== 'btn_focus'
           return (
             <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.5]}>
               <RoundedShapeButton
@@ -389,6 +391,7 @@ export default function BattleFieldSpace({
                 image={BUTTON_IMAGES[i]}
                 imageScale={BUTTON_IMAGE_SCALES[i]}
                 imageColor={BUTTON_IMAGE_COLORS[i]}
+                soundEnabled={btnSoundEnabled}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)

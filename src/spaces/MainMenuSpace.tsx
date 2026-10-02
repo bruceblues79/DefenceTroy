@@ -18,7 +18,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
           width={2.5}
           height={1}
           cornerRadius={0.1}
-          color="#dc2626"
+          color="#FFE066"
           onClick={(e) => {
             e.stopPropagation()
             window.location.href = 'https://svalbardpost.xyz/'
@@ -34,7 +34,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
           width={2.5}
           height={1}
           cornerRadius={0.1}
-          color="#2563eb"
+          color="#FFE066"
           onClick={(e) => {
             e.stopPropagation()
             onStart()
