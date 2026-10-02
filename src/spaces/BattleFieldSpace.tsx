@@ -26,7 +26,7 @@ const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
 // SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
 // 集火按钮图标红染以在中灰底上突出
-const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#E23636']
+const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#FFE066']
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
