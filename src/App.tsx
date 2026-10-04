@@ -186,7 +186,7 @@ export default function App() {
     <WorldProvider world={world}>
       <FullscreenPrompt />
       <LandscapePrompt />
-      <Canvas dpr={[1, 2]} shadows>
+      <Canvas dpr={[1, 2]} shadows gl={{ localClippingEnabled: true }}>
         <color attach="background" args={['#888888']} />
         <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
         <AudioAnchor />
