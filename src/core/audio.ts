@@ -27,9 +27,9 @@ interface SoundConfig {
 const SOUNDS: Record<SoundId, SoundConfig> = {
   bow: { url: `${BASE}assets/audio/bow-release.wav?v=5`, pool: 6 },
   spear: { url: `${BASE}assets/audio/spear-release.wav?v=5`, pool: 6 },
-  enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=5`, pool: 4 },
+  enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=5`, pool: 4, volume: 0.3 },
   enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=5`, pool: 4, volume: 0.5 },
-  defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=5`, pool: 4 },
+  defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=5`, pool: 4, volume: 0.3 },
   defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=5`, pool: 4, volume: 0.5 },
   wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=5`, pool: 4 },
 }
