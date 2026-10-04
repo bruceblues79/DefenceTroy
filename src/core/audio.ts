@@ -20,16 +20,17 @@ const BASE = import.meta.env.BASE_URL
 interface SoundConfig {
   url: string
   pool: number
+  volume?: number
 }
 
-/** 音效注册表：url + 池大小（同音效最大并发实例数） */
+/** 音效注册表：url + 池大小 + 音量（缺省 1.0） */
 const SOUNDS: Record<SoundId, SoundConfig> = {
   bow: { url: `${BASE}assets/audio/bow-release.wav?v=4`, pool: 6 },
   spear: { url: `${BASE}assets/audio/spear-release.wav?v=4`, pool: 6 },
   enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=4`, pool: 4 },
-  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=4`, pool: 4 },
+  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=4`, pool: 4, volume: 0.5 },
   defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=4`, pool: 4 },
-  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=4`, pool: 4 },
+  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=4`, pool: 4, volume: 0.5 },
   wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=4`, pool: 4 },
 }
 
@@ -45,8 +46,12 @@ export function preloadAudio(): void {
   const loader = new THREE.AudioLoader()
 
   for (const id of Object.keys(SOUNDS) as SoundId[]) {
-    const { url, pool } = SOUNDS[id]
-    pools[id] = Array.from({ length: pool }, () => new THREE.Audio(listener!))
+    const { url, pool, volume = 1 } = SOUNDS[id]
+    pools[id] = Array.from({ length: pool }, () => {
+      const s = new THREE.Audio(listener!)
+      s.setVolume(volume)
+      return s
+    })
     loader.load(
       url,
       (buffer) => {
