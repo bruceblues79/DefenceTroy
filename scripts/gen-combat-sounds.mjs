@@ -129,23 +129,26 @@ function genSpearRelease() {
   return normalizeAndFade(samples)
 }
 
-// ── 2. 敌方受击闷哼 ───────────────────────────────────
-function genEnemyHurt() {
-  const DURATION = 0.15
+// ── 2. 统一受击闷哼（敌我共用） ─────────────────────
+function genHurt() {
+  const DURATION = 0.08
   const N = Math.floor(SAMPLE_RATE * DURATION)
   const samples = new Float64Array(N)
-  const bp = makeBandpass(600, 3)
+  const bp = makeBandpass(400, 3)
+  const lp = makeLowpass(700)
 
   for (let i = 0; i < N; i++) {
     const t = i / SAMPLE_RATE
-    // 150Hz 基频 + 快速衰减（闷哼主体）
-    const env = Math.exp(-t / 0.06)
-    const vocal = Math.sin(2 * Math.PI * 150 * t) * env * 0.5
-    // 带通噪声（喉音质感）
+    // 100Hz 基频 + 极快衰减（沉闷短促）
+    const env = Math.exp(-t / 0.03)
+    const vocal = Math.sin(2 * Math.PI * 100 * t) * env * 0.5
+    // 带通噪声（喉音质感，中心 400Hz 更暗）
     const noise = bp(Math.random() * 2 - 1) * env * 0.3
     samples[i] = vocal + noise
   }
-  return normalizeAndFade(samples, 1, 10)
+  // 低通压制高频，更沉闷
+  for (let i = 0; i < N; i++) samples[i] = lp(samples[i])
+  return normalizeAndFade(samples, 1, 5)
 }
 
 // ── 3. 敌方死亡嚎叫（ahhaaa 人声风） ──────────────────
@@ -177,23 +180,6 @@ function genEnemyDeath() {
   // 整体低通压暗
   for (let i = 0; i < N; i++) samples[i] = lp(samples[i])
   return normalizeAndFade(samples)
-}
-
-// ── 4. 守军受击哼叫 ───────────────────────────────────
-function genDefenderHurt() {
-  const DURATION = 0.15
-  const N = Math.floor(SAMPLE_RATE * DURATION)
-  const samples = new Float64Array(N)
-  const bp = makeBandpass(800, 3)
-
-  for (let i = 0; i < N; i++) {
-    const t = i / SAMPLE_RATE
-    const env = Math.exp(-t / 0.05)
-    const vocal = Math.sin(2 * Math.PI * 250 * t) * env * 0.5
-    const noise = bp(Math.random() * 2 - 1) * env * 0.25
-    samples[i] = vocal + noise
-  }
-  return normalizeAndFade(samples, 1, 10)
 }
 
 // ── 5. 守军死亡嚎叫（ahhaaa 人声风，比敌方亮但仍压暗） ─
@@ -245,9 +231,8 @@ function genWallHit() {
 const outDir = 'public/assets/audio'
 const sounds = [
   ['spear-release.wav', genSpearRelease],
-  ['enemy-hurt.wav', genEnemyHurt],
+  ['hurt.wav', genHurt],
   ['enemy-death.wav', genEnemyDeath],
-  ['defender-hurt.wav', genDefenderHurt],
   ['defender-death.wav', genDefenderDeath],
   ['wall-hit.wav', genWallHit],
 ]

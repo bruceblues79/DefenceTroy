@@ -9,11 +9,11 @@ import * as THREE from 'three'
 export type SoundId =
   | 'bow'
   | 'spear'
-  | 'enemyHurt'
+  | 'hurt'
   | 'enemyDeath'
-  | 'defenderHurt'
   | 'defenderDeath'
   | 'wallHit'
+  | 'button'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -25,13 +25,13 @@ interface SoundConfig {
 
 /** 音效注册表：url + 池大小 + 音量（缺省 1.0） */
 const SOUNDS: Record<SoundId, SoundConfig> = {
-  bow: { url: `${BASE}assets/audio/bow-release.wav?v=5`, pool: 6 },
-  spear: { url: `${BASE}assets/audio/spear-release.wav?v=5`, pool: 6 },
-  enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=5`, pool: 4, volume: 0.3 },
-  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=5`, pool: 4, volume: 0.5 },
-  defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=5`, pool: 4, volume: 0.3 },
-  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=5`, pool: 4, volume: 0.5 },
-  wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=5`, pool: 4 },
+  bow: { url: `${BASE}assets/audio/bow-release.wav?v=6`, pool: 6 },
+  spear: { url: `${BASE}assets/audio/spear-release.wav?v=6`, pool: 6 },
+  hurt: { url: `${BASE}assets/audio/hurt.wav?v=6`, pool: 4, volume: 0.3 },
+  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=6`, pool: 4, volume: 0.5 },
+  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=6`, pool: 4, volume: 0.5 },
+  wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=6`, pool: 4 },
+  button: { url: `${BASE}assets/audio/button-click.wav?v=6`, pool: 2 },
 }
 
 let listener: THREE.AudioListener | null = null
@@ -97,7 +97,7 @@ export function playSound(id: SoundId): void {
   sound.play()
 }
 
-/** 播放按钮点击音效（复用 bow 音） */
+/** 播放按钮点击音效（传统 UI click） */
 export function playClick(): void {
-  playSound('bow')
+  playSound('button')
 }

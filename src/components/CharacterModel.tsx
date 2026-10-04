@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import type { Entity } from 'koota'
-import { Attack, Health, Position, Velocity, Targeting, IsWall, IsEnemy } from '../core/traits'
+import { Attack, Health, Position, Velocity, Targeting, IsWall } from '../core/traits'
 import { deathQueue } from '../core/systems/death'
 import { playSound } from '../core/audio'
 
@@ -264,7 +264,7 @@ export default function CharacterModel({
       const inProtect = s.state === 'atk' && t < s.protectUntil
       if (!inProtect) {
         playClip('hurt')
-        playSound(entity.has(IsEnemy) ? 'enemyHurt' : 'defenderHurt')
+        playSound('hurt')
         s.state = 'hurt'
         s.endsAt = t + HURT_DURATION
         s.protectUntil = 0
