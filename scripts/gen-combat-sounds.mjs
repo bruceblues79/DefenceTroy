@@ -148,26 +148,34 @@ function genEnemyHurt() {
   return normalizeAndFade(samples, 1, 10)
 }
 
-// ── 3. 敌方死亡嚎叫 ───────────────────────────────────
+// ── 3. 敌方死亡嚎叫（ahhaaa 人声风） ──────────────────
+// 锯齿波（声带）→ 双谐振峰带通（模拟 "ah" 元音音色）→ 低通压暗
 function genEnemyDeath() {
   const DURATION = 0.5
   const N = Math.floor(SAMPLE_RATE * DURATION)
   const samples = new Float64Array(N)
-  const bp = makeBandpass(400, 2.5)
+
+  // 双谐振峰：F1（口腔）~ 600Hz，F2（咽腔）~ 950Hz —— 偏低，音色暗淡
+  const f1 = makeBandpass(600, 6)
+  const f2 = makeBandpass(950, 5)
+  const lp = makeLowpass(1600) // 压暗高频，去掉尖锐气声
 
   for (let i = 0; i < N; i++) {
     const t = i / SAMPLE_RATE
-    // 下行锯齿：300Hz → 80Hz
-    const freq = 300 - (300 - 80) * (t / DURATION)
+    // 下行基频：280Hz → 70Hz（ah-haa 的下滑哀嚎）
+    const freq = 280 - (280 - 70) * (t / DURATION)
     const phase = 2 * Math.PI * freq * t
-    // 锯齿波（vocal cord 近似）
-    const saw = ((phase % (2 * Math.PI)) / Math.PI - 1)
-    const env = Math.exp(-t / 0.35)
-    const vocal = saw * env * 0.4
-    // 带通噪声（气声）
-    const breath = bp(Math.random() * 2 - 1) * env * 0.2
-    samples[i] = vocal + breath
+    // 锯齿波（声带振动近似）
+    const saw = ((phase % (2 * Math.PI)) / Math.PI - 1) * 0.5
+    // 双 formant 串联 → "ah" 元音音色
+    const formant = f2(f1(saw))
+    // 慢速衰减包络
+    const env = Math.exp(-t / 0.4)
+    samples[i] = formant * env * 1.2
   }
+
+  // 整体低通压暗
+  for (let i = 0; i < N; i++) samples[i] = lp(samples[i])
   return normalizeAndFade(samples)
 }
 
@@ -188,23 +196,28 @@ function genDefenderHurt() {
   return normalizeAndFade(samples, 1, 10)
 }
 
-// ── 5. 守军死亡嚎叫 ───────────────────────────────────
+// ── 5. 守军死亡嚎叫（ahhaaa 人声风，比敌方亮但仍压暗） ─
 function genDefenderDeath() {
   const DURATION = 0.45
   const N = Math.floor(SAMPLE_RATE * DURATION)
   const samples = new Float64Array(N)
-  const bp = makeBandpass(600, 2.5)
+
+  // 比敌方略高：F1 ~ 700Hz，F2 ~ 1100Hz
+  const f1 = makeBandpass(700, 6)
+  const f2 = makeBandpass(1100, 5)
+  const lp = makeLowpass(1800)
 
   for (let i = 0; i < N; i++) {
     const t = i / SAMPLE_RATE
-    const freq = 450 - (450 - 120) * (t / DURATION)
+    const freq = 420 - (420 - 110) * (t / DURATION)
     const phase = 2 * Math.PI * freq * t
-    const saw = ((phase % (2 * Math.PI)) / Math.PI - 1)
-    const env = Math.exp(-t / 0.3)
-    const vocal = saw * env * 0.4
-    const breath = bp(Math.random() * 2 - 1) * env * 0.18
-    samples[i] = vocal + breath
+    const saw = ((phase % (2 * Math.PI)) / Math.PI - 1) * 0.5
+    const formant = f2(f1(saw))
+    const env = Math.exp(-t / 0.35)
+    samples[i] = formant * env * 1.2
   }
+
+  for (let i = 0; i < N; i++) samples[i] = lp(samples[i])
   return normalizeAndFade(samples)
 }
 

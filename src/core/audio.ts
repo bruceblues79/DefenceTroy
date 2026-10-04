@@ -25,13 +25,13 @@ interface SoundConfig {
 
 /** 音效注册表：url + 池大小 + 音量（缺省 1.0） */
 const SOUNDS: Record<SoundId, SoundConfig> = {
-  bow: { url: `${BASE}assets/audio/bow-release.wav?v=4`, pool: 6 },
-  spear: { url: `${BASE}assets/audio/spear-release.wav?v=4`, pool: 6 },
-  enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=4`, pool: 4 },
-  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=4`, pool: 4, volume: 0.5 },
-  defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=4`, pool: 4 },
-  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=4`, pool: 4, volume: 0.5 },
-  wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=4`, pool: 4 },
+  bow: { url: `${BASE}assets/audio/bow-release.wav?v=5`, pool: 6 },
+  spear: { url: `${BASE}assets/audio/spear-release.wav?v=5`, pool: 6 },
+  enemyHurt: { url: `${BASE}assets/audio/enemy-hurt.wav?v=5`, pool: 4 },
+  enemyDeath: { url: `${BASE}assets/audio/enemy-death.wav?v=5`, pool: 4, volume: 0.5 },
+  defenderHurt: { url: `${BASE}assets/audio/defender-hurt.wav?v=5`, pool: 4 },
+  defenderDeath: { url: `${BASE}assets/audio/defender-death.wav?v=5`, pool: 4, volume: 0.5 },
+  wallHit: { url: `${BASE}assets/audio/wall-hit.wav?v=5`, pool: 4 },
 }
 
 let listener: THREE.AudioListener | null = null
