@@ -1,4 +1,5 @@
 import { Button } from '@react-three/uikit-default'
+import { Text } from '@react-three/uikit'
 
 /**
  * 主菜单
@@ -25,7 +26,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             window.location.href = 'https://svalbardpost.xyz/'
           }}
         >
-          quit
+          <Text color="#ffffff" fontSize={30}>quit</Text>
         </Button>
       </group>
 
@@ -44,7 +45,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             onStart()
           }}
         >
-          play
+          <Text color="#ffffff" fontSize={30}>play</Text>
         </Button>
       </group>
     </group>
