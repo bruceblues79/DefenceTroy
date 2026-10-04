@@ -16,7 +16,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
           sizeX={2.5}
           sizeY={1}
           backgroundColor="#dc2626"
-          borderRadius={0.1}
+          borderRadius={10}
           alignItems="center"
           justifyContent="center"
           onClick={(e) => {
@@ -24,7 +24,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             window.location.href = 'https://svalbardpost.xyz/'
           }}
         >
-          <Text color="#ffffff" fontSize={15}>quit</Text>
+          <Text color="#ffffff" fontSize={30}>quit</Text>
         </Root>
       </group>
 
@@ -34,7 +34,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
           sizeX={2.5}
           sizeY={1}
           backgroundColor="#2563eb"
-          borderRadius={0.1}
+          borderRadius={10}
           alignItems="center"
           justifyContent="center"
           onClick={(e) => {
@@ -42,7 +42,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
             onStart()
           }}
         >
-          <Text color="#ffffff" fontSize={15}>play</Text>
+          <Text color="#ffffff" fontSize={30}>play</Text>
         </Root>
       </group>
     </group>
