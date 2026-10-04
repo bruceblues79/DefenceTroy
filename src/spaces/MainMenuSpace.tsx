@@ -13,8 +13,8 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
       {/* quit 按钮（红） — 返回主站，上方 */}
       <group position={[0, 2, 2.75]} rotation={[-Math.PI / 2, 0, 0]}>
         <Button
-          sizeX={2.5}
-          sizeY={1}
+          width={250}
+          height={100}
           backgroundColor="#dc2626"
           color="#ffffff"
           fontSize={30}
@@ -32,8 +32,8 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
       {/* play 按钮（蓝），下方 */}
       <group position={[0, 2, 1.25]} rotation={[-Math.PI / 2, 0, 0]}>
         <Button
-          sizeX={2.5}
-          sizeY={1}
+          width={250}
+          height={100}
           backgroundColor="#2563eb"
           color="#ffffff"
           fontSize={30}
