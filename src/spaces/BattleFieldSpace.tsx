@@ -17,6 +17,7 @@ import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Target
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 import { UI_FONT } from '../core/font'
+import { playClick } from '../core/audio'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
@@ -405,6 +406,7 @@ export default function BattleFieldSpace({
                     : name === 'btn_menu' && !paused
                     ? (e: ThreeEvent<PointerEvent>) => {
                         e.stopPropagation()
+                        playClick()
                         setShopOpen(false)
                         onPause()
                       }
