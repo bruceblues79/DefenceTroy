@@ -2,6 +2,7 @@ import type { World, Entity } from 'koota'
 import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health } from '../traits'
 import { calculateDamage } from '../combat/damage'
 import { UNIT_SHOOT_HEIGHT } from '../actions'
+import { playSound } from '../audio'
 
 const HIT_THRESHOLD = 0.15 // 命中判定距离（米）
 
@@ -39,6 +40,7 @@ export function updateProjectiles(world: World, _dt: number) {
         if (targetHealth) {
           const finalDamage = calculateDamage(proj.sourceKind, target, proj.damage)
           target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
+          playSound('wallHit')
         }
         toDestroy.push(projectile)
         return

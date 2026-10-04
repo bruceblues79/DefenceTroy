@@ -3,6 +3,7 @@ import { Environment, OrbitControls, OrthographicCamera } from '@react-three/dre
 import { WorldProvider } from 'koota/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { world } from './core/world'
+import { preloadAudio } from './core/audio'
 import MainMenuSpace from './spaces/MainMenuSpace'
 import LoadingSpace from './spaces/LoadingSpace'
 import BattleFieldSpace from './spaces/BattleFieldSpace'
@@ -148,6 +149,11 @@ export default function App() {
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
   }, [gameState])
+
+  // 启动时预加载按钮音效，确保首次点击零延迟
+  useEffect(() => {
+    preloadAudio()
+  }, [])
 
   return (
     <WorldProvider world={world}>

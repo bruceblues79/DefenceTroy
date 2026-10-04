@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import type { Entity } from 'koota'
-import { Attack, Health, Position, Velocity, Targeting, IsWall } from '../core/traits'
+import { Attack, Health, Position, Velocity, Targeting, IsWall, IsEnemy } from '../core/traits'
 import { deathQueue } from '../core/systems/death'
+import { playSound } from '../core/audio'
 
 /**
  * 计算单位当前应朝向的 yaw（绕 Y 轴）：
@@ -166,6 +167,7 @@ export default function CharacterModel({
   useEffect(
     () => () => {
       if (deathQueue.delete(entity.id())) {
+        playSound(modelKey.startsWith('enemy') ? 'enemyDeath' : 'defenderDeath')
         onDeathRef.current?.({ modelKey, position: st.current.lastPos, yaw: st.current.lastYaw })
       }
     },
@@ -262,6 +264,7 @@ export default function CharacterModel({
       const inProtect = s.state === 'atk' && t < s.protectUntil
       if (!inProtect) {
         playClip('hurt')
+        playSound(entity.has(IsEnemy) ? 'enemyHurt' : 'defenderHurt')
         s.state = 'hurt'
         s.endsAt = t + HURT_DURATION
         s.protectUntil = 0
