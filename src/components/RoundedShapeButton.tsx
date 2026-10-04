@@ -2,7 +2,6 @@ import { type ThreeEvent } from '@react-three/fiber'
 import { Text, useTexture } from '@react-three/drei'
 import RoundShapePlane from './RoundShapePlane'
 import { UI_FONT } from '../core/font'
-import { playClick, unlockAudio } from '../core/audio'
 
 interface RoundedShapeButtonProps {
   // ── 几何/外观(透传给 RoundShapePlane) ──
@@ -22,8 +21,6 @@ interface RoundedShapeButtonProps {
   onClick?: (e: ThreeEvent<MouseEvent>) => void
   onPointerDown?: (e: ThreeEvent<PointerEvent>) => void
   onPointerUp?: (e: ThreeEvent<PointerEvent>) => void
-  /** 是否播放点击音效,默认 true。拖拽类按钮(兵营/集火)应设为 false */
-  soundEnabled?: boolean
   // ── 可选图片槽位 ──
   /** 图片 URL;提供时在 localZ +0.005 渲染一个透明图片平面 */
   image?: string
@@ -81,7 +78,6 @@ export default function RoundedShapeButton({
   onClick,
   onPointerDown,
   onPointerUp,
-  soundEnabled = true,
   image,
   imageScale = 1,
   imageTransparent,
@@ -92,22 +88,13 @@ export default function RoundedShapeButton({
   ...planeProps
 }: RoundedShapeButtonProps) {
   const bgRenderOrder = planeProps.renderOrder ?? 0
-  // pointerdown 时提前解锁 AudioContext，给 resume 留足时间，避免 click 播放延迟
-  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    if (soundEnabled) unlockAudio()
-    onPointerDown?.(e)
-  }
-  const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    if (soundEnabled) playClick()
-    onClick?.(e)
-  }
   return (
     <RoundShapePlane
       width={width}
       height={height}
       {...planeProps}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
+      onClick={onClick}
+      onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
     >
       {image && (

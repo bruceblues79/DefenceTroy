@@ -6,7 +6,7 @@ import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.j
 import type { Entity } from 'koota'
 import { Attack, Health, Position, Velocity, Targeting, IsWall } from '../core/traits'
 import { deathQueue } from '../core/systems/death'
-import { playSound } from '../core/audio'
+import { playPositionalSound } from '../core/audio'
 
 /**
  * 计算单位当前应朝向的 yaw（绕 Y 轴）：
@@ -167,7 +167,8 @@ export default function CharacterModel({
   useEffect(
     () => () => {
       if (deathQueue.delete(entity.id())) {
-        playSound(modelKey.startsWith('enemy') ? 'enemyDeath' : 'defenderDeath')
+        const p = st.current.lastPos
+        playPositionalSound(modelKey.startsWith('enemy') ? 'enemyDeath' : 'defenderDeath', [p[0], p[1], p[2]])
         onDeathRef.current?.({ modelKey, position: st.current.lastPos, yaw: st.current.lastYaw })
       }
     },
@@ -264,7 +265,8 @@ export default function CharacterModel({
       const inProtect = s.state === 'atk' && t < s.protectUntil
       if (!inProtect) {
         playClip('hurt')
-        playSound('hurt')
+        const p = st.current.lastPos
+        playPositionalSound('hurt', [p[0], p[1], p[2]])
         s.state = 'hurt'
         s.endsAt = t + HURT_DURATION
         s.protectUntil = 0

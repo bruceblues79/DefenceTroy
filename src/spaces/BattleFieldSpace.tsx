@@ -17,7 +17,6 @@ import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Target
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
 import { UI_FONT } from '../core/font'
-import { playClick } from '../core/audio'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
@@ -378,8 +377,6 @@ export default function BattleFieldSpace({
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
-          // 兵营按钮(bow/spear)和集火按钮(focus)是拖拽操作,不需要点击音效
-          const btnSoundEnabled = name !== 'btn_bow' && name !== 'btn_spear' && name !== 'btn_focus'
           return (
             <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.5]}>
               <RoundedShapeButton
@@ -392,7 +389,6 @@ export default function BattleFieldSpace({
                 image={BUTTON_IMAGES[i]}
                 imageScale={BUTTON_IMAGE_SCALES[i]}
                 imageColor={BUTTON_IMAGE_COLORS[i]}
-                soundEnabled={btnSoundEnabled}
                 onPointerDown={
                   type
                     ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
@@ -406,7 +402,6 @@ export default function BattleFieldSpace({
                     : name === 'btn_menu' && !paused
                     ? (e: ThreeEvent<PointerEvent>) => {
                         e.stopPropagation()
-                        playClick()
                         setShopOpen(false)
                         onPause()
                       }
