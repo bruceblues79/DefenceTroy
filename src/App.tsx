@@ -1,9 +1,9 @@
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import { Environment, OrbitControls, OrthographicCamera } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { world } from './core/world'
-import { preloadAudio } from './core/audio'
+import { preloadAudio, getListener, getAudioAnchor, unlockAudio } from './core/audio'
 import MainMenuSpace from './spaces/MainMenuSpace'
 import LoadingSpace from './spaces/LoadingSpace'
 import BattleFieldSpace from './spaces/BattleFieldSpace'
@@ -108,6 +108,26 @@ function LandscapePrompt() {
   )
 }
 
+/**
+ * 空间音频锚点组件
+ * 将 AudioListener 挂载到相机、audioAnchor（PositionalAudio 父节点）挂载到场景。
+ * 必须放在 Canvas 内以获取 camera/scene。
+ */
+function AudioAnchor() {
+  const { camera, scene } = useThree()
+  useEffect(() => {
+    const l = getListener()
+    const anchor = getAudioAnchor()
+    if (l) camera.add(l)
+    scene.add(anchor)
+    return () => {
+      if (l) camera.remove(l)
+      scene.remove(anchor)
+    }
+  }, [camera, scene])
+  return null
+}
+
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
   const [paused, setPaused] = useState(false)
@@ -150,9 +170,16 @@ export default function App() {
     return () => cancelAnimationFrame(rafId)
   }, [gameState])
 
-  // 启动时预加载按钮音效，确保首次点击零延迟
+  // 启动时预加载战斗音效
   useEffect(() => {
     preloadAudio()
+  }, [])
+
+  // 首次用户手势解锁 AudioContext（浏览器自动播放策略要求）
+  useEffect(() => {
+    const handler = () => unlockAudio()
+    window.addEventListener('pointerdown', handler, { once: true })
+    return () => window.removeEventListener('pointerdown', handler)
   }, [])
 
   return (
@@ -162,6 +189,7 @@ export default function App() {
       <Canvas dpr={[1, 2]} shadows>
         <color attach="background" args={['#888888']} />
         <OrthographicCamera makeDefault position={[0, 9, 0]} zoom={80} />
+        <AudioAnchor />
         {/* 镜头锁死：不旋转、不缩放、不平移。
             minPolarAngle 必须留 0 —— setPolarAngle 会把值 clamp 到 [min,max]，
             设成 min=max=20° 会把入场推进动画直接吃掉。用户输入已被 enableRotate 禁掉，不会突破上限 */}

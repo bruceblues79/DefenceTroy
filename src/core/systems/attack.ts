@@ -1,8 +1,8 @@
 import type { World } from 'koota'
-import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, IsRam, UnitType } from '../traits'
+import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, IsRam, UnitType, Position } from '../traits'
 import { spawnActions } from '../actions'
 import { calculateDamage } from '../combat/damage'
-import { playSound } from '../audio'
+import { playPositionalSound } from '../audio'
 
 /**
  * 攻击系统
@@ -66,12 +66,16 @@ export function updateAttack(world: World, dt: number) {
             damage,
           )
           target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
-          if (target.has(IsWall)) playSound('wallHit')
+          if (target.has(IsWall)) {
+            const tp = target.get(Position)
+            if (tp) playPositionalSound('wallHit', [tp.x, tp.y, tp.z])
+          }
         }
       } else {
         // 远程：发射抛射物 + 播放发射音效
         const kind = attacker.get(UnitType)?.kind
-        playSound(kind === 'archer' ? 'bow' : 'spear')
+        const ap = attacker.get(Position)
+        if (ap) playPositionalSound(kind === 'archer' ? 'bow' : 'spear', [ap.x, ap.y, ap.z])
         actions.spawnProjectile(attacker, target, damage)
       }
     }

@@ -14,7 +14,7 @@ import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 const SAMPLE_RATE = 44100
-const DURATION = 0.45 // 秒
+const DURATION = 0.3 // 秒（缩短，更紧凑）
 const N = Math.floor(SAMPLE_RATE * DURATION)
 
 // ── 工具 ──────────────────────────────────────────────
@@ -48,52 +48,59 @@ const samples = new Float64Array(N)
 for (let i = 0; i < N; i++) {
   const t = i / SAMPLE_RATE // 秒
 
-  // 1. 弓弦瞬态：0~15ms 的白噪声爆发，指数衰减
+  // 1. 弓弦瞬态：0~15ms 的白噪声爆发，指数衰减（更尖锐）
   let transient = 0
   if (t < 0.015) {
-    const env = Math.exp(-t / 0.003) // 3ms 时间常数
-    transient = (Math.random() * 2 - 1) * env * 0.5
+    const env = Math.exp(-t / 0.0015) // 1.5ms 时间常数（更尖锐的"啪"）
+    transient = (Math.random() * 2 - 1) * env * 0.6
   }
 
-  // 2. 弦余振：多谐波正弦，快速衰减（低沉：基频 150Hz）
+  // 2. 弦余振：多谐波正弦，快速衰减（减少低沉拖沓感）
   let stringVib = 0
-  if (t < 0.15) {
-    const env = Math.exp(-t / 0.04) // 40ms 时间常数
-    const f0 = 150 // 基频 Hz（更低沉）
+  if (t < 0.08) {
+    const env = Math.exp(-t / 0.03) // 30ms 时间常数
+    const f0 = 150 // 基频 Hz
     stringVib = (
       Math.sin(2 * Math.PI * f0 * t) * 0.55 +
       Math.sin(2 * Math.PI * f0 * 2 * t) * 0.22 +
       Math.sin(2 * Math.PI * f0 * 3 * t) * 0.10 +
-      Math.sin(2 * Math.PI * f0 * 0.5 * t) * 0.18 // 次低音增加厚度
-    ) * env * 0.45
+      Math.sin(2 * Math.PI * f0 * 0.5 * t) * 0.18
+    ) * env * 0.3 // 幅度 0.45→0.3（减弱拖沓）
   }
 
-  // 2b. 低频"咚"：80Hz 正弦，快速衰减，增加弓弦释放的厚重感
+  // 2b. 低频"咚"：80Hz 正弦，快速衰减（减弱厚重感）
   let thump = 0
-  if (t < 0.1) {
-    const env = Math.exp(-t / 0.025)
-    thump = Math.sin(2 * Math.PI * 80 * t) * env * 0.3
+  if (t < 0.08) {
+    const env = Math.exp(-t / 0.02)
+    thump = Math.sin(2 * Math.PI * 80 * t) * env * 0.15
   }
 
   samples[i] = transient + stringVib + thump
 }
 
-// 3. 箭啸声：带通滤波白噪声，频率下滑 + 幅度衰减（低沉：2kHz→400Hz）
+// 3. 箭啸声：带通滤波白噪声，中心频率 3000→600Hz 快速下滑（"嗖"的穿透感）
 const whoosh = new Float64Array(N)
 for (let i = 0; i < N; i++) {
   whoosh[i] = Math.random() * 2 - 1
 }
 
-// 对 whoosh 做带通滤波（中心频率 ~1.2kHz，低沉化）
-const bpFixed = makeBandpass(1200, 5)
+// 频率下滑式带通：0.15s 内 3000Hz → 600Hz 线性下滑，Q=8
+const SWEEP_DUR = 0.15
+const F_START = 3000
+const F_END = 600
+let bpSweep = null
 for (let i = 0; i < N; i++) {
   const t = i / SAMPLE_RATE
-  const filtered = bpFixed(whoosh[i])
-  // 幅度包络：10ms 起音，之后指数衰减
-  const env = t < 0.01 ? t / 0.01 : Math.exp(-(t - 0.01) / 0.2)
-  // 频率调制效果：用中频正弦调制滤波输出
-  const fm = 1 + 0.25 * Math.sin(2 * Math.PI * 500 * t)
-  samples[i] += filtered * env * 0.3 * fm
+  // 每 ~300 采样更新一次带通中心频率（避免逐采样重建滤波器开销）
+  if (i % 300 === 0 || i === 0) {
+    const progress = Math.min(t / SWEEP_DUR, 1)
+    const freq = F_START + (F_END - F_START) * progress
+    bpSweep = makeBandpass(freq, 8)
+  }
+  const filtered = bpSweep(whoosh[i])
+  // 幅度包络：5ms 起音，之后快速衰减（更干脆）
+  const env = t < 0.005 ? t / 0.005 : Math.exp(-(t - 0.005) / 0.12)
+  samples[i] += filtered * env * 0.35
 }
 
 // ── 归一化到 [-1, 1] 并加轻微淡入淡出 ────────────────
