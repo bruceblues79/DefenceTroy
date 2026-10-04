@@ -92,13 +92,12 @@ export default function RoundedShapeButton({
   ...planeProps
 }: RoundedShapeButtonProps) {
   const bgRenderOrder = planeProps.renderOrder ?? 0
-  // pointerdown 时提前解锁 AudioContext，给 resume 留足时间，避免 click 播放延迟
+  // pointerdown 时提前解锁 AudioContext 并播放点击音效（松手前触发，避免按钮卸载导致 click 不触发）
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    if (soundEnabled) unlockAudio()
+    if (soundEnabled) { unlockAudio(); playClick() }
     onPointerDown?.(e)
   }
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    if (soundEnabled) playClick()
     onClick?.(e)
   }
   return (
