@@ -1,5 +1,6 @@
 import { type ThreeEvent } from '@react-three/fiber'
 import { Text, useTexture } from '@react-three/drei'
+import { useRef } from 'react'
 import RoundShapePlane from './RoundShapePlane'
 import { UI_FONT } from '../core/font'
 import { playClick, unlockAudio } from '../core/audio'
@@ -92,12 +93,15 @@ export default function RoundedShapeButton({
   ...planeProps
 }: RoundedShapeButtonProps) {
   const bgRenderOrder = planeProps.renderOrder ?? 0
-  // pointerdown 时提前解锁 AudioContext 并播放点击音效（松手前触发，避免按钮卸载导致 click 不触发）
+  // pointerdown 解锁 AudioContext 并尝试播放（首次点击 context 可能仍挂起，无声音）
+  // click 时补播（此时 context 已 running），用时间戳防抖避免重复
+  const lastPlayRef = useRef(0)
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    if (soundEnabled) { unlockAudio(); playClick() }
+    if (soundEnabled) { unlockAudio(); playClick(); lastPlayRef.current = Date.now() }
     onPointerDown?.(e)
   }
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    if (soundEnabled && Date.now() - lastPlayRef.current > 100) playClick()
     onClick?.(e)
   }
   return (
