@@ -1,31 +1,14 @@
-import { useTexture } from '@react-three/drei'
 import { Button } from '@react-three/uikit-default'
-import { Image, Text } from '@react-three/uikit'
-import * as THREE from 'three'
-
-const BASE = import.meta.env.BASE_URL
-const BG_ASSET_VERSION = 1
-/** 主菜单 / loading 共用底图（1:1 正方形 WebP） */
-export const BG_URL = `${BASE}assets/textures/main-menu-bg.webp?v=${BG_ASSET_VERSION}`
+import { Text } from '@react-three/uikit'
 
 /**
- * 主菜单
- * 使用 @react-three/uikit-default 的 Button 组件。
- * 底图用 uikit <Image> 渲染（比裸 plane+material 更规则），
- * 外层 group 的 scale 手动控制底图可见范围。
+ * 主菜单按钮区。
+ * 底图由 App.tsx 的 MenuBackground 统一渲染（menu/loading 共用），这里只放按钮。
  * uikit 组件内部仅嵌套 uikit 组件，空间定位由外层 <group> 完成。
  */
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
-  const bgTexture = useTexture(BG_URL)
-  bgTexture.colorSpace = THREE.SRGBColorSpace
-
   return (
     <group>
-      {/* 底图：uikit Image，1:1 正方形，外层 scale 控制可见范围 */}
-      <group position={[0, 0, 0]} scale={0.5} rotation={[-Math.PI / 2, 0, 0]}>
-        <Image src={bgTexture} sizeX={2500} sizeY={2500} />
-      </group>
-
       {/* quit 按钮（红） — 返回主站，上方 */}
       <group position={[0, 2, 2.75]} rotation={[-Math.PI / 2, 0, 0]}>
         <Button

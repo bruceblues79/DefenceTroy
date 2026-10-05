@@ -1,5 +1,5 @@
 import { Canvas, useThree } from '@react-three/fiber'
-import { Environment, OrbitControls, OrthographicCamera } from '@react-three/drei'
+import { Environment, OrbitControls, OrthographicCamera, useTexture } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { world } from './core/world'
@@ -8,6 +8,27 @@ import MainMenuSpace from './spaces/MainMenuSpace'
 import LoadingSpace from './spaces/LoadingSpace'
 import BattleFieldSpace from './spaces/BattleFieldSpace'
 import * as THREE from 'three'
+
+const BASE = import.meta.env.BASE_URL
+const BG_ASSET_VERSION = 1
+/** 主菜单 / loading 共用底图（1:1 正方形 WebP） */
+const BG_URL = `${BASE}assets/textures/main-menu-bg.webp?v=${BG_ASSET_VERSION}`
+
+/**
+ * 菜单/加载阶段底图。
+ * 用 meshBasicMaterial + toneMapped={false}，不受场景灯光与 HDR 环境贴图影响，颜色准确。
+ * 由 gameState 控制显隐，menu 与 loading 共用同一份。
+ */
+function MenuBackground() {
+  const bgTexture = useTexture(BG_URL)
+  bgTexture.colorSpace = THREE.SRGBColorSpace
+  return (
+    <mesh position={[0, 0, 0]} scale={0.5} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[25, 25]} />
+      <meshBasicMaterial map={bgTexture} toneMapped={false} />
+    </mesh>
+  )
+}
 
 type GameState = 'menu' | 'loading' | 'play'
 
@@ -219,6 +240,8 @@ export default function App() {
           shadow-camera-far={30}
         />
         <Environment files={`${import.meta.env.BASE_URL}assets/hdr/battle_field.hdr`} environmentIntensity={0.4} />
+        {/* 菜单/加载底图：仅在非战斗阶段显示 */}
+        {gameState !== 'play' && <MenuBackground />}
         {gameState === 'menu' && <MainMenuSpace onStart={handleStart} />}
         {gameState === 'loading' && <LoadingSpace onLoaded={handleLoaded} />}
         {gameState === 'play' && (
