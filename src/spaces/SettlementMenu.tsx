@@ -1,14 +1,14 @@
-import { Billboard, Text } from '@react-three/drei'
-import RoundShapePlane from '../components/RoundShapePlane'
-import RoundedShapeButton from '../components/RoundedShapeButton'
-import { UI_FONT } from '../core/font'
+import { Container, Text } from '@react-three/uikit'
+import { Button } from '@react-three/uikit-default'
 
 type GameResult = 'victory' | 'defeat'
 
 /**
- * 结算菜单
- * - 胜利：只一个蓝染按钮（返回主菜单）
- * - 失败：重新开始（黄）+ 返回主菜单（红）
+ * 结算菜单（uikit 版）
+ * 外层 group 平放面朝上（俯视正交相机），内部 uikit Container 作圆角背景。
+ * - 胜利：单个 win 按钮（蓝）返回主菜单
+ * - 失败：retry（黄）+ quit（红）两按钮
+ * 文字使用 uikit 默认 Inter 字体（英文）。
  */
 export default function SettlementMenu({
   result,
@@ -19,57 +19,72 @@ export default function SettlementMenu({
   onRestart: () => void
   onExitToMenu: () => void
 }) {
-  if (result === 'victory') {
-    return (
-      <Billboard position={[0, 3, 0]}>
-        <RoundShapePlane width={3} height={3} cornerRadius={0.15} color="#666666" position={[0, 0.01, 0]} />
-        <group position={[0, 0, 0.02]}>
-          <RoundedShapeButton
-            width={2.5}
-            height={1}
-            cornerRadius={0.1}
-            color="#4a90d9"
-            onClick={(e) => {
-              e.stopPropagation()
+  return (
+    <group position={[0, 3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <Container
+        width={300}
+        height={300}
+        backgroundColor="#666666"
+        opacity={0.85}
+        borderRadius={15}
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        padding={16}
+        gap={12}
+      >
+        {result === 'victory' ? (
+          <Button
+            width={250}
+            height={100}
+            backgroundColor="#4a90d9"
+            color="#ffffff"
+            fontSize={30}
+            borderRadius={10}
+            hover={{ backgroundColor: '#3a7bc8' }}
+            onClick={(e: any) => {
+              e.stopPropagation?.()
               onExitToMenu()
             }}
-          />
-          <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">win</Text>
-        </group>
-      </Billboard>
-    )
-  }
+          >
+            <Text color="#ffffff" fontSize={30}>win</Text>
+          </Button>
+        ) : (
+          <>
+            <Button
+              width={250}
+              height={100}
+              backgroundColor="#eab308"
+              color="#ffffff"
+              fontSize={30}
+              borderRadius={10}
+              hover={{ backgroundColor: '#ca8a04' }}
+              onClick={(e: any) => {
+                e.stopPropagation?.()
+                onRestart()
+              }}
+            >
+              <Text color="#ffffff" fontSize={30}>retry</Text>
+            </Button>
 
-  // defeat
-  return (
-    <Billboard position={[0, 3, 0]}>
-      <RoundShapePlane width={3} height={3} cornerRadius={0.15} color="#666666" position={[0, 0.01, 0]} />
-      <group position={[0, 0.625, 0.02]}>
-        <RoundedShapeButton
-          width={2.5}
-          height={1}
-          cornerRadius={0.1}
-          color="#eab308"
-          onClick={(e) => {
-            e.stopPropagation()
-            onRestart()
-          }}
-        />
-        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">retry</Text>
-      </group>
-      <group position={[0, -0.625, 0.02]}>
-        <RoundedShapeButton
-          width={2.5}
-          height={1}
-          cornerRadius={0.1}
-          color="#dc2626"
-          onClick={(e) => {
-            e.stopPropagation()
-            onExitToMenu()
-          }}
-        />
-        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
-      </group>
-    </Billboard>
+            <Button
+              width={250}
+              height={100}
+              backgroundColor="#dc2626"
+              color="#ffffff"
+              fontSize={30}
+              borderRadius={10}
+              hover={{ backgroundColor: '#b91c1c' }}
+              onClick={(e: any) => {
+                e.stopPropagation?.()
+                onExitToMenu()
+              }}
+            >
+              <Text color="#ffffff" fontSize={30}>quit</Text>
+            </Button>
+          </>
+        )}
+      </Container>
+    </group>
   )
 }
