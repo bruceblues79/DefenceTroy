@@ -40,9 +40,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
   {
     intro: {
-      title: '希腊联军登陆',
-      body: '希腊联军登陆海岸，发起试探性进攻。保卫城墙！',
-      tip: '点击拖动瞄准按钮至敌方单位，在守军攻击范围内即可集火；也可拖动城墙上守军至目标，满足距离则切换攻击目标。',
+      title: 'Greek Alliance Landing',
+      body: 'The Greek Alliance lands on the coast, launching a probing attack. Defend the walls!',
+      tip: 'Drag the aim button onto an enemy unit to focus fire within defender range; or drag a wall defender onto a target to switch attack targets if in range.',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
@@ -52,9 +52,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退第一轮',
-      body: '城墙暂无重大威胁，但这场战争注定漫长！',
-      tip: '获胜奖金100g。拖动单位可调整城墙站位，也可互相交换位置。',
+      title: 'Round 1 Repelled',
+      body: 'The walls face no major threat yet, but this war is bound to be long!',
+      tip: 'Victory bonus: 100g. Drag units to reposition on the wall, or swap positions with each other.',
     },
     gold: 100,
   },
@@ -62,9 +62,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第二轮 ──
   {
     intro: {
-      title: '弓兵侵扰',
-      body: '希腊联军派出步兵与弓兵混合部队，优先击杀敌方弓兵！',
-      tip: '你已获得收入，点击购物车图标，选择兵种雇佣。雇佣单位存入兵种栏，点击拖动至城墙完成部署。',
+      title: 'Archer Harassment',
+      body: 'The Greek Alliance sends a mixed force of infantry and archers. Prioritize enemy archers!',
+      tip: 'You have earned income. Click the cart icon to hire units. Hired units go to the barracks; drag them onto the wall to deploy.',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
@@ -75,9 +75,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退第2轮',
-      body: '城墙压力不大，但我方守军开始出现伤亡！',
-      tip: '获胜奖金200g。将城墙单位拖下城墙，可返回兵营缓慢恢复生命。',
+      title: 'Round 2 Repelled',
+      body: 'Wall pressure is light, but our defenders are taking casualties!',
+      tip: 'Victory bonus: 200g. Drag units off the wall to return to barracks and slowly recover HP.',
     },
     gold: 200,
   },
@@ -85,9 +85,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第三轮 ──
   {
     intro: {
-      title: '长矛兵强袭',
-      body: '希腊联军集结高速长矛兵，对我方弓兵威胁极大！',
-      tip: '破矛兵可有效克制长矛兵。雇佣后从兵营拖至城墙，可部署在原有单位位置；被替换单位自动返回兵营待命。',
+      title: 'Pikeman Assault',
+      body: 'The Greek Alliance musters fast pikemen, a grave threat to our archers!',
+      tip: 'Pikeman counters are effective against pikemen. Hire and drag from barracks to the wall; you can deploy on existing unit slots, and the replaced unit returns to barracks.',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
@@ -98,9 +98,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退第3轮',
-      body: '城墙尚且稳固，敌军已开始使用多样战术向我方施压！',
-      tip: '获胜奖金200g。灵活掌握守军轮换与位置调整，稳住防守节奏。',
+      title: 'Round 3 Repelled',
+      body: 'The walls still hold, but the enemy is employing varied tactics to pressure us!',
+      tip: 'Victory bonus: 200g. Master defender rotation and positioning to maintain defensive rhythm.',
     },
     gold: 200,
   },
@@ -108,9 +108,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第四轮 ──
   {
     intro: {
-      title: '联军混合方阵进攻',
-      body: '敌军混合方阵逼近，对方已经熟悉我方防守配置。',
-      tip: '破矛兵防御出众，可短暂承受攻势。灵活轮换、移动守军，能够改变敌方攻击目标。',
+      title: 'Alliance Mixed Phalanx',
+      body: 'The enemy mixed phalanx approaches; they have grown familiar with our defenses.',
+      tip: 'Pikeman counters have strong defense and can briefly withstand assaults. Rotate and move defenders to redirect enemy targets.',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
@@ -122,9 +122,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退第4轮',
-      body: '敌军现阶段不以破城为目标，意图持续消耗我方兵力。',
-      tip: '获胜奖金200g。熟练掌握守军轮换与位置调整，稳住防守节奏。',
+      title: 'Round 4 Repelled',
+      body: 'The enemy is not aiming to breach the walls now, seeking to wear down our forces.',
+      tip: 'Victory bonus: 200g. Master defender rotation and positioning to maintain defensive rhythm.',
     },
     gold: 200,
   },
@@ -132,9 +132,9 @@ export const ROUNDS: RoundConfig[] = [
   // ── 第五轮 ──
   {
     intro: {
-      title: '攻城车阴影',
-      body: '在混合方阵中，攻城车非常结实，会对城墙造成极大威胁。',
-      tip: '用矛兵集火攻城车，造成最大伤害。弓兵对攻城车伤害减半。灵活地更换守军位置，优先击破攻城车。',
+      title: 'Shadow of the Battering Ram',
+      body: 'Amid the mixed phalanx, the battering ram is heavily armored and poses a grave threat to the walls.',
+      tip: 'Focus fire on the ram with spearmen for maximum damage. Archers deal half damage to rams. Reposition defenders flexibly to destroy the ram first.',
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
@@ -146,9 +146,9 @@ export const ROUNDS: RoundConfig[] = [
     ],
     waveGap: WAVE_GAP,
     ending: {
-      title: '击退第5轮',
-      body: '敌军对我方展开了立体攻势。',
-      tip: '获胜奖金200g。灵活地切换目标与我方单位。',
+      title: 'Round 5 Repelled',
+      body: 'The enemy has launched a multi-dimensional offensive.',
+      tip: 'Victory bonus: 200g. Flexibly switch targets and our units.',
     },
     gold: 200,
   },
