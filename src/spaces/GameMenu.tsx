@@ -1,8 +1,11 @@
-import { Billboard, Text } from '@react-three/drei'
-import RoundShapePlane from '../components/RoundShapePlane'
-import RoundedShapeButton from '../components/RoundedShapeButton'
-import { UI_FONT } from '../core/font'
+import { Container, Text } from '@react-three/uikit'
+import { Button } from '@react-three/uikit-default'
 
+/**
+ * 游戏内暂停菜单（uikit 版）
+ * 外层 group 平放面朝上（俯视正交相机），内部 uikit Container 作圆角背景，
+ * 三个按钮均使用 uikit-default Button，文字用 uikit Text（默认 Inter 英文）。
+ */
 export default function GameMenu({
   onResume,
   onRestart,
@@ -13,47 +16,67 @@ export default function GameMenu({
   onExitToMenu: () => void
 }) {
   return (
-    <Billboard position={[0, 3, 0]}>
-      <RoundShapePlane width={3} height={4} cornerRadius={0.15} color="#888888" position={[0, 0.01, 0]} />
-      <group position={[0, 1.25, 0.02]}>
-        <RoundedShapeButton
-          width={2.5}
-          height={1}
-          cornerRadius={0.1}
-          color="#2563eb"
-          onClick={(e) => {
-            e.stopPropagation()
+    <group position={[0, 3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <Container
+        width={300}
+        height={400}
+        backgroundColor="#888888"
+        opacity={0.85}
+        borderRadius={15}
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        padding={16}
+        gap={12}
+      >
+        <Button
+          width={250}
+          height={100}
+          backgroundColor="#2563eb"
+          color="#ffffff"
+          fontSize={30}
+          borderRadius={10}
+          hover={{ backgroundColor: '#1d4ed8' }}
+          onClick={(e: any) => {
+            e.stopPropagation?.()
             onResume()
           }}
-        />
-        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">resume</Text>
-      </group>
-      <group position={[0, 0, 0.02]}>
-        <RoundedShapeButton
-          width={2.5}
-          height={1}
-          cornerRadius={0.1}
-          color="#eab308"
-          onClick={(e) => {
-            e.stopPropagation()
+        >
+          <Text color="#ffffff" fontSize={30}>resume</Text>
+        </Button>
+
+        <Button
+          width={250}
+          height={100}
+          backgroundColor="#eab308"
+          color="#ffffff"
+          fontSize={30}
+          borderRadius={10}
+          hover={{ backgroundColor: '#ca8a04' }}
+          onClick={(e: any) => {
+            e.stopPropagation?.()
             onRestart()
           }}
-        />
-        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">restart</Text>
-      </group>
-      <group position={[0, -1.25, 0.02]}>
-        <RoundedShapeButton
-          width={2.5}
-          height={1}
-          cornerRadius={0.1}
-          color="#dc2626"
-          onClick={(e) => {
-            e.stopPropagation()
+        >
+          <Text color="#ffffff" fontSize={30}>restart</Text>
+        </Button>
+
+        <Button
+          width={250}
+          height={100}
+          backgroundColor="#dc2626"
+          color="#ffffff"
+          fontSize={30}
+          borderRadius={10}
+          hover={{ backgroundColor: '#b91c1c' }}
+          onClick={(e: any) => {
+            e.stopPropagation?.()
             onExitToMenu()
           }}
-        />
-        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.35} color="#ffffff" anchorX="center" anchorY="middle">quit</Text>
-      </group>
-    </Billboard>
+        >
+          <Text color="#ffffff" fontSize={30}>quit</Text>
+        </Button>
+      </Container>
+    </group>
   )
 }

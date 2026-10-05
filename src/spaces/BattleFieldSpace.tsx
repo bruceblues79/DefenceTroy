@@ -1,5 +1,7 @@
-import { Billboard, Text } from '@react-three/drei'
+import { Billboard } from '@react-three/drei'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
+import { Image, Text } from '@react-three/uikit'
+import { Button } from '@react-three/uikit-default'
 import { useWorld } from 'koota/react'
 import { useEffect, useRef, useState } from 'react'
 import type { Entity } from 'koota'
@@ -10,13 +12,11 @@ import BattleSystems from '../components/BattleSystems'
 import UnitRenderer from '../components/UnitRenderer'
 import GroundModel from '../components/GroundModel'
 import DragUnitProxy from '../components/DragUnitProxy'
-import RoundedShapeButton from '../components/RoundedShapeButton'
 import RoundPromptPanel from '../components/RoundPromptPanel'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP } from '../core/actions'
 import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
 import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
-import { UI_FONT } from '../core/font'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
@@ -24,13 +24,11 @@ const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 // 按钮底色：全部统一中灰半透明
 const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
-// SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
-// 集火按钮图标红染以在中灰底上突出
-const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#FFE066']
+// 图标颜色直接烤进 SVG（uikit Image 的 color prop 不生效，贴图原色直通）
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
-const ASSET_VERSION = 4
+const ASSET_VERSION = 10
 const BASE = import.meta.env.BASE_URL
 // 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
@@ -41,8 +39,6 @@ export const BUTTON_IMAGES = [
   `${BASE}assets/svg/icon-shop.svg?v=${ASSET_VERSION}`,
   `${BASE}assets/svg/icon-menu.svg?v=${ASSET_VERSION}`,
 ]
-// SVG 透明背景无白底；缩到 0.75 留出 padding，使按钮底色边框可见
-const BUTTON_IMAGE_SCALES = [0.75, 0.75, 0.75, 0.75, 0.75]
 
 // 拖拽示意物染色：与各兵种守军模型颜色一致
 const DRAG_COLORS: Record<UnitType, string> = {
@@ -372,28 +368,35 @@ export default function BattleFieldSpace({
         </mesh>
       )}
 
-      {/* five buttons: 0.8 square rounded planes, billboard to face camera */}
+      {/* five buttons: uikit-default Button, billboard to face camera */}
       {!gameOver && !paused && !promptOpen &&
         BUTTON_NAMES.map((name, i) => {
           const type = BUTTON_TYPES[i]
           const count = type ? barracks[type].length : 0
           return (
             <Billboard key={name} position={[BUTTON_X[i], 2.0, 4.5]}>
-              <RoundedShapeButton
-                name={name}
-                width={0.8}
-                height={0.8}
-                cornerRadius={0.1}
-                color={BUTTON_COLORS[i]}
+              <Button
+                width={80}
+                height={80}
+                backgroundColor={BUTTON_COLORS[i]}
                 opacity={BUTTON_OPACITY}
-                image={BUTTON_IMAGES[i]}
-                imageScale={BUTTON_IMAGE_SCALES[i]}
-                imageColor={BUTTON_IMAGE_COLORS[i]}
+                borderRadius={10}
+                padding={0}
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                hover={{ backgroundColor: '#666666' }}
                 onPointerDown={
                   type
-                    ? (e: ThreeEvent<PointerEvent>) => startButtonDrag(e, type)
+                    ? (e: ThreeEvent<PointerEvent>) => {
+                        e.stopPropagation()
+                        startButtonDrag(e, type)
+                      }
                     : name === 'btn_focus'
-                    ? (e: ThreeEvent<PointerEvent>) => startFocusDrag(e)
+                    ? (e: ThreeEvent<PointerEvent>) => {
+                        e.stopPropagation()
+                        startFocusDrag(e)
+                      }
                     : name === 'btn_shop'
                     ? (e: ThreeEvent<PointerEvent>) => {
                         e.stopPropagation()
@@ -407,32 +410,34 @@ export default function BattleFieldSpace({
                       }
                     : undefined
                 }
-              />
-              {type && count > 0 && (
-                <Text
-                  font={UI_FONT}
-                  position={[0.3, 0.3, 0.01]}
-                  fontSize={0.28}
-                  color="#ffffff"
-                  anchorX="center"
-                  anchorY="middle"
-                >
-                  {count}
-                </Text>
-              )}
-              {/* btn_menu / btn_shop 的文字已由 BUTTON_IMAGES 的图标取代 */}
-              {name === 'btn_shop' && (
-                <Text
-                  font={UI_FONT}
-                  position={[0, 0.3, 0.01]}
-                  fontSize={0.2}
-                  color="#ffd700"
-                  anchorX="center"
-                  anchorY="middle"
-                >
-                  {Math.min(gold, 9999)}
-                </Text>
-              )}
+              >
+                {type && count > 0 && (
+                  <Text
+                    positionType="absolute"
+                    positionTop={4}
+                    positionRight={6}
+                    fontSize={16}
+                    color="#ffffff"
+                  >
+                    {count}
+                  </Text>
+                )}
+                {name === 'btn_shop' && (
+                  <Text
+                    positionType="absolute"
+                    positionTop={2}
+                    positionLeft="50%"
+                    transformTranslateX="-50%"
+                    fontSize={14}
+                    color="#ffd700"
+                  >
+                    {Math.min(gold, 9999)}
+                  </Text>
+                )}
+              </Button>
+              <group position={[0, 0, 0.01]}> 
+                <Image src={BUTTON_IMAGES[i]} width={60} height={60} opacity={1} /> 
+              </group>
             </Billboard>
           )
         })}

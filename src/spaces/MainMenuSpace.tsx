@@ -2,11 +2,9 @@ import { Button } from '@react-three/uikit-default'
 import { Text } from '@react-three/uikit'
 
 /**
- * 主菜单
- * 使用 @react-three/uikit-default 的 Button 组件。
+ * 主菜单按钮区。
+ * 底图由 App.tsx 的 MenuBackground 统一渲染（menu/loading 共用），这里只放按钮。
  * uikit 组件内部仅嵌套 uikit 组件，空间定位由外层 <group> 完成。
- * 无背景 panel，依赖场景背景色（中灰 #888888）。
- * 两按钮组中心位于 [0,2,2]，quit 在上 play 在下，平铺朝上适配顶视相机。
  */
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
   return (
