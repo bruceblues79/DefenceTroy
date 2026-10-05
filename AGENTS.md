@@ -1,8 +1,5 @@
 # DefenceTroy
 
-> 手机竖屏塔防游戏 · React Three Fiber + Three.js + koota (ECS)
-> 技术版本见 package.json · Node 22+ / npm / 单端口静态站点（GitHub Pages 友好）
-
 技术栈约束：
 - 3D 渲染：React Three Fiber（R3F）。优先声明式组件，裸 THREE.js 仅在 R3F 无对应能力时使用。
 - 场景工具：@react-three/drei。优先复用 Text、Billboard、OrthographicCamera 等封装，不重复造轮子。
