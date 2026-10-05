@@ -1,28 +1,30 @@
 import { useTexture } from '@react-three/drei'
 import { Button } from '@react-three/uikit-default'
-import { Text } from '@react-three/uikit'
+import { Image, Text } from '@react-three/uikit'
 import * as THREE from 'three'
 
 const BASE = import.meta.env.BASE_URL
+const BG_ASSET_VERSION = 1
+/** 主菜单 / loading 共用底图（1:1 正方形 WebP） */
+export const BG_URL = `${BASE}assets/textures/main-menu-bg.webp?v=${BG_ASSET_VERSION}`
 
 /**
  * 主菜单
  * 使用 @react-three/uikit-default 的 Button 组件。
+ * 底图用 uikit <Image> 渲染（比裸 plane+material 更规则），
+ * 外层 group 的 scale 手动控制底图可见范围。
  * uikit 组件内部仅嵌套 uikit 组件，空间定位由外层 <group> 完成。
- * 背景为一张 1:1 正方形底图（WebP），整张贴到正方形 plane 上，
- * 通过 mesh 的 scale 手动控制显示范围。
  */
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
-  const bgTexture = useTexture(`${BASE}assets/textures/main-menu-bg.webp`)
+  const bgTexture = useTexture(BG_URL)
   bgTexture.colorSpace = THREE.SRGBColorSpace
 
   return (
     <group>
-      {/* 全屏底图：1:1 正方形，朝向上方/相机，scale 控制可见范围 */}
-      <mesh position={[0, 0, 0]} scale={0.5} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[25, 25]} />
-        <meshBasicMaterial map={bgTexture} transparent toneMapped={false} />
-      </mesh>
+      {/* 底图：uikit Image，1:1 正方形，外层 scale 控制可见范围 */}
+      <group position={[0, 0, 0]} scale={0.5} rotation={[-Math.PI / 2, 0, 0]}>
+        <Image src={bgTexture} sizeX={2500} sizeY={2500} />
+      </group>
 
       {/* quit 按钮（红） — 返回主站，上方 */}
       <group position={[0, 2, 2.75]} rotation={[-Math.PI / 2, 0, 0]}>
