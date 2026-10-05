@@ -1,16 +1,29 @@
+import { useTexture } from '@react-three/drei'
 import { Button } from '@react-three/uikit-default'
 import { Text } from '@react-three/uikit'
+import * as THREE from 'three'
+
+const BASE = import.meta.env.BASE_URL
 
 /**
  * 主菜单
  * 使用 @react-three/uikit-default 的 Button 组件。
  * uikit 组件内部仅嵌套 uikit 组件，空间定位由外层 <group> 完成。
- * 无背景 panel，依赖场景背景色（中灰 #888888）。
- * 两按钮组中心位于 [0,2,2]，quit 在上 play 在下，平铺朝上适配顶视相机。
+ * 背景为一张 1:1 正方形底图（WebP），整张贴到正方形 plane 上，
+ * 通过 mesh 的 scale 手动控制显示范围。
  */
 export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
+  const bgTexture = useTexture(`${BASE}assets/textures/main-menu-bg.webp`)
+  bgTexture.colorSpace = THREE.SRGBColorSpace
+
   return (
     <group>
+      {/* 全屏底图：1:1 正方形，朝向上方/相机，scale 控制可见范围 */}
+      <mesh position={[0, 0, 0]} scale={0.25} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[25, 25]} />
+        <meshBasicMaterial map={bgTexture} transparent toneMapped={false} />
+      </mesh>
+
       {/* quit 按钮（红） — 返回主站，上方 */}
       <group position={[0, 2, 2.75]} rotation={[-Math.PI / 2, 0, 0]}>
         <Button
