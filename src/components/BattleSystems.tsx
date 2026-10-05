@@ -7,6 +7,7 @@ import {
   updateEnemySapperAI,
   updateEnemyRamAI,
   updateEnemyPikemanAI,
+  updateEnemyQueue,
   updateDefenderArcherAI,
   updateDefenderSpearBreakerAI,
   updateAttack,
@@ -82,11 +83,12 @@ export default function BattleSystems({ paused = false, engine, barracksDefender
     // 限制最大 delta，避免切换标签页后跳帧
     const dt = Math.min(delta, 0.1)
 
-    // 系统执行顺序：AI → 攻击 → 移动 → 抛射物 → 死亡
+    // 系统执行顺序：AI → 排队修正 → 攻击 → 移动 → 抛射物 → 死亡
     updateEnemyArcherAI(world, dt)
     updateEnemySapperAI(world, dt)
     updateEnemyRamAI(world, dt)
     updateEnemyPikemanAI(world, dt)
+    updateEnemyQueue(world, dt)
     updateDefenderArcherAI(world, dt)
     updateDefenderSpearBreakerAI(world, dt)
     updateAttack(world, dt)
