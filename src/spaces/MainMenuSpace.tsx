@@ -19,7 +19,7 @@ export default function MainMenuSpace({ onStart }: { onStart: () => void }) {
   return (
     <group>
       {/* 全屏底图：1:1 正方形，朝向上方/相机，scale 控制可见范围 */}
-      <mesh position={[0, 0, 0]} scale={0.25} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, 0]} scale={0.5} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[25, 25]} />
         <meshBasicMaterial map={bgTexture} transparent toneMapped={false} />
       </mesh>
