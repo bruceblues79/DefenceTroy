@@ -24,13 +24,11 @@ const BUTTON_X = [-1.8, -0.9, 0, 0.9, 1.8]
 // 按钮底色：全部统一中灰半透明
 const BUTTON_COLORS = ['#888888', '#888888', '#888888', '#888888', '#888888']
 const BUTTON_OPACITY = 0.75
-// SVG 图标按兵种/功能染色（与 meshBasicMaterial.color 相乘）
-// 集火按钮图标红染以在中灰底上突出
-const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#FFE066']
+// 图标颜色直接烤进 SVG（uikit Image 的 color prop 不生效，贴图原色直通）
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
-const ASSET_VERSION = 7
+const ASSET_VERSION = 10
 const BASE = import.meta.env.BASE_URL
 // 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
@@ -413,7 +411,6 @@ export default function BattleFieldSpace({
                     : undefined
                 }
               >
-                <Image src={BUTTON_IMAGES[i]} width={60} height={60} color={BUTTON_IMAGE_COLORS[i]} />
                 {type && count > 0 && (
                   <Text
                     positionType="absolute"
@@ -438,6 +435,9 @@ export default function BattleFieldSpace({
                   </Text>
                 )}
               </Button>
+              <group position={[0, 0, 0.01]}> 
+                <Image src={BUTTON_IMAGES[i]} width={60} height={60} opacity={1} /> 
+              </group>
             </Billboard>
           )
         })}
