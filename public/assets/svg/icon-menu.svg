@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24"><path fill="#42A5F5" fill-rule="evenodd" d="M3.464 20.536C4.93 22 7.286 22 12 22s7.071 0 8.535-1.465C22 19.072 22 16.714 22 12s0-7.071-1.465-8.536C19.072 2 16.714 2 12 2S4.929 2 3.464 3.464C2 4.93 2 7.286 2 12s0 7.071 1.464 8.535M18.75 16a.75.75 0 0 1-.75.75H6a.75.75 0 0 1 0-1.5h12a.75.75 0 0 1 .75.75M18 12.75a.75.75 0 0 0 0-1.5H6a.75.75 0 0 0 0 1.5zM18.75 8a.75.75 0 0 1-.75.75H6a.75.75 0 0 1 0-1.5h12a.75.75 0 0 1 .75.75" clip-rule="evenodd"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 24 24">
+  <!-- 浅灰底板，让图标从中灰按钮上浮出来 -->
+  <circle cx="12" cy="12" r="10" fill="#AAAAAA"/>
+  <!-- 外框圆：蓝色描边 -->
+  <circle cx="12" cy="12" r="9" fill="none" stroke="#42A5F5" stroke-width="1.5"/>
+  <!-- 三条横线：白色填充 -->
+  <rect x="5.5" y="6.25" width="13" height="1.5" rx="0.75" fill="#ffffff"/>
+  <rect x="5.5" y="11.25" width="13" height="1.5" rx="0.75" fill="#ffffff"/>
+  <rect x="5.5" y="16.25" width="13" height="1.5" rx="0.75" fill="#ffffff"/>
+</svg>

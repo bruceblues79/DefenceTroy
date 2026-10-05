@@ -30,7 +30,7 @@ const BUTTON_IMAGE_COLORS = ['#368BE2', '#36E2C5', '#E23636', '#E2C736', '#FFE06
 // 与 BUTTON_NAMES 对齐：前 2 个兵种按钮有库存，focus/Shop/Menu 无
 const BUTTON_TYPES: (UnitType | null)[] = ['bow', 'spear', null, null, null]
 // 资源版本号：改 SVG 后递增，强制浏览器重新下载（避免缓存旧图）
-const ASSET_VERSION = 5
+const ASSET_VERSION = 6
 const BASE = import.meta.env.BASE_URL
 // 与 BUTTON_NAMES 对齐：兵种/商店/菜单均使用 SVG 图标（透明背景）
 // 导出供 LoadingSpace 预热 —— 否则战斗首帧 useTexture 会在无 Suspense 边界处挂起
