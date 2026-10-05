@@ -6,6 +6,7 @@
 技术栈约束：
 - 3D 渲染：React Three Fiber（R3F）。优先声明式组件，裸 THREE.js 仅在 R3F 无对应能力时使用。
 - 场景工具：@react-three/drei。优先复用 Text、Billboard、OrthographicCamera 等封装，不重复造轮子。
+- UI：@react-three/uikit + @react-three/uikit-default（Button 等预设）。uikit 组件内不嵌套 R3F 元素，空间定位由外层 group/mesh 处理；Canvas 需 `gl={{ localClippingEnabled: true }}`；文字用 `Text` 组件显式包裹（字符串 children 不会自动渲染）。
 - ECS：koota。实体/特征/系统模式，目录遵循 `core/`(traits/systems/actions) + `spaces/`。
 - 构建：Vite + TypeScript，单端口静态站点。
 - 音效：Node.js 纯 JS 生成 WAV（scripts/），Web Audio API 播放，不引 Python/Howler。
