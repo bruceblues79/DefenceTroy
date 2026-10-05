@@ -2,8 +2,10 @@ import { Canvas, useThree } from '@react-three/fiber'
 import { Environment, OrbitControls, OrthographicCamera, useTexture } from '@react-three/drei'
 import { WorldProvider } from 'koota/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { preloadFont } from 'troika-three-text'
 import { world } from './core/world'
 import { preloadAudio, getListener, getAudioAnchor, unlockAudio } from './core/audio'
+import { UI_FONT } from './core/font'
 import MainMenuSpace from './spaces/MainMenuSpace'
 import LoadingSpace from './spaces/LoadingSpace'
 import BattleFieldSpace from './spaces/BattleFieldSpace'
@@ -194,6 +196,11 @@ export default function App() {
   // 启动时预加载战斗音效
   useEffect(() => {
     preloadAudio()
+  }, [])
+
+  // 启动时预加载 UI 字体，避免 loading 阶段 drei <Text> 因字体加载 suspend 冒泡导致闪灰
+  useEffect(() => {
+    preloadFont({ font: UI_FONT }, () => {})
   }, [])
 
   // 首次用户手势解锁 AudioContext（浏览器自动播放策略要求）

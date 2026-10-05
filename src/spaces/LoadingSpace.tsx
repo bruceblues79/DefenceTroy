@@ -7,13 +7,19 @@ import { BUTTON_IMAGES } from './BattleFieldSpace'
 import { SHOP_TAB_IMAGES } from './ShopScreen'
 import { UI_FONT } from '../core/font'
 
-/** loading 时显示的文字，面向相机。底图由 App.tsx 的 MenuBackground 统一渲染。 */
+/**
+ * loading 时显示的文字，面向相机。底图由 App.tsx 的 MenuBackground 统一渲染。
+ * Text 外层包 Suspense fallback={null}：万一字体还没加载好，只隐藏文字，
+ * 不让 suspend 冒泡到 Canvas 露出灰色背景。
+ */
 function LoadingBillboard() {
   return (
     <Billboard position={[0, 0.1, 0]}>
-      <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.25} color="black" anchorX="center" anchorY="middle">
-        loading...
-      </Text>
+      <Suspense fallback={null}>
+        <Text font={UI_FONT} position={[0, 0, 0.01]} fontSize={0.25} color="black" anchorX="center" anchorY="middle">
+          loading...
+        </Text>
+      </Suspense>
     </Billboard>
   )
 }
