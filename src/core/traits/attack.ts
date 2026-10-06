@@ -19,7 +19,7 @@ export const Attack = trait({
  * 伤害不在此 trait 存储，改由 combat/damage.ts 的百分比表按兵种组合查表
  *
  * 守方的「先手一击」不靠独立机制实现：守方 range 本身就比对手略大一点点
- * （守弓 6.75 vs 攻弓 6、破矛兵 5 vs 长枪兵 4.5），先手是射程差的自然结果。
+ * （守弓 6.5 vs 攻弓 6、破矛兵 4.65 vs 长枪兵 4.5），先手是射程差的自然结果。
  */
 export const CanAttackUnits = trait({
   range: 5,

@@ -30,13 +30,13 @@ export const WALL_WIDTH = 4.5
 // 城墙血量：归一化为 100，与全单位一致
 export const WALL_HP = 100
 
-// 敌方弓兵：攻击单位（range=6）+ 攻击城门（wallZ=-0.8）
+// 敌方弓兵：攻击单位（range=6）+ 攻击城门（wallZ=-1.3）
 // 攻间隔统一 1.5s；移速 0.9；伤害由 combat/damage.ts 百分比表提供
 export const ENEMY_ARCHER_HP = 100
 export const ENEMY_ARCHER_SPEED = 0.9
 export const ENEMY_ARCHER_UNITS_RANGE = 6
 export const ENEMY_ARCHER_UNITS_INTERVAL = 1.5
-export const ENEMY_ARCHER_WALL_Z = -0.8
+export const ENEMY_ARCHER_WALL_Z = -1.3
 export const ENEMY_ARCHER_WALL_INTERVAL = 1.5
 export const ENEMY_ARCHER_REWARD = 50
 
@@ -67,15 +67,15 @@ export const ENEMY_RAM_WALL_INTERVAL = 2
 export const ENEMY_RAM_REWARD = 100
 
 // 守军弓兵：只攻击单位
-// 射程 6.75 = 攻弓 6 + 0.75，略大于对手保证先手
+// 射程 6.5 = 攻弓 6 + 0.5，略大于对手保证先手
 export const DEFENDER_ARCHER_HP = 100
-export const DEFENDER_ARCHER_UNITS_RANGE = 6.75
+export const DEFENDER_ARCHER_UNITS_RANGE = 6.5
 export const DEFENDER_ARCHER_UNITS_INTERVAL = 1.5
 
 // 守军破矛兵：只攻击单位
-// 射程 5 = 长枪兵 4.5 + 0.5，略大于对手保证先手
+// 射程 4.65 = 长枪兵 4.5 + 0.15，略大于对手保证先手
 export const DEFENDER_SPEAR_BREAKER_HP = 100
-export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 5
+export const DEFENDER_SPEAR_BREAKER_UNITS_RANGE = 4.65
 export const DEFENDER_SPEAR_BREAKER_UNITS_INTERVAL = 1.5
 
 export const PROJECTILE_SPEED = 15
@@ -205,7 +205,7 @@ export const spawnActions = createActions((world) => ({
   },
 
   /** 生成守军破矛兵：只攻击单位。可选 hp 用于从兵营回收后重新部署（保留血量）。部署后先走满冷却再攻击
-   *  射程 4.75 比长枪兵 4.5 略大（先手由此而来） */
+   *  射程 4.65 比长枪兵 4.5 略大（先手由此而来） */
   spawnDefenderSpearBreaker(x: number, y: number = 2, z: number = WALL_POSITION.z, hp?: number) {
     return world.spawn(
       Position({ x, y, z }),
