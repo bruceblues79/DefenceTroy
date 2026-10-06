@@ -1,13 +1,14 @@
 import type { World } from 'koota'
 import { Attack, CanAttackUnits, CanAttackWall, Targeting, Health, IsWall, IsMelee, IsRam, UnitType, Position } from '../traits'
 import { spawnActions } from '../actions'
-import { calculateDamage } from '../combat/damage'
+import { getDamagePercentage } from '../combat/damage'
 import { playPositionalSound } from '../audio'
 
 /**
  * 攻击系统
- * - 目标是城墙 → 用 CanAttackWall 的 damage/interval
- * - 目标是单位 → 用 CanAttackUnits 的 damage/interval
+ * - 目标是城墙 → 用 CanAttackWall 的 interval
+ * - 目标是单位 → 用 CanAttackUnits 的 interval
+ * - 伤害统一由 combat/damage.ts 的百分比表按兵种组合查表，结算为目标 maxHP × 百分比
  * 攻击开始即结算伤害（近战直接扣血，远程发射抛射物），无动画触发点。
  */
 export function updateAttack(world: World, dt: number) {
@@ -36,47 +37,40 @@ export function updateAttack(world: World, dt: number) {
       attack.isAttacking = true
       attack.attackTimer = 0
 
-      // 根据目标类型选择攻击参数
-      let damage: number
+      // 根据目标类型选择攻击参数（仅需 interval，伤害改查表）
       if (target.has(IsWall)) {
-        const wallAtk = attacker.get(CanAttackWall)
-        if (!wallAtk) {
+        if (!attacker.get(CanAttackWall)) {
           abortAttack(attack)
           return
         }
-        damage = wallAtk.isPercent
-          ? target.get(Health)!.max * (wallAtk.damage / 100)
-          : wallAtk.damage
       } else {
-        const unitsAtk = attacker.get(CanAttackUnits)
-        if (!unitsAtk) {
+        if (!attacker.get(CanAttackUnits)) {
           abortAttack(attack)
           return
         }
-        damage = unitsAtk.damage
       }
+
+      // 查表获取伤害百分比，再按目标 maxHP 换算实际伤害
+      const sourceKind = attacker.get(UnitType)?.kind
+      const pct = getDamagePercentage(sourceKind, target)
+      const targetHealth = target.get(Health)
+      const damage = targetHealth ? targetHealth.max * (pct / 100) : 0
 
       if (attacker.has(IsMelee) || attacker.has(IsRam)) {
         // 近战：直接扣血（无抛射物飞行）
-        const targetHealth = target.get(Health)
         if (targetHealth) {
-          const finalDamage = calculateDamage(
-            attacker.get(UnitType)?.kind,
-            target,
-            damage,
-          )
-          target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
+          target.set(Health, { current: Math.max(0, targetHealth.current - damage) })
           if (target.has(IsWall)) {
             const tp = target.get(Position)
             if (tp) playPositionalSound('wallHit', [tp.x, tp.y, tp.z])
           }
         }
       } else {
-        // 远程：发射抛射物 + 播放发射音效
+        // 远程：发射抛射物 + 播放发射音效（抛射物携带百分比，命中时按目标 maxHP 结算）
         const kind = attacker.get(UnitType)?.kind
         const ap = attacker.get(Position)
         if (ap) playPositionalSound(kind === 'archer' ? 'bow' : 'spear', [ap.x, ap.y, ap.z])
-        actions.spawnProjectile(attacker, target, damage)
+        actions.spawnProjectile(attacker, target, pct)
       }
     }
   })

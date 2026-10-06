@@ -197,7 +197,7 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
 
       {/* 抛射物：弓兵射箭，长枪兵/破矛兵投矛 */}
       {projectiles.map((entity) => (
-        entity.get(Projectile)?.sourceKind === 'archer'
+        entity.get(Projectile)?.kind === 'archer'
           ? <ArrowProxy key={entityKey(entity)} entity={entity} />
           : <SpearProxy key={entityKey(entity)} entity={entity} />
       ))}

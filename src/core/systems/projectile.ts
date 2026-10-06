@@ -1,6 +1,5 @@
 import type { World, Entity } from 'koota'
 import { Position, Velocity, Projectile, IsProjectile, IsWall, Targeting, Health } from '../traits'
-import { calculateDamage } from '../combat/damage'
 import { UNIT_SHOOT_HEIGHT } from '../actions'
 import { playPositionalSound } from '../audio'
 
@@ -9,6 +8,7 @@ const HIT_THRESHOLD = 0.15 // 命中判定距离（米）
 /**
  * 抛射物系统
  * 追踪目标飞行 + 命中检测 + 伤害结算
+ * proj.damage 为命中伤害占目标 maxHP 的百分比（0-100），命中时按目标当前 maxHP 换算
  */
 export function updateProjectiles(world: World, _dt: number) {
   const projectiles = world.query(IsProjectile, Position, Velocity, Projectile, Targeting('*'))
@@ -38,8 +38,8 @@ export function updateProjectiles(world: World, _dt: number) {
       const distToWall = targetPos.z - pos.z
       if (distToWall <= HIT_THRESHOLD) {
         if (targetHealth) {
-          const finalDamage = calculateDamage(proj.sourceKind, target, proj.damage)
-          target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
+          const damage = targetHealth.max * (proj.damage / 100)
+          target.set(Health, { current: Math.max(0, targetHealth.current - damage) })
           playPositionalSound('wallHit', [targetPos.x, targetPos.y, targetPos.z])
         }
         toDestroy.push(projectile)
@@ -59,8 +59,8 @@ export function updateProjectiles(world: World, _dt: number) {
 
     if (dist < HIT_THRESHOLD) {
       if (targetHealth) {
-        const finalDamage = calculateDamage(proj.sourceKind, target, proj.damage)
-        target.set(Health, { current: Math.max(0, targetHealth.current - finalDamage) })
+        const damage = targetHealth.max * (proj.damage / 100)
+        target.set(Health, { current: Math.max(0, targetHealth.current - damage) })
       }
       toDestroy.push(projectile)
       return

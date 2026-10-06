@@ -15,30 +15,26 @@ export const Attack = trait({
 /**
  * 攻击对方阵营单位的能力参数
  * range: 攻击射程（米）
- * damage: 每次伤害
  * interval: 完整攻击周期（秒）
+ * 伤害不在此 trait 存储，改由 combat/damage.ts 的百分比表按兵种组合查表
  *
  * 守方的「先手一击」不靠独立机制实现：守方 range 本身就比对手略大一点点
- * （守弓 5.7 vs 攻弓 5.0、破矛兵 3.3 vs 长枪兵 2.5），先手是射程差的自然结果。
+ * （守弓 6.75 vs 攻弓 6、破矛兵 5 vs 长枪兵 4.5），先手是射程差的自然结果。
  */
 export const CanAttackUnits = trait({
   range: 5,
-  damage: 5,
   interval: 1.5,
 })
 
 /**
  * 攻击城门的能力参数
  * wallZ: 攻城 z 位置，pos.z >= wallZ 时停止并攻击城墙
- * damage: 每次伤害（isPercent 为 true 时为百分比 0-100，按 target.max 计算）
  * interval: 完整攻击周期（秒）
- * isPercent: true 时 damage 按目标 maxHP 百分比结算（用于攻城车）
+ * 伤害不在此 trait 存储，改由 combat/damage.ts 的百分比表按兵种组合查表（统一为目标 maxHP 百分比）
  */
 export const CanAttackWall = trait({
   wallZ: 1.95,
-  damage: 8,
   interval: 1.2,
-  isPercent: false,
 })
 
 /**
