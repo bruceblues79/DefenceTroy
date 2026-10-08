@@ -34,7 +34,7 @@ export interface RoundConfig {
 }
 
 const SPAWN_INTERVAL = 1
-const WAVE_GAP = 6
+const WAVE_GAP = 5
 
 export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
@@ -143,6 +143,7 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
@@ -163,13 +164,15 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
