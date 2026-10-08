@@ -34,7 +34,7 @@ export interface RoundConfig {
 }
 
 const SPAWN_INTERVAL = 1
-const WAVE_GAP = 10
+const WAVE_GAP = 7.5
 
 export const ROUNDS: RoundConfig[] = [
   // ── 第一轮 ──
