@@ -25,13 +25,14 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
  * 攻城方排队防穿越系统
  *
  * 从前到后（z 降序）逐个处理：对每个正在前进的单位，找前方
- * 同类型、同 x 列、已停止的同类兵中**最近**的那个；
+ * 同类型、同 x 列的同类兵中**最近**的那个（无论前方是否停止）；
  * 若「本帧移动后」距离小于 gap，则阻挡（vel.z=0）；
  * 若已冲入 gap 内，一次性 snap 到 nearestFront.z - gap。
  *
  * 关键不变量：
- * - 回退后同步更新 entry.z，后续单位据此排队，保证队列单调（每两个相邻 stopped 单位间距 ≥ gap）。
- * - 只取最近的前方 stopped 同类作为 blocker，避免被远处同类误推到过前位置。
+ * - 回退后同步更新 entry.z，后续单位据此排队，保证队列单调。
+ * - 只取最近的前方同类作为 blocker，避免被远处同类误推到过前位置。
+ * - 不要求前方 stopped：前方移动中的同类也能阻挡，防止后方追上重叠。
  *
  * 执行时机：所有敌人 AI 之后、updateMovement 之前。
  */
@@ -52,7 +53,7 @@ export function updateEnemyQueue(world: World, dt: number) {
 
   if (entries.length < 2) return
 
-  // 从前到后排序（z 降序）：前方单位先处理，停止状态向后传播
+  // 从前到后排序（z 降序）：前方单位先处理
   entries.sort((a, b) => b.z - a.z)
 
   for (let i = 0; i < entries.length; i++) {
@@ -60,7 +61,7 @@ export function updateEnemyQueue(world: World, dt: number) {
     if (e.stopped) continue
 
     const gap = QUEUE_GAP[e.kind] ?? 0.7
-    let nearestFrontZ = Infinity // 离 e 最近的前方 stopped 同类的 z（越小越近）
+    let nearestFrontZ = Infinity // 离 e 最近的前方同类的 z（越小越近）
     let blocked = false
 
     // entries[0..i-1] 是前方的单位（z 降序排列）
@@ -68,12 +69,14 @@ export function updateEnemyQueue(world: World, dt: number) {
       const front = entries[j]
       if (front.kind !== e.kind) continue
       if (Math.abs(front.x - e.x) > COLUMN_THRESHOLD) continue
-      if (!front.stopped) continue
+      // 不检查 front.stopped：前方移动中的同类也阻挡，防止后方追上
       // 基于「本帧移动后」的距离判定：防止放行后 movement 又把它推进 gap 内
-      const projected = front.z - (e.z + e.velZ * dt)
+      const frontProjected = front.z + front.velZ * dt
+      const eProjected = e.z + e.velZ * dt
+      const projected = frontProjected - eProjected
       if (projected > gap) continue
-      // 取最近的前方 stopped 同类（z 最小）
-      if (front.z < nearestFrontZ) nearestFrontZ = front.z
+      // 取最近的前方同类（z 最小）
+      if (frontProjected < nearestFrontZ) nearestFrontZ = frontProjected
       blocked = true
     }
 
@@ -81,7 +84,7 @@ export function updateEnemyQueue(world: World, dt: number) {
       e.stopped = true
       const vel = e.entity.get(Velocity)
       if (vel) vel.z = 0
-      // 一次性位置校正到最近前方 stopped 同类的身后 gap 处，
+      // 一次性位置校正到最近前方同类的身后 gap 处，
       // 并同步 entry.z，保证后续单位排队边界正确
       const pos = e.entity.get(Position)
       if (pos) {
@@ -90,6 +93,20 @@ export function updateEnemyQueue(world: World, dt: number) {
           pos.z = minZ
           e.z = minZ
         }
+      }
+    }
+  }
+
+  // DEBUG: 检测同 kind 同 x 列的重叠（间距 < gap*0.5 视为重叠）
+  for (let i = 0; i < entries.length; i++) {
+    for (let j = i + 1; j < entries.length; j++) {
+      const a = entries[i], b = entries[j]
+      if (a.kind !== b.kind) continue
+      if (Math.abs(a.x - b.x) > COLUMN_THRESHOLD) continue
+      const gap = QUEUE_GAP[a.kind] ?? 0.7
+      const dist = Math.abs(a.z - b.z)
+      if (dist < gap * 0.5) {
+        console.warn(`[QUEUE-OVERLAP] ${a.kind} x=${a.x.toFixed(2)} z1=${a.z.toFixed(3)} z2=${b.z.toFixed(3)} dist=${dist.toFixed(3)} gap=${gap}`)
       }
     }
   }
