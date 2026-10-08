@@ -5,11 +5,14 @@ import { trait } from 'koota'
  * cooldown: 剩余冷却（秒）
  * attackTimer: 当前攻击已进行时间（秒）
  * isAttacking: 是否正在攻击周期中
+ * currentInterval: 本次攻击触发时记录的周期（秒），isAttacking 期间不重新查 target，
+ *   避免 target 中途死亡时 getInterval=0 立即结束 atk，让动作完整播放
  */
 export const Attack = trait({
   cooldown: 0,
   attackTimer: 0,
   isAttacking: false,
+  currentInterval: 0,
 })
 
 /**

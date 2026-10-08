@@ -11,6 +11,7 @@ import {
   IsSpearBreaker,
   IsPikeman,
   IsRam,
+  IsPrayer,
   IsWall,
   IsProjectile,
   Position,
@@ -69,6 +70,8 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
   const enemyPikeman = useQuery(IsEnemy, IsPikeman, Position)
   // 敌人攻城车
   const enemyRams = useQuery(IsEnemy, IsRam, Position)
+  // 敌人祷言师
+  const enemyPrayers = useQuery(IsEnemy, IsPrayer, Position)
   // 守军弓手
   const defenderArchers = useQuery(IsDefender, IsArcher, Position)
   // 守军破矛兵
@@ -154,6 +157,20 @@ export default function UnitRenderer({ onDefenderDragStart, onSlotOver, onSlotUp
           entity={entity}
           onPointerUp={onEnemyPointerUp?.(entity)}
         />
+      ))}
+
+      {/* 敌人祷言师 */}
+      {enemyPrayers.map((entity) => (
+        <group key={entityKey(entity)}>
+          <CharacterModel
+            entity={entity}
+            modelKey={'enemyPrayer' as ModelKey}
+            yaw={MODEL_YAW.enemyPrayer}
+            onPointerUp={onEnemyPointerUp?.(entity)}
+            onDeath={handleDeath}
+          />
+          <HealthBarProxy entity={entity} offset={[0, BAR_Y, 0]} width={0.4} yaw={MODEL_YAW.enemyPrayer} backOffset={BAR_BACK} />
+        </group>
       ))}
 
       {/* 守军弓手 */}

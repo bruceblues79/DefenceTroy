@@ -7,7 +7,8 @@ import { trait } from 'koota'
 //   'pikeman'  攻方「长枪兵」——速度 2×，抗弓箭
 //   'sapper'   攻方「攻城兵」——只攻墙，作用是干扰/分散火力/送钱
 //   'ram'      攻方「攻城车」——慢速厚血，百分比砸墙，需集火
-export type UnitKind = 'archer' | 'spearbreaker' | 'pikeman' | 'sapper' | 'ram' | 'wall' | 'unknown'
+//   'prayer'   攻方「祷言师」——走到停止位后吟唱，给己方随机 kind 攻速 buff
+export type UnitKind = 'archer' | 'spearbreaker' | 'pikeman' | 'sapper' | 'ram' | 'prayer' | 'wall' | 'unknown'
 
 // 兵种身份 trait：所有战斗实体必须挂载，缺失时 kind 默认为 'unknown'（倍率 x1.0）
 export const UnitType = trait<{ kind: UnitKind }>({ kind: 'unknown' })
@@ -25,6 +26,7 @@ export const IsMelee = trait()          // 攻击方式：近战直扣血。目�
 export const IsSpearBreaker = trait()   // 守方破矛兵
 export const IsPikeman = trait()        // 攻方长枪兵
 export const IsRam = trait()            // 攻方攻城车：近战砸墙，百分比伤害，厚血慢速
+export const IsPrayer = trait()         // 攻方祷言师：吟唱给己方随机 kind 攻速 buff
 
 // 抛射物标签
 export const IsProjectile = trait()

@@ -58,6 +58,7 @@ export function createRoundEngine(configs: RoundConfig[], cb: RoundEngineCallbac
     if (type === 'sapper') actions.spawnEnemySapper(x, ENEMY_SPAWN_Z)
     else if (type === 'archer') actions.spawnEnemyArcher(x, ENEMY_SPAWN_Z)
     else if (type === 'ram') actions.spawnEnemyRam(x, ENEMY_SPAWN_Z)
+    else if (type === 'prayer') actions.spawnEnemyPrayer(x, ENEMY_SPAWN_Z)
     else actions.spawnEnemyPikeman(x, ENEMY_SPAWN_Z)
   }
 

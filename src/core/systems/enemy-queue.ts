@@ -18,6 +18,7 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
   sapper: 0.7,
   pikeman: 0.7,
   ram: 1.2,
+  prayer: 0.7,
 }
 
 /**

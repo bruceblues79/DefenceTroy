@@ -2,8 +2,8 @@
 // 所有发兵相关参数集中于此，不得散落在发兵逻辑中。
 // 追加轮次只需向 ROUNDS 数组末尾追加，胜利结算自动移动到最后一个已配置轮次之后。
 
-// sapper 攻城兵（干扰/送钱） / archer 弩兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭） / ram 攻城车（厚血百分比砸墙）
-export type EnemyType = 'sapper' | 'archer' | 'pikeman' | 'ram'
+// sapper 攻城兵（干扰/送钱） / archer 弩兵（标准体） / pikeman 长枪兵（速度 2×，抗弓箭） / ram 攻城车（厚血百分比砸墙） / prayer 祷言师（吟唱给己方攻速 buff）
+export type EnemyType = 'sapper' | 'archer' | 'pikeman' | 'ram' | 'prayer'
 
 export interface WaveEnemy {
   type: EnemyType
@@ -153,3 +153,35 @@ export const ROUNDS: RoundConfig[] = [
     gold: 200,
   },
 ]
+
+// ── 测试关卡配置（agent 按用户要求修改）──
+// 起始轮次：0 = 正常游戏（从第一轮开始），-1 = 测试关卡（仅单轮 + 足额金币）
+export const START_ROUND: number = 0
+
+// 测试关卡起始金币
+export const TEST_GOLD = 999999
+
+// 测试关卡发兵小波：3 步兵 + 1 祷言 + 3 弓兵（验祷言师 buff 流程）
+export const TEST_WAVE: WaveEnemy[] = [
+  { type: 'sapper', count: 3 },
+  { type: 'prayer', count: 1 },
+  { type: 'archer', count: 3 },
+]
+
+/** 构建测试轮：单小波，intro/ending 标注 Test Round，整备金 0 */
+export function buildTestRound(wave: WaveEnemy[]): RoundConfig {
+  return {
+    intro: {
+      title: 'Test Round',
+      body: 'Unit testing ground. Gold is abundant; configure the wave in rounds.config.ts.',
+      tip: 'Modify TEST_WAVE in src/core/rounds/rounds.config.ts to change enemies.',
+    },
+    waves: [{ enemies: wave, spawnInterval: SPAWN_INTERVAL }],
+    waveGap: WAVE_GAP,
+    ending: {
+      title: 'Test Round Cleared',
+      body: 'Wave eliminated. Adjust TEST_WAVE and redeploy to test other units.',
+    },
+    gold: 0,
+  }
+}

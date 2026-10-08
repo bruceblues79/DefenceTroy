@@ -16,6 +16,7 @@ import {
   IsSpearBreaker,
   IsPikeman,
   IsRam,
+  IsPrayer,
   IsProjectile,
   Targeting,
   UnitType,
@@ -65,6 +66,15 @@ export const ENEMY_RAM_SPEED = 0.3
 export const ENEMY_RAM_WALL_Z = 1.75
 export const ENEMY_RAM_WALL_INTERVAL = 2
 export const ENEMY_RAM_REWARD = 100
+
+// 敌方祷言师：走到 wallZ=-0.5 后吟唱，吟唱完成给己方随机 kind 攻速 buff
+// 攻间隔 3s；施法动作 1.5s（开始瞬间触发 buff）；移速 0.4；不攻击单位/城墙（不进入 updateAttack 伤害结算）
+export const ENEMY_PRAYER_HP = 100
+export const ENEMY_PRAYER_SPEED = 0.4
+export const ENEMY_PRAYER_WALL_Z = -0.5
+export const ENEMY_PRAYER_INTERVAL = 3
+export const ENEMY_PRAYER_CHANT = 1.5
+export const ENEMY_PRAYER_REWARD = 50
 
 // 守军弓兵：只攻击单位
 // 射程 6.5 = 攻弓 6 + 0.5，略大于对手保证先手
@@ -185,6 +195,21 @@ export const spawnActions = createActions((world) => ({
       UnitType({ kind: 'ram' }),
       IsEnemy,
       IsRam,
+    )
+  },
+
+  /** 生成敌方祷言师：走到 wallZ 后吟唱，给己方随机 kind 攻速 buff。不攻击墙/单位
+   *  Attack 字段由 updateEnemyPrayerAI 自管；updateAttack 通过 IsPrayer early-return 跳过 */
+  spawnEnemyPrayer(x: number, z: number = ENEMY_SPAWN_Z) {
+    return world.spawn(
+      Position({ x, y: 0, z }),
+      Velocity({ x: 0, y: 0, z: 0 }),
+      Health({ current: ENEMY_PRAYER_HP, max: ENEMY_PRAYER_HP }),
+      Attack({ cooldown: ENEMY_PRAYER_INTERVAL, attackTimer: 0, isAttacking: false }),
+      Reward({ value: ENEMY_PRAYER_REWARD }),
+      UnitType({ kind: 'prayer' }),
+      IsEnemy,
+      IsPrayer,
     )
   },
 
