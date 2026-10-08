@@ -1,4 +1,4 @@
-import type { World } from 'koota'
+import type { World, Entity } from 'koota'
 import { Position, Velocity, IsEnemy, UnitType } from '../traits'
 import type { UnitKind } from '../traits'
 
@@ -24,45 +24,57 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
 /**
  * 攻城方排队防穿越系统
  *
- * 对每个正在前进（vel.z > 0）的攻城方单位，检查前方是否有
- * 同类型、同 x 列、已停止（vel.z <= 0）的同类兵且距离小于排队间距；
+ * 从前到后（z 降序）逐个处理：对每个正在前进的单位，检查前方是否有
+ * 同类型、同 x 列、已停止的同类兵且距离小于排队间距；
  * 若被阻挡则将 vel.z 置 0，使其排在前方同类兵身后等待。
  *
- * 不影响攻击守军逻辑：弓兵/长枪兵的 AI 已在射程内有守军时
- * 将 vel.z 设为 0，本系统只处理前进中的单位。
+ * 前到后处理确保停止状态逐级传播：第二个停 → 第三个立刻看到
+ * 第二个已停并也停下，不再重叠。
  *
  * 执行时机：所有敌人 AI 之后、updateMovement 之前。
  */
 export function updateEnemyQueue(world: World, _dt: number) {
-  // 第一遍：收集所有攻城方单位快照（只读）
-  type Snapshot = { x: number; z: number; velZ: number; kind: UnitKind }
-  const snapshot: Snapshot[] = []
+  type Entry = { x: number; z: number; velZ: number; kind: UnitKind; stopped: boolean; entity: Entity }
+  const entries: Entry[] = []
 
-  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, vel, ut]) => {
-    snapshot.push({ x: pos.x, z: pos.z, velZ: vel.z, kind: ut.kind })
+  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, vel, ut], entity) => {
+    entries.push({
+      x: pos.x,
+      z: pos.z,
+      velZ: vel.z,
+      kind: ut.kind,
+      stopped: vel.z <= 0,
+      entity,
+    })
   })
 
-  if (snapshot.length < 2) return
+  if (entries.length < 2) return
 
-  // 第二遍：对每个正在前进的单位，检查是否被前方同类兵阻挡
-  world.query(IsEnemy, Position, Velocity, UnitType).updateEach(([pos, vel, ut]) => {
-    if (vel.z <= 0) return
+  // 从前到后排序（z 降序）：前方单位先处理，停止状态向后传播
+  entries.sort((a, b) => b.z - a.z)
 
-    const gap = QUEUE_GAP[ut.kind] ?? 0.7
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i]
+    if (e.stopped) continue
+
+    const gap = QUEUE_GAP[e.kind] ?? 0.7
     let blocked = false
 
-    for (const other of snapshot) {
-      if (other.kind !== ut.kind) continue
-      if (other.z <= pos.z) continue // 不在前方
-      if (Math.abs(other.x - pos.x) > COLUMN_THRESHOLD) continue // 不同列
-      if (other.z - pos.z > gap) continue // 距离太远
-      if (other.velZ > 0) continue // 前方兵仍在移动，不阻挡
+    // entries[0..i-1] 是前方的单位（z 降序排列）
+    for (let j = 0; j < i; j++) {
+      const front = entries[j]
+      if (front.kind !== e.kind) continue
+      if (Math.abs(front.x - e.x) > COLUMN_THRESHOLD) continue
+      if (!front.stopped) continue
+      if (front.z - e.z > gap) continue
       blocked = true
       break
     }
 
     if (blocked) {
-      vel.z = 0
+      e.stopped = true
+      const vel = e.entity.get(Velocity)
+      if (vel) vel.z = 0
     }
-  })
+  }
 }
