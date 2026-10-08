@@ -25,7 +25,7 @@ const ENEMY_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>>
 // 守方攻击敌军（行：攻击方兵种；列：受击方兵种；值：目标 maxHP 百分比）
 const DEFENDER_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
   archer:       { sapper: 10, archer: 10, pikeman: 5,  ram: 2, prayer: 2 },   // 守弓
-  spearbreaker: { sapper: 15, archer: 20, pikeman: 20, ram: 5, prayer: 3 },   // 破矛
+  spearbreaker: { sapper: 15, archer: 15, pikeman: 15, ram: 5, prayer: 3 },   // 破矛
 }
 
 /**
