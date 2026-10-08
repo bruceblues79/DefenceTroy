@@ -1,4 +1,4 @@
-import type { World } from 'koota'
+import type { World, Entity } from 'koota'
 import { Position, Velocity, IsEnemy, UnitType } from '../traits'
 import type { UnitKind } from '../traits'
 
@@ -35,39 +35,45 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
  * 执行时机：所有敌人 AI 之后、updateMovement 之前。
  */
 export function updateEnemyQueue(world: World, _dt: number) {
-  // 第一遍：收集所有攻城方单位快照（只读）
-  type Snapshot = { x: number; z: number; velZ: number; kind: UnitKind }
-  const snapshot: Snapshot[] = []
+  // 收集所有攻城方单位（位置不变，速度需实时读取以支持链式传播）
+  type Entry = { entity: Entity; z: number; x: number; kind: UnitKind }
+  const entries: Entry[] = []
 
-  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, vel, ut]) => {
-    snapshot.push({ x: pos.x, z: pos.z, velZ: vel.z, kind: ut.kind })
+  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, _vel, ut], entity) => {
+    entries.push({ entity, z: pos.z, x: pos.x, kind: ut.kind })
   })
 
-  if (snapshot.length < 2) return
+  if (entries.length < 2) return
 
-  // 第二遍：对每个正在前进的单位，匹配 gap 内最近前方同类兵的速度
-  // 前方停则停（排队），前方行则同速随行（保持间距），无前方阻挡则按自身速度前进
-  world.query(IsEnemy, Position, Velocity, UnitType).updateEach(([pos, vel, ut]) => {
-    if (vel.z <= 0) return
+  // 按 z 降序（前方在前），保证速度匹配从前往后链式传播：
+  // 前方停 → 后方读取前方已调整的速度也停，避免后方误判前方仍在移动而追尾
+  entries.sort((a, b) => b.z - a.z)
 
-    const gap = QUEUE_GAP[ut.kind] ?? 0.7
-    let matchedVelZ: number | null = null
+  for (let i = 0; i < entries.length; i++) {
+    const cur = entries[i]
+    const curVel = cur.entity.get(Velocity)
+    if (!curVel || curVel.z <= 0) continue
+
+    const gap = QUEUE_GAP[cur.kind] ?? 0.7
     let nearestDist = Infinity
+    let matchedVelZ: number | null = null
 
-    for (const other of snapshot) {
-      if (other.kind !== ut.kind) continue
-      if (other.z <= pos.z) continue // 不在前方
-      if (Math.abs(other.x - pos.x) > COLUMN_THRESHOLD) continue // 不同列
-      const dist = other.z - pos.z
+    // 只检查前方（索引 < i，因已按 z 降序排列）同类单位
+    for (let j = 0; j < i; j++) {
+      const other = entries[j]
+      if (other.kind !== cur.kind) continue
+      if (Math.abs(other.x - cur.x) > COLUMN_THRESHOLD) continue // 不同列
+      const dist = other.z - cur.z
       if (dist >= gap) continue // 距离太远，不匹配
       if (dist < nearestDist) {
         nearestDist = dist
-        matchedVelZ = other.velZ
+        const otherVel = other.entity.get(Velocity)
+        matchedVelZ = otherVel?.z ?? 0
       }
     }
 
     if (matchedVelZ !== null) {
-      vel.z = matchedVelZ
+      cur.entity.set(Velocity, { x: curVel.x, y: curVel.y, z: matchedVelZ })
     }
-  })
+  }
 }
