@@ -1,4 +1,4 @@
-import type { World, Entity } from 'koota'
+import type { World } from 'koota'
 import { Position, Velocity, IsEnemy, UnitType } from '../traits'
 import type { UnitKind } from '../traits'
 
@@ -18,96 +18,50 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
   sapper: 0.7,
   pikeman: 0.7,
   ram: 1.2,
-  prayer: 0.7,
 }
 
 /**
  * 攻城方排队防穿越系统
  *
- * 从前到后（z 降序）逐个处理：对每个正在前进的单位，找前方
- * 同类型、同 x 列的同类兵中**最近**的那个（无论前方是否停止）；
- * 若「本帧移动后」距离小于 gap，则阻挡（vel.z=0）；
- * 若已冲入 gap 内，一次性 snap 到 nearestFront.z - gap。
+ * 对每个正在前进（vel.z > 0）的攻城方单位，检查前方是否有
+ * 同类型、同 x 列、已停止（vel.z <= 0）的同类兵且距离小于排队间距；
+ * 若被阻挡则将 vel.z 置 0，使其排在前方同类兵身后等待。
  *
- * 关键不变量：
- * - 回退后同步更新 entry.z，后续单位据此排队，保证队列单调。
- * - 只取最近的前方同类作为 blocker，避免被远处同类误推到过前位置。
- * - 不要求前方 stopped：前方移动中的同类也能阻挡，防止后方追上重叠。
+ * 不影响攻击守军逻辑：弓兵/长枪兵的 AI 已在射程内有守军时
+ * 将 vel.z 设为 0，本系统只处理前进中的单位。
  *
  * 执行时机：所有敌人 AI 之后、updateMovement 之前。
  */
-export function updateEnemyQueue(world: World, dt: number) {
-  type Entry = { x: number; z: number; velZ: number; kind: UnitKind; stopped: boolean; entity: Entity }
-  const entries: Entry[] = []
+export function updateEnemyQueue(world: World, _dt: number) {
+  // 第一遍：收集所有攻城方单位快照（只读）
+  type Snapshot = { x: number; z: number; velZ: number; kind: UnitKind }
+  const snapshot: Snapshot[] = []
 
-  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, vel, ut], entity) => {
-    entries.push({
-      x: pos.x,
-      z: pos.z,
-      velZ: vel.z,
-      kind: ut.kind,
-      stopped: vel.z <= 0,
-      entity,
-    })
+  world.query(IsEnemy, Position, Velocity, UnitType).readEach(([pos, vel, ut]) => {
+    snapshot.push({ x: pos.x, z: pos.z, velZ: vel.z, kind: ut.kind })
   })
 
-  if (entries.length < 2) return
+  if (snapshot.length < 2) return
 
-  // 从前到后排序（z 降序）：前方单位先处理
-  entries.sort((a, b) => b.z - a.z)
+  // 第二遍：对每个正在前进的单位，检查是否被前方同类兵阻挡
+  world.query(IsEnemy, Position, Velocity, UnitType).updateEach(([pos, vel, ut]) => {
+    if (vel.z <= 0) return
 
-  for (let i = 0; i < entries.length; i++) {
-    const e = entries[i]
-    if (e.stopped) continue
-
-    const gap = QUEUE_GAP[e.kind] ?? 0.7
-    let nearestFrontZ = Infinity // 离 e 最近的前方同类的 z（越小越近）
+    const gap = QUEUE_GAP[ut.kind] ?? 0.7
     let blocked = false
 
-    // entries[0..i-1] 是前方的单位（z 降序排列）
-    for (let j = 0; j < i; j++) {
-      const front = entries[j]
-      if (front.kind !== e.kind) continue
-      if (Math.abs(front.x - e.x) > COLUMN_THRESHOLD) continue
-      // 不检查 front.stopped：前方移动中的同类也阻挡，防止后方追上
-      // 基于「本帧移动后」的距离判定：防止放行后 movement 又把它推进 gap 内
-      const frontProjected = front.z + front.velZ * dt
-      const eProjected = e.z + e.velZ * dt
-      const projected = frontProjected - eProjected
-      if (projected > gap) continue
-      // 取最近的前方同类（z 最小）
-      if (frontProjected < nearestFrontZ) nearestFrontZ = frontProjected
+    for (const other of snapshot) {
+      if (other.kind !== ut.kind) continue
+      if (other.z <= pos.z) continue // 不在前方
+      if (Math.abs(other.x - pos.x) > COLUMN_THRESHOLD) continue // 不同列
+      if (other.z - pos.z > gap) continue // 距离太远
+      if (other.velZ > 0) continue // 前方兵仍在移动，不阻挡
       blocked = true
+      break
     }
 
     if (blocked) {
-      e.stopped = true
-      const vel = e.entity.get(Velocity)
-      if (vel) vel.z = 0
-      // 一次性位置校正到最近前方同类的身后 gap 处，
-      // 并同步 entry.z，保证后续单位排队边界正确
-      const pos = e.entity.get(Position)
-      if (pos) {
-        const minZ = nearestFrontZ - gap
-        if (pos.z > minZ) {
-          pos.z = minZ
-          e.z = minZ
-        }
-      }
+      vel.z = 0
     }
-  }
-
-  // DEBUG: 检测同 kind 同 x 列的重叠（间距 < gap*0.5 视为重叠）
-  for (let i = 0; i < entries.length; i++) {
-    for (let j = i + 1; j < entries.length; j++) {
-      const a = entries[i], b = entries[j]
-      if (a.kind !== b.kind) continue
-      if (Math.abs(a.x - b.x) > COLUMN_THRESHOLD) continue
-      const gap = QUEUE_GAP[a.kind] ?? 0.7
-      const dist = Math.abs(a.z - b.z)
-      if (dist < gap * 0.5) {
-        console.warn(`[QUEUE-OVERLAP] ${a.kind} x=${a.x.toFixed(2)} z1=${a.z.toFixed(3)} z2=${b.z.toFixed(3)} dist=${dist.toFixed(3)} gap=${gap}`)
-      }
-    }
-  }
+  })
 }
