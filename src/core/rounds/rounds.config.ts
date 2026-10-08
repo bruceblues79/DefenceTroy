@@ -71,7 +71,7 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -94,7 +94,7 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -116,9 +116,9 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -138,17 +138,44 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'Round 5 Repelled',
       body: 'The enemy has launched a multi-dimensional offensive.',
       tip: 'Victory bonus: 200g. Flexibly switch targets and our units.',
+    },
+    gold: 200,
+  },
+
+  // ── 第六轮 ──
+  {
+    intro: {
+      title: 'The Annoying Prayer',
+      body: 'Unable to break through, the enemy deploys a surprise unit: the Prayer. They do not deal direct damage, but are hard to kill.',
+      tip: 'Units buffed by the Prayer are highly threatening — it enhances both offense and defense. Coordinate your forces to focus fire on the Prayer.',
+    },
+    waves: [
+      { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+    ],
+    waveGap: WAVE_GAP,
+    ending: {
+      title: 'Round 6 Repelled',
+      body: 'The enemy\'s tactics have grown more sophisticated.',
+      tip: 'Victory bonus: 200g. Choose focus-fire targets wisely and replenish your forces.',
     },
     gold: 200,
   },
