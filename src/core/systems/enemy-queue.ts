@@ -21,11 +21,13 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
 }
 
 /**
- * 攻城方排队防穿越系统
+ * 攻城方排队间距系统
  *
- * 对每个正在前进（vel.z > 0）的攻城方单位，检查前方是否有
- * 同类型、同 x 列、已停止（vel.z <= 0）的同类兵且距离小于排队间距；
- * 若被阻挡则将 vel.z 置 0，使其排在前方同类兵身后等待。
+ * 对每个正在前进（vel.z > 0）的攻城方单位，查找前方同类型、同 x 列、
+ * 距离小于排队间距的最近同类兵，匹配其速度（vel.z）：
+ * - 前方停止 → 自身停止（排队等待）
+ * - 前方移动 → 自身同速随行（保持间距，不追尾）
+ * - 无前方阻挡 → 按自身速度前进
  *
  * 不影响攻击守军逻辑：弓兵/长枪兵的 AI 已在射程内有守军时
  * 将 vel.z 设为 0，本系统只处理前进中的单位。
@@ -43,25 +45,29 @@ export function updateEnemyQueue(world: World, _dt: number) {
 
   if (snapshot.length < 2) return
 
-  // 第二遍：对每个正在前进的单位，检查是否被前方同类兵阻挡
+  // 第二遍：对每个正在前进的单位，匹配 gap 内最近前方同类兵的速度
+  // 前方停则停（排队），前方行则同速随行（保持间距），无前方阻挡则按自身速度前进
   world.query(IsEnemy, Position, Velocity, UnitType).updateEach(([pos, vel, ut]) => {
     if (vel.z <= 0) return
 
     const gap = QUEUE_GAP[ut.kind] ?? 0.7
-    let blocked = false
+    let matchedVelZ: number | null = null
+    let nearestDist = Infinity
 
     for (const other of snapshot) {
       if (other.kind !== ut.kind) continue
       if (other.z <= pos.z) continue // 不在前方
       if (Math.abs(other.x - pos.x) > COLUMN_THRESHOLD) continue // 不同列
-      if (other.z - pos.z > gap) continue // 距离太远
-      if (other.velZ > 0) continue // 前方兵仍在移动，不阻挡
-      blocked = true
-      break
+      const dist = other.z - pos.z
+      if (dist >= gap) continue // 距离太远，不匹配
+      if (dist < nearestDist) {
+        nearestDist = dist
+        matchedVelZ = other.velZ
+      }
     }
 
-    if (blocked) {
-      vel.z = 0
+    if (matchedVelZ !== null) {
+      vel.z = matchedVelZ
     }
   })
 }
