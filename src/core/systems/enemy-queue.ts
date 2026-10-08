@@ -24,13 +24,14 @@ const QUEUE_GAP: Partial<Record<UnitKind, number>> = {
 /**
  * 攻城方排队防穿越系统
  *
- * 从前到后（z 降序）逐个处理：对每个正在前进的单位，检查前方是否有
- * 同类型、同 x 列、已停止的同类兵且「本帧移动后」距离小于排队间距；
- * 若被阻挡则将 vel.z 置 0，使其排在前方同类兵身后等待。
- * 若已冲入 gap 内（前帧残留/卡顿跳帧），回退位置到 front.z - gap。
+ * 从前到后（z 降序）逐个处理：对每个正在前进的单位，找前方
+ * 同类型、同 x 列、已停止的同类兵中**最近**的那个；
+ * 若「本帧移动后」距离小于 gap，则阻挡（vel.z=0）；
+ * 若已冲入 gap 内，一次性 snap 到 nearestFront.z - gap。
  *
- * 前到后处理确保停止状态逐级传播：第二个停 → 第三个立刻看到
- * 第二个已停并也停下，不再重叠。
+ * 关键不变量：
+ * - 回退后同步更新 entry.z，后续单位据此排队，保证队列单调（每两个相邻 stopped 单位间距 ≥ gap）。
+ * - 只取最近的前方 stopped 同类作为 blocker，避免被远处同类误推到过前位置。
  *
  * 执行时机：所有敌人 AI 之后、updateMovement 之前。
  */
@@ -59,8 +60,8 @@ export function updateEnemyQueue(world: World, dt: number) {
     if (e.stopped) continue
 
     const gap = QUEUE_GAP[e.kind] ?? 0.7
+    let nearestFrontZ = Infinity // 离 e 最近的前方 stopped 同类的 z（越小越近）
     let blocked = false
-    let blockerZ = 0
 
     // entries[0..i-1] 是前方的单位（z 降序排列）
     for (let j = 0; j < i; j++) {
@@ -71,21 +72,24 @@ export function updateEnemyQueue(world: World, dt: number) {
       // 基于「本帧移动后」的距离判定：防止放行后 movement 又把它推进 gap 内
       const projected = front.z - (e.z + e.velZ * dt)
       if (projected > gap) continue
+      // 取最近的前方 stopped 同类（z 最小）
+      if (front.z < nearestFrontZ) nearestFrontZ = front.z
       blocked = true
-      blockerZ = front.z
-      break
     }
 
     if (blocked) {
       e.stopped = true
       const vel = e.entity.get(Velocity)
       if (vel) vel.z = 0
-      // 位置回退：若已冲入 gap 内（距离 < gap），拉回到 front.z - gap，
-      // 防止残留位置造成的视觉重叠
+      // 一次性位置校正到最近前方 stopped 同类的身后 gap 处，
+      // 并同步 entry.z，保证后续单位排队边界正确
       const pos = e.entity.get(Position)
       if (pos) {
-        const minZ = blockerZ - gap
-        if (pos.z > minZ) pos.z = minZ
+        const minZ = nearestFrontZ - gap
+        if (pos.z > minZ) {
+          pos.z = minZ
+          e.z = minZ
+        }
       }
     }
   }
