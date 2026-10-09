@@ -16,7 +16,7 @@ import RoundPromptPanel from '../components/RoundPromptPanel'
 import { spawnActions, combatActions, WALL_SLOTS, WALL_POSITION, DEFENDER_ARCHER_HP, DEFENDER_SPEAR_BREAKER_HP } from '../core/actions'
 import { IsDefender, IsArcher, IsSpearBreaker, IsEnemy, Position, Health, Targeting, CanAttackUnits } from '../core/traits'
 import { createRoundEngine, type RoundEngine } from '../core/rounds/rounds-engine'
-import { ROUNDS, type RoundConfig } from '../core/rounds/rounds.config'
+import { ROUNDS, START_ROUND, TEST_GOLD, TEST_WAVE, buildTestRound, type RoundConfig } from '../core/rounds/rounds.config'
 
 const BUTTON_NAMES = ['btn_bow', 'btn_spear', 'btn_focus', 'btn_shop', 'btn_menu'] as const
 // 间距 0.9、外缘 ±2.2：最窄主流机型 360px 宽（可视半宽 2.25）下留 4px 余量不被裁切
@@ -100,9 +100,11 @@ export default function BattleFieldSpace({
   onGameOver: (result: 'victory' | 'defeat') => void
 }) {
   const world = useWorld()
+  // 测试关卡：START_ROUND === -1 时仅单轮 + 足额金币
+  const testMode = START_ROUND === -1
   const [barracks, setBarracks] = useState<Barracks>({ bow: [], spear: [] })
   const [dragState, setDragState] = useState<DragState>(null)
-  const [gold, setGold] = useState(0)
+  const [gold, setGold] = useState(testMode ? TEST_GOLD : 0)
   const [shopOpen, setShopOpen] = useState(false)
   const [prompt, setPrompt] = useState<PromptState>({ kind: 'none' })
   const regenAccumRef = useRef(0)
@@ -110,7 +112,8 @@ export default function BattleFieldSpace({
   // 轮次引擎（创建一次，回调绑定 React state）
   const engineRef = useRef<RoundEngine | null>(null)
   if (!engineRef.current) {
-    engineRef.current = createRoundEngine(ROUNDS, {
+    const configs = testMode ? [buildTestRound(TEST_WAVE)] : ROUNDS
+    engineRef.current = createRoundEngine(configs, {
       onIntro: (round) => setPrompt({ kind: 'intro', round }),
       onEnding: (round) => {
         setGold((g) => g + round.gold)

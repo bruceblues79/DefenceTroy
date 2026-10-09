@@ -3,12 +3,12 @@ import type { UnitKind } from './tags'
 
 /**
  * 抛射物参数
- * damage: 命中伤害
+ * damage: 命中伤害占目标 maxHP 的百分比（0-100），发射时已按兵种组合查表解析
  * speed: 飞行速度
- * sourceKind: 发射者兵种身份（用于克制系数矩阵；发射者死亡不影响已射出抛射物）
+ * kind: 发射者兵种身份（仅用于视觉渲染：archer 射箭，其余投矛）
  */
 export const Projectile = trait({
   damage: 5,
   speed: 15,
-  sourceKind: 'unknown' as UnitKind,
+  kind: 'unknown' as UnitKind,
 })

@@ -14,7 +14,7 @@ function distanceXZ(ax: number, az: number, bx: number, bz: number) {
  * 守军破矛兵 AI 系统
  * 行为：静止在城墙上，攻击射程内距离自己最近的敌人
  * 与守军弓兵结构一致，区别在于射程/伤害参数（由 CanAttackUnits 提供）
- * 射程 4.0 比长枪兵 3.2 略大（先手由此而来）；够不到攻弓（wallZ=-0.8 距守矛 4.25）是它「专而不强」的代价
+ * 射程 4.65 比长枪兵 4.5 略大（先手由此而来）；够不到攻弓（wallZ=-1.3 距守矛 4.75）是它「专而不强」的代价
  */
 export function updateDefenderSpearBreakerAI(world: World, _dt: number) {
   const defenders = world.query(IsDefender, IsSpearBreaker, Position, CanAttackUnits)

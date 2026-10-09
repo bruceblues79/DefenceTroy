@@ -40,11 +40,15 @@ export function computeUnitYaw(entity: Entity): number | null {
 
 const BASE = import.meta.env.BASE_URL
 
+// prayer GLB 资产版本号：GLB 更新后递增以破浏览器缓存
+const PRAYER_GLB_VERSION = 1
+
 /** 角色模型文件（攻守弓手分文件：敌我不共用贴图） */
 export const MODEL_URLS = {
   enemyArcher: `${BASE}assets/glb/char_archer_atk.glb`,
   enemySapper: `${BASE}assets/glb/char_sapper.glb`,
   enemyPikeman: `${BASE}assets/glb/char_pikeman.glb`,
+  enemyPrayer: `${BASE}assets/glb/char_prayer.glb?v=${PRAYER_GLB_VERSION}`,
   defenderArcher: `${BASE}assets/glb/char_archer_def.glb`,
   defenderSpearBreaker: `${BASE}assets/glb/char_spear_breaker.glb`,
 } as const
@@ -60,6 +64,7 @@ export const MODEL_YAW: Record<ModelKey, number> = {
   enemyArcher: 0,
   enemySapper: 0,
   enemyPikeman: 0,
+  enemyPrayer: 0,
   defenderArcher: Math.PI,
   defenderSpearBreaker: Math.PI,
 }
@@ -76,6 +81,15 @@ const CLIP_SUFFIX: Record<ClipName, string> = {
   atk: '_atk',
   hurt: '_hurt',
   die: '_die',
+}
+
+/**
+ * 模型动画名前缀优先匹配：当 GLB 内混入其他模型动画时（如 char_prayer.glb 同时含
+ * prayer_atk 和 archer_atk），按后缀匹配会误取非本模型动作。此处声明各模型
+ * 自身的动画前缀，findAction 优先匹配此前缀开头的 clip，找不到再 fallback 到后缀匹配。
+ */
+const CLIP_PREFIX: Partial<Record<ModelKey, string>> = {
+  enemyPrayer: 'prayer',
 }
 
 /** attack 起手 0.6s 内受伤只掉血，不播 hurt */
@@ -110,8 +124,21 @@ function useCharacterClips(modelKey: ModelKey, root: React.RefObject<THREE.Group
  * 按后缀取动作。
  * ⚠️ 必须「用时再取」：useAnimations 的 actions 是懒解析 getter，render 阶段 ref 还是 null，
  * 那时解析会得到 undefined 且不会重试——所以绝不能在 useMemo 里把 action 缓存下来。
+ *
+ * 当 preferredPrefix 提供时，优先匹配以 preferredPrefix 开头且 endWith(suffix) 的动作，
+ * 避免混入其他模型的同名后缀动画（如 prayer GLB 误带 archer_atk）。
  */
-function findAction(actions: Record<string, THREE.AnimationAction | null>, suffix: string) {
+function findAction(
+  actions: Record<string, THREE.AnimationAction | null>,
+  suffix: string,
+  preferredPrefix?: string,
+) {
+  if (preferredPrefix) {
+    for (const name of Object.keys(actions)) {
+      const action = actions[name]
+      if (action && name.startsWith(preferredPrefix) && name.endsWith(suffix)) return action
+    }
+  }
   for (const name of Object.keys(actions)) {
     const action = actions[name]
     if (action && name.endsWith(suffix)) return action
@@ -146,7 +173,8 @@ export default function CharacterModel({
 }) {
   const group = useRef<THREE.Group>(null!)
   const { model, actions } = useCharacterClips(modelKey, group)
-  const clipOf = (name: ClipName) => findAction(actions, CLIP_SUFFIX[name])
+  const clipOf = (name: ClipName) =>
+    findAction(actions, CLIP_SUFFIX[name], CLIP_PREFIX[modelKey])
 
   const st = useRef({
     state: 'guard' as ClipName,

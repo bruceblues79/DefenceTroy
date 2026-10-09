@@ -2,60 +2,44 @@ import type { Entity } from 'koota'
 import { IsDefender, IsEnemy, IsWall, UnitType, type UnitKind } from '../traits'
 
 /**
- * 兵种克制系数矩阵（按阵营拆分，非对称）
- * 行：攻击方兵种；列：受击方兵种；值：最终伤害倍率
+ * 伤害百分比表（伤害 = 目标 maxHP 的百分比）
  *
- * 设计规则：
- * - 守军攻击敌军 → 查 DEFENDER_OFFENSE
- * - 敌军攻击守军 → 查 ENEMY_OFFENSE（攻城兵只攻墙，不在此表）
- * - 对城墙伤害：始终 x1.0
- * - 未知来源/目标：x1.0
+ * 按攻击方阵营拆分为两张表，因为同一 kind（如 archer）在敌我双方的伤害不同：
+ * - ENEMY_DAMAGE：敌方攻击守军/城墙（攻击方为敌军，目标为守军或城墙）
+ * - DEFENDER_DAMAGE：守方攻击敌军（攻击方为守军，目标为敌军）
  *
- * 克制闭环（守方靠射程与先手，不只靠数值）：
- *   攻弓 ──(距墙纵深 3.55 > 破矛兵射程 3.3，破矛兵够不到)──▶ 破矛兵
- *   破矛兵 ──(受长枪兵 0.25 / 对长枪兵 2.0)──▶ 长枪兵
- *   长枪兵 ──(守弓打他只有 0.25 + 速度 2×)──▶ 守弓
+ * 查表规则：按目标阵营分支
+ * - 目标为守军或城墙 → ENEMY_DAMAGE[攻击方kind][目标kind]
+ * - 目标为敌军 → DEFENDER_DAMAGE[攻击方kind][目标kind]
+ * - 未命中 → 0（不造成伤害）
  */
 
-// 守军攻击敌军（行 key：archer 守弓 / spearbreaker 破矛兵；
-//               列 key：sapper 攻城兵 / archer 攻弓 / pikeman 长枪兵 / ram 攻城车）
-const DEFENDER_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:       { sapper: 1.0,  archer: 1.0,  pikeman: 0.25, ram: 0.5 },
-  spearbreaker: { sapper: 1.0,  archer: 0.5,  pikeman: 2.0,  ram: 2.0 },
+// 敌方攻击守军/城墙（行：攻击方兵种；列：受击方兵种；值：目标 maxHP 百分比）
+const ENEMY_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
+  archer:  { archer: 9, spearbreaker: 7.5, wall: 0.25 },      // 敌弓
+  pikeman: { archer: 10, spearbreaker: 7.5, wall: 0.25 },     // 敌矛
+  sapper:  { wall: 0.05 },                                     // 敌步（只攻墙）
+  ram:     { wall: 5 },                                        // 敌攻城（只攻墙）
 }
 
-// 敌军攻击守军（行 key：archer 攻弓 / pikeman 长枪兵；
-//               列 key：archer 守弓 / spearbreaker 破矛兵）
-const ENEMY_OFFENSE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:  { archer: 1.0, spearbreaker: 1.0 },
-  pikeman: { archer: 1.5, spearbreaker: 0.25 },
+// 守方攻击敌军（行：攻击方兵种；列：受击方兵种；值：目标 maxHP 百分比）
+const DEFENDER_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
+  archer:       { sapper: 12.5, archer: 12.5, pikeman: 10, ram: 2, prayer: 4 },   // 守弓
+  spearbreaker: { sapper: 12.5, archer: 20, pikeman: 15, ram: 2, prayer: 4 },  // 破矛
 }
 
 /**
- * 获取克制倍率。按目标阵营分支查表：
- * - 目标为城墙 → x1.0
- * - 目标为守军 → ENEMY_OFFENSE（攻击方必为敌军）
- * - 目标为敌军 → DEFENDER_OFFENSE（攻击方必为守军）
- * - 来源或目标缺失 → x1.0
+ * 获取攻击方对目标的伤害百分比（0-100）
+ * 按目标阵营选择伤害表：目标为守军/城墙查 ENEMY_DAMAGE，目标为敌军查 DEFENDER_DAMAGE
  */
-export function getDamageMultiplier(
+export function getDamagePercentage(
   sourceKind: UnitKind | undefined,
   target: Entity | undefined,
 ): number {
-  if (!sourceKind || !target) return 1
-  if (target.has(IsWall)) return 1
+  if (!sourceKind || !target) return 0
   const targetKind = target.get(UnitType)?.kind ?? 'unknown'
-  const matrix = target.has(IsDefender) ? ENEMY_OFFENSE
-              : target.has(IsEnemy)     ? DEFENDER_OFFENSE
+  const matrix = target.has(IsDefender) || target.has(IsWall) ? ENEMY_DAMAGE
+              : target.has(IsEnemy) ? DEFENDER_DAMAGE
               : null
-  return matrix?.[sourceKind]?.[targetKind] ?? 1
-}
-
-/** 最终伤害 = 基础伤害 × 克制倍率 */
-export function calculateDamage(
-  sourceKind: UnitKind | undefined,
-  target: Entity | undefined,
-  baseDamage: number,
-): number {
-  return baseDamage * getDamageMultiplier(sourceKind, target)
+  return matrix?.[sourceKind]?.[targetKind] ?? 0
 }
