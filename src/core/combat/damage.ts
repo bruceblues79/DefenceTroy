@@ -16,16 +16,16 @@ import { IsDefender, IsEnemy, IsWall, UnitType, type UnitKind } from '../traits'
 
 // 敌方攻击守军/城墙（行：攻击方兵种；列：受击方兵种；值：目标 maxHP 百分比）
 const ENEMY_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:  { archer: 10, spearbreaker: 7.5, wall: 0.25 },   // 敌弓
-  pikeman: { archer: 12.5, spearbreaker: 10, wall: 0.25 },    // 敌矛
+  archer:  { archer: 9, spearbreaker: 7.5, wall: 0.25 },      // 敌弓
+  pikeman: { archer: 10, spearbreaker: 7.5, wall: 0.25 },     // 敌矛
   sapper:  { wall: 0.05 },                                     // 敌步（只攻墙）
   ram:     { wall: 5 },                                        // 敌攻城（只攻墙）
 }
 
 // 守方攻击敌军（行：攻击方兵种；列：受击方兵种；值：目标 maxHP 百分比）
 const DEFENDER_DAMAGE: Partial<Record<UnitKind, Partial<Record<UnitKind, number>>>> = {
-  archer:       { sapper: 12.5, archer: 10, pikeman: 10, ram: 2, prayer: 4 },   // 守弓
-  spearbreaker: { sapper: 12.5, archer: 20, pikeman: 12.5, ram: 2, prayer: 4 },  // 破矛
+  archer:       { sapper: 12.5, archer: 12.5, pikeman: 10, ram: 2, prayer: 4 },   // 守弓
+  spearbreaker: { sapper: 12.5, archer: 20, pikeman: 15, ram: 2, prayer: 4 },  // 破矛
 }
 
 /**
