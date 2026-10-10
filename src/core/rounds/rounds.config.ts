@@ -67,11 +67,11 @@ export const ROUNDS: RoundConfig[] = [
       tip: 'You have earned income. Click the cart icon to hire units. Hired units go to the barracks; drag them onto the wall to deploy.',
     },
     waves: [
-      { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -94,7 +94,8 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -115,10 +116,11 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 2 }, { type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 2 }, { type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
@@ -139,7 +141,7 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 2 }, { type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
