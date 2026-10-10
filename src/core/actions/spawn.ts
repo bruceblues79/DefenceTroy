@@ -73,7 +73,7 @@ export const ENEMY_PRAYER_HP = 100
 export const ENEMY_PRAYER_SPEED = 0.4
 export const ENEMY_PRAYER_WALL_Z = -0.5
 export const ENEMY_PRAYER_INTERVAL = 3
-export const ENEMY_PRAYER_CHANT = 1.5
+export const ENEMY_PRAYER_CHANT = 1
 export const ENEMY_PRAYER_REWARD = 50
 
 // 守军弓兵：只攻击单位
