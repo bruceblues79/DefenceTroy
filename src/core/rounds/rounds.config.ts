@@ -113,7 +113,7 @@ export const ROUNDS: RoundConfig[] = [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 4 }, { type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 5 }, { type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 5 }, { type: 'archer', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
