@@ -116,7 +116,6 @@ export default function BattleFieldSpace({
     engineRef.current = createRoundEngine(configs, {
       onIntro: (round) => setPrompt({ kind: 'intro', round }),
       onEnding: (round) => {
-        setGold((g) => g + round.gold)
         setPrompt({ kind: 'ending', round })
       },
       onAllDone: () => onGameOver('victory'),

@@ -29,8 +29,6 @@ export interface RoundConfig {
   /** 小波之间的等待时间（秒） */
   waveGap: number
   ending: RoundPrompt
-  /** 整备金奖励 */
-  gold: number
 }
 
 const SPAWN_INTERVAL = 1
@@ -54,9 +52,8 @@ export const ROUNDS: RoundConfig[] = [
     ending: {
       title: 'Round 1 Repelled',
       body: 'The walls face no major threat yet, but this war is bound to be long!',
-      tip: 'Victory bonus: 100g. Drag units to reposition on the wall, or swap positions with each other.',
+      tip: 'Drag units to reposition on the wall, or swap positions with each other.',
     },
-    gold: 100,
   },
 
   // ── 第二轮 ──
@@ -68,18 +65,17 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 6 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'Round 2 Repelled',
       body: 'Wall pressure is light, but our defenders are taking casualties!',
-      tip: 'Victory bonus: 200g. Drag units off the wall to return to barracks and slowly recover HP.',
+      tip: 'Drag units off the wall to return to barracks and slowly recover HP.',
     },
-    gold: 200,
   },
 
   // ── 第三轮 ──
@@ -91,19 +87,18 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'pikeman', count: 4 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 6 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'Round 3 Repelled',
       body: 'The walls still hold, but the enemy is employing varied tactics to pressure us!',
-      tip: 'Victory bonus: 200g. Master defender rotation and positioning to maintain defensive rhythm.',
+      tip: 'Flexibly drag units and focus fire to reduce defensive pressure.',
     },
-    gold: 200,
   },
 
   // ── 第四轮 ──
@@ -116,9 +111,9 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 4 }, { type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 5 }, { type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
@@ -126,9 +121,8 @@ export const ROUNDS: RoundConfig[] = [
     ending: {
       title: 'Round 4 Repelled',
       body: 'The enemy is not aiming to breach the walls now, seeking to wear down our forces.',
-      tip: 'Victory bonus: 200g. Master defender rotation and positioning to maintain defensive rhythm.',
+      tip: 'Master defender rotation and positioning to maintain defensive rhythm.',
     },
-    gold: 200,
   },
 
   // ── 第五轮 ──
@@ -141,19 +135,18 @@ export const ROUNDS: RoundConfig[] = [
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 4 }, { type: 'archer', count: 4 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 3 }, { type: 'archer', count: 3 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'ram', count: 1 }, { type: 'pikeman', count: 5 }, { type: 'archer', count: 5 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
     ],
     waveGap: WAVE_GAP,
     ending: {
       title: 'Round 5 Repelled',
       body: 'The enemy has launched a multi-dimensional offensive.',
-      tip: 'Victory bonus: 200g. Flexibly switch targets and our units.',
+      tip: 'Time your focus fire well, flexibly switch targets and your units.',
     },
-    gold: 200,
   },
 
   // ── 第六轮 ──
@@ -165,11 +158,11 @@ export const ROUNDS: RoundConfig[] = [
     },
     waves: [
       { enemies: [{ type: 'sapper', count: 4 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'archer', count: 4 }, { type: 'pikeman', count: 4 }, { type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'archer', count: 6 }, { type: 'pikeman', count: 4 }, { type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'ram', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
-      { enemies: [{ type: 'pikeman', count: 4 }, { type: 'archer', count: 4 }, { type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
+      { enemies: [{ type: 'pikeman', count: 6 }, { type: 'archer', count: 4 }, { type: 'prayer', count: 1 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 3 }], spawnInterval: SPAWN_INTERVAL },
       { enemies: [{ type: 'sapper', count: 2 }], spawnInterval: SPAWN_INTERVAL },
     ],
@@ -177,9 +170,8 @@ export const ROUNDS: RoundConfig[] = [
     ending: {
       title: 'Round 6 Repelled',
       body: 'The enemy\'s tactics have grown more sophisticated.',
-      tip: 'Victory bonus: 200g. Choose focus-fire targets wisely and replenish your forces.',
+      tip: 'Choose focus-fire targets wisely and replenish your forces.',
     },
-    gold: 200,
   },
 ]
 
@@ -211,6 +203,5 @@ export function buildTestRound(wave: WaveEnemy[]): RoundConfig {
       title: 'Test Round Cleared',
       body: 'Wave eliminated. Adjust TEST_WAVE and redeploy to test other units.',
     },
-    gold: 0,
   }
 }
